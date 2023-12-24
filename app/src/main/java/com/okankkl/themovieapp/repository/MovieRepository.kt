@@ -6,6 +6,6 @@ import com.okankkl.themovieapp.response.MovieResponse
 
 interface MovieRepository
 {
-    fun getMovieList() : Resources
-    fun getMovieDetail(id : Int) : Movie?
+    suspend fun getMovieList() : Resources
+    suspend fun getMovieDetail(id : Int) : Resources
 }

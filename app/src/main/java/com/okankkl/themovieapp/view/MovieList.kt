@@ -55,20 +55,6 @@ fun MovieList(navController: NavController)
         movieListViewModel.getMoviesFromInternet()
     }
 
-    var movieList2 by remember {
-        mutableStateOf(
-            listOf<Int>(
-                R.drawable.movie,
-                R.drawable.movie,
-                R.drawable.movie,
-                R.drawable.movie2,
-                R.drawable.movie,
-                R.drawable.movie2,
-                R.drawable.movie,
-                R.drawable.movie2
-        ))
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,10 +62,10 @@ fun MovieList(navController: NavController)
 
         Search()
         when(movieList.value){
-            is Resources.Loading -> Resources.Loading
+            is Resources.Loading -> Loading()
             is Resources.Success -> {
                 PosterList(
-                    movieList = (movieList.value as Resources.Success).movieList,
+                    movieList = (movieList.value as Resources.Success).data as List<Movie>,
                     navController)
             }
             is Resources.Failed -> {
@@ -181,7 +167,7 @@ fun Poster(movie : Movie,onClick : (Int) -> Unit){
             model = IMAGE_BASE_URL+movie.posterPath,
             contentDescription = null,
             modifier = Modifier
-                .padding(5.dp)
+                .padding(15.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .clickable {
                     onClick(movie.id)
@@ -200,7 +186,8 @@ fun Loading(){
     ){
         CircularProgressIndicator(
             modifier = Modifier
-                .align(Alignment.Center)
+                .align(Alignment.Center),
+            color = Color.White
         )
     }
 }

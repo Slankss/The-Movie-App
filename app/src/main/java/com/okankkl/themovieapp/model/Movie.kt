@@ -25,22 +25,27 @@ data class Movie(
     @SerializedName("vote_count")
     var voteCount : Int
 ){
+
     @SerializedName("genre_ids")
     var genreIds : List<Int> = listOf<Int>()
     @SerializedName("belongs_to_collection")
-    var belongsToCollection : String? = null
-    var budget : String = ""
-    var genres : Genres? = null
+    var belongsToCollection : BelongsToCollection? = null
+    var budget : Int = 0
+    var genres : List<Genres> = listOf<Genres>()
     var homepage : String = ""
     @SerializedName("imdb_id")
     var imdbId : String = ""
     @SerializedName("production_companies")
-    var productionCompanies : Company? = null
+    var productionCompanies : List<Company> = listOf<Company>()
     @SerializedName("production_countries")
-    var productionCountries : Country? = null
+    var productionCountries : List<Country> = listOf<Country>()
     var status : String = ""
     var tagline : String = ""
     var videos : Videos? = null
+    var revenue : Int = 0
+    var runtime = 0
+    @SerializedName("spoken_languages")
+    var spokenLanguages : List<Language> = listOf<Language>()
 
 
     constructor(
@@ -54,13 +59,15 @@ data class Movie(
         this.genreIds = genreIds
     }
 
+
     constructor(
-        adult: String,backdropPath: String,id: Int,originalLanguage: String,
-        originalTitle: String,overview: String,popularity: Double,posterPath: String,
-        releaseDate: String, title: String,video: Boolean,voteAverage: Double,voteCount: Int,
-        belongsToCollection : String?,budget : String,genres : Genres,homepage : String,
-        imdbId : String,productionCompanies : Company,productionCountries : Country,
-        status : String,tagline : String,videos : Videos
+        adult: String,backdropPath: String,belongsToCollection : BelongsToCollection?,budget : Int,
+        genres : List<Genres>,homepage : String,id: Int,imdbId : String,originalLanguage: String,
+        originalTitle: String, overview: String, popularity: Double, posterPath: String,
+        productionCompanies : List<Company>,productionCountries : List<Country>,releaseDate: String,
+        revenue : Int,runtime : Int,spokenLanguages : List<Language>,status: String, tagline : String,
+        title: String,video: Boolean,voteAverage: Double, voteCount: Int,videos : Videos
+
         )
             : this(adult, backdropPath, id, originalLanguage, originalTitle, overview, popularity,
         posterPath, releaseDate, title, video, voteAverage, voteCount)
@@ -75,6 +82,11 @@ data class Movie(
         this.status = status
         this.tagline = tagline
         this.videos = videos
+        this.revenue = revenue
+        this.runtime = runtime
+        this.spokenLanguages = spokenLanguages
     }
+
+
 
 }

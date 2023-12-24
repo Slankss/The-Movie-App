@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,57 +34,91 @@ import androidx.navigation.NavController
 import com.okankkl.themovieapp.R
 import com.okankkl.themovieapp.ui.theme.LightBlue
 import androidx.compose.runtime.*
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.okankkl.themovieapp.components.YouTubePlayer
+import com.okankkl.themovieapp.model.Movie
+import com.okankkl.themovieapp.model.Resources
+import com.okankkl.themovieapp.model.Videos
+import com.okankkl.themovieapp.util.Util.IMAGE_BASE_URL
+import com.okankkl.themovieapp.viewModel.MovieDetailViewModel
 
 @Composable
 fun MovieDetail(navController: NavController,movieId : Int?)
 {
+    var movieViewModel : MovieDetailViewModel = hiltViewModel()
+    var movie = movieViewModel.movie.collectAsState()
+
+    SideEffect {
+        if(movieId != null){
+            movieViewModel.getMovie(movieId)
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 30.dp, vertical = 30.dp)
     ) {
-        TopHeader(poster = movieId)
-        Content()
+        when(movie.value){
+            is Resources.Loading -> Loading()
+            is Resources.Success -> {
+                Success(
+                    movie = (movie.value as Resources.Success).data as Movie
+                )
+            }
+            is Resources.Failed -> {
+                Failed(errorMsg = (movie.value as Resources.Failed).errorMsg)
+            }
+        }
+
+
     }
 
 }
 
 @Composable
-fun TopHeader(poster : Int?){
+fun Success(movie : Movie){
+    TopHeader(movie = movie)
+    Content(movie = movie)
+}
 
-    var movieRate = 7/2
+@Composable
+fun TopHeader(movie: Movie ){
+
+    var movieRate = movie.voteAverage / 2
 
     Row(
        modifier = Modifier
            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ){
-        poster?.let {
-            Box(
-                modifier = Modifier
-                    .weight(4f)
-                    .height(200.dp)
-                    .shadow(
-                        elevation = 6.dp,
-                        shape = RoundedCornerShape(20.dp)
-                    )
-                ,
 
-            ){
-                Image(
-                    painter = painterResource(id = it),
-                    contentDescription = null,
-                    contentScale = ContentScale.FillHeight,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
+        Box(
+            modifier = Modifier
+                .weight(4f)
+                .height(200.dp)
+                .shadow(
+                    elevation = 6.dp,
+                    shape = RoundedCornerShape(20.dp)
                 )
-            }
-
+            ,
+            ){
+            AsyncImage(
+                model = IMAGE_BASE_URL+movie.posterPath,
+                contentDescription = null,
+                contentScale = ContentScale.FillHeight,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(20.dp))
+            )
         }
+
         Column(
             modifier = Modifier
                 .weight(6f)
@@ -92,7 +128,7 @@ fun TopHeader(poster : Int?){
         ) {
             Text(
                 modifier = Modifier,
-                text = "Avengers: End Game",
+                text = movie.title,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.labelLarge.copy(
                     fontSize = 28.sp,
@@ -104,10 +140,11 @@ fun TopHeader(poster : Int?){
                 modifier = Modifier,
                 verticalAlignment = Alignment.CenterVertically
             ){
+                var point = String.format("%.1f",movie.voteAverage)
                 Text(
                     modifier = Modifier
                         .padding(end = 5.dp),
-                    text = "4.0",
+                    text = point,
                     style = MaterialTheme.typography.headlineLarge.copy(
                         fontSize = 28.sp,
                         color = LightBlue
@@ -122,6 +159,31 @@ fun TopHeader(poster : Int?){
                             tint = LightBlue,
                             modifier = Modifier
                                 .padding(end = 3.dp)
+
+                        )
+                    }
+                    else if(i - 1 <= movieRate){
+                        Icon(
+                            painter = painterResource(id = R.drawable.filled_star),
+                            contentDescription = "Filled star",
+                            modifier = Modifier
+                                .padding(end = 3.dp)
+                                .graphicsLayer(alpha=0.99f)
+                                .drawWithCache {
+                                    onDrawWithContent {
+                                        drawContent()
+                                        drawRect(
+                                            brush = Brush.horizontalGradient(
+                                                listOf(
+                                                    LightBlue,
+                                                    Color(0xFFFFFF),
+                                                    Color(0xFFFFFF)
+                                                )
+                                            ),
+                                            blendMode = BlendMode.SrcAtop
+                                        )
+                                    }
+                                }
 
                         )
                     }
@@ -146,7 +208,7 @@ fun TopHeader(poster : Int?){
 }
 
 @Composable
-fun Content(){
+fun Content(movie: Movie){
 
     var defaultColor = Color(0x99FFFFFF)
     var activeColor = Color(0xFFFFFFFF)
@@ -208,8 +270,12 @@ fun Content(){
         }
 
         when(activeHeader){
-            headerList[0] -> Trailers()
-            headerList[1] -> Overview()
+            headerList[0] -> {
+                movie.videos?.let {
+                    Trailers(it)
+                }
+            }
+            headerList[1] -> Overview(movie.overview)
             headerList[2] -> Detail()
         }
 
@@ -217,39 +283,38 @@ fun Content(){
 }
 
 @Composable
-fun Trailers(){
+fun Trailers(videos : Videos){
 
     Column(
         modifier = Modifier
+            .verticalScroll(rememberScrollState())
             .padding(top = 25.dp)
     ) {
-        Text(
-            modifier = Modifier
-                .padding(bottom = 10.dp, start = 10.dp),
-            text = "Trailer",
-            style = MaterialTheme.typography.labelLarge.copy(
-                color = Color(0xB3FFFFFF)
+        videos.results.forEach { video ->
+            Text(
+                modifier = Modifier
+                    .padding(bottom = 10.dp, start = 10.dp),
+                text = "Trailer",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    color = Color(0xB3FFFFFF)
+                )
             )
-        )
 
-        YouTubePlayer(
-            videoId = "zSWdZVtXT7E",
-            lifecycleOwner = LocalLifecycleOwner.current
-        )
+            YouTubePlayer(
+                videoId = video.id,
+                lifecycleOwner = LocalLifecycleOwner.current
+            )
+        }
+
     }
 
 }
 
 @Composable
-fun Overview(){
+fun Overview(overview : String){
 
     Text(
-        text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt " +
-                    "ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation " +
-                    "ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in " +
-                    "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur " +
-                    "sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est " +
-                    "laborum.",
+        text = overview,
         modifier = Modifier
             .padding(top = 25.dp)
             .fillMaxWidth(),

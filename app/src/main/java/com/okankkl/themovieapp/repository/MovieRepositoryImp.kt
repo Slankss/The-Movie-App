@@ -1,5 +1,6 @@
 package com.okankkl.themovieapp.repository
 
+import android.util.Log
 import com.okankkl.themovieapp.api.MovieApi
 import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.model.Resources
@@ -10,7 +11,7 @@ class MovieRepositoryImp
     @Inject
     constructor(var movieApi : MovieApi) : MovieRepository
 {
-    override fun getMovieList(): Resources
+    override suspend fun getMovieList(): Resources
     {
         return try {
             val response = movieApi.getPopularMovies()
@@ -27,8 +28,21 @@ class MovieRepositoryImp
         }
     }
 
-    override fun getMovieDetail(id: Int): Movie?
+    override suspend fun getMovieDetail(id: Int): Resources
     {
-        return null
+        return try
+        {
+            val response = movieApi.getMovie(id)
+            if(response.isSuccessful){
+                response.body()?.let {
+                    Resources.Success(data = it)
+                } ?: Resources.Failed(errorMsg = "Error")
+            }
+            else{
+                Resources.Failed(errorMsg = "Error")
+            }
+        } catch (e : Exception){
+            Resources.Failed(e.message!!)
+        }
     }
 }

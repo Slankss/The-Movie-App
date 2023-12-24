@@ -20,8 +20,8 @@ class AppModule
     @Provides
     fun provideRetrofit() : MovieApi{
         return Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(MovieApi::class.java)
     }
