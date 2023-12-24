@@ -1,17 +1,36 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.okankkl.themovieapp
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.okankkl.themovieapp.components.SearchTextField
+import com.okankkl.themovieapp.model.Pages
+import com.okankkl.themovieapp.ui.theme.BackgroundColor
 import com.okankkl.themovieapp.ui.theme.TheMovieAppTheme
+import com.okankkl.themovieapp.view.Favourites
+import com.okankkl.themovieapp.view.MovieDetail
+import com.okankkl.themovieapp.view.MovieList
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity()
 {
     override fun onCreate(savedInstanceState: Bundle?)
@@ -21,30 +40,50 @@ class MainActivity : ComponentActivity()
             TheMovieAppTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    Greeting("Android")
+                    AppActivity()
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier)
+fun AppActivity()
 {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+   val scope = rememberCoroutineScope()
+   var navController = rememberNavController()
+
+
+    Scaffold(
+        modifier = Modifier,
+        containerColor = BackgroundColor
+    ) {
+        NavHost(navController = navController, startDestination = Pages.MovieList.name){
+
+            composable(route = Pages.MovieList.name){
+                MovieList(navController = navController)
+            }
+
+            composable(
+                route = "${Pages.MovieDetail.name}/{movieId}",
+                arguments = listOf(navArgument("movieId"){
+                    type = NavType.IntType
+                })
+                )
+            { backStackEntry ->
+                MovieDetail(navController = navController,backStackEntry.arguments?.getInt("movieId"))
+            }
+
+            composable(route = Pages.Favourites.name){
+                Favourites(navController = navController)
+            }
+
+        }
+    }
+
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview()
-{
-    TheMovieAppTheme {
-        Greeting("Android")
-    }
-}
