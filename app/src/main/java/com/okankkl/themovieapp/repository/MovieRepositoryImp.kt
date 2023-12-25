@@ -1,10 +1,7 @@
 package com.okankkl.themovieapp.repository
 
-import android.util.Log
 import com.okankkl.themovieapp.api.MovieApi
-import com.okankkl.themovieapp.model.Movie
-import com.okankkl.themovieapp.model.Resources
-import com.okankkl.themovieapp.response.MovieResponse
+import com.okankkl.themovieapp.enum_sealed.Resources
 import javax.inject.Inject
 
 class MovieRepositoryImp

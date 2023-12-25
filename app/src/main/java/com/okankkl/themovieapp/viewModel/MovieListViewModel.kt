@@ -2,14 +2,11 @@ package com.okankkl.themovieapp.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.okankkl.themovieapp.api.MovieApi
-import com.okankkl.themovieapp.model.Resources
-import com.okankkl.themovieapp.repository.MovieRepository
+import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.repository.MovieRepositoryImp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,8 +21,7 @@ class MovieListViewModel
 
     fun getMoviesFromInternet(){
         viewModelScope.launch {
-            _movieList.update { Resources.Loading }
-            _movieList.update { repository.getMovieList() }
+            _movieList.value =  repository.getMovieList()
         }
 
     }

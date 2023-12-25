@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
@@ -18,7 +20,7 @@ fun YouTubePlayer(
     videoId : String,
     lifecycleOwner : LifecycleOwner
 ){
-
+    val videoState = remember{ mutableStateOf(false) }
     AndroidView(
         modifier = Modifier
             .fillMaxWidth()
@@ -26,14 +28,16 @@ fun YouTubePlayer(
         factory = { context ->
         YouTubePlayerView(context = context).apply {
             lifecycleOwner.lifecycle.addObserver(this)
-
-            addYouTubePlayerListener(object  : AbstractYouTubePlayerListener(){
+            var youtubePlayerListener = object  : AbstractYouTubePlayerListener(){
                 override fun onReady(youTubePlayer: YouTubePlayer)
                 {
                     youTubePlayer.loadVideo(videoId,0f)
                     super.onReady(youTubePlayer)
                 }
-            })
+            }
+            addYouTubePlayerListener(youtubePlayerListener)
+
+
         }
     })
 

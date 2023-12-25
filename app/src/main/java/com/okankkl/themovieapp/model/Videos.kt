@@ -22,5 +22,6 @@ data class Video(
     var size : Int,
     var type : String,
     var official : Boolean,
-    var id : String
+    var id : String,
+    var key : String
 )
