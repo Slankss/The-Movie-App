@@ -1,6 +1,5 @@
 package com.okankkl.themovieapp.view
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,7 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.okankkl.themovieapp.components.YouTubePlayer
 import com.okankkl.themovieapp.model.Movie
-import com.okankkl.themovieapp.model.Resources
+import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.Videos
 import com.okankkl.themovieapp.util.Util.IMAGE_BASE_URL
 import com.okankkl.themovieapp.viewModel.MovieDetailViewModel

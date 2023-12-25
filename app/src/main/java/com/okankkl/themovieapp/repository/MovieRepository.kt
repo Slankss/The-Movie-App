@@ -1,8 +1,6 @@
 package com.okankkl.themovieapp.repository
 
-import com.okankkl.themovieapp.model.Movie
-import com.okankkl.themovieapp.model.Resources
-import com.okankkl.themovieapp.response.MovieResponse
+import com.okankkl.themovieapp.enum_sealed.Resources
 
 interface MovieRepository
 {

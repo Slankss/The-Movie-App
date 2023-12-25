@@ -1,4 +1,4 @@
-package com.okankkl.themovieapp.model
+package com.okankkl.themovieapp.enum_sealed
 
 enum class Pages
 {

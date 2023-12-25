@@ -1,10 +1,8 @@
 package com.okankkl.themovieapp.viewModel
 
-import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.okankkl.themovieapp.model.Movie
-import com.okankkl.themovieapp.model.Resources
+import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.repository.MovieRepositoryImp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
