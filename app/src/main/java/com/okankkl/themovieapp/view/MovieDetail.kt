@@ -1,6 +1,5 @@
 package com.okankkl.themovieapp.view
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,17 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.VerticalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -48,13 +42,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.okankkl.themovieapp.components.YouTubePlayer
-import com.okankkl.themovieapp.enum_sealed.MovieDetailPages
 import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.Videos
 import com.okankkl.themovieapp.util.Util.IMAGE_BASE_URL
 import com.okankkl.themovieapp.viewModel.MovieDetailViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun MovieDetail(navController: NavController,movieId : Int?)
@@ -175,7 +167,7 @@ fun TopHeader(movie: Movie ){
                             contentDescription = "Filled star",
                             modifier = Modifier
                                 .padding(end = 3.dp)
-                                .graphicsLayer(alpha = 0.99f)
+                                .graphicsLayer(alpha=0.99f)
                                 .drawWithCache {
                                     onDrawWithContent {
                                         drawContent()
@@ -214,7 +206,6 @@ fun TopHeader(movie: Movie ){
 
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalStdlibApi::class)
 @Composable
 fun Content(movie: Movie){
 
@@ -223,53 +214,69 @@ fun Content(movie: Movie){
 
     var activeHeader by remember { mutableStateOf("Overview") }
     var headerList by remember { mutableStateOf(listOf("Trailer","Overview","Details")) }
-    val scope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(pageCount = {MovieDetailPages.values().size})
-    val selectedTabIndex = remember{ derivedStateOf { pagerState.currentPage }}
-
-    var videoState by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .padding(vertical = 30.dp)
     ) {
-        TabRow(
-            selectedTabIndex = selectedTabIndex.value,
-            modifier = Modifier.fillMaxWidth(),
-            containerColor = Color.Transparent
-        ) {
-            MovieDetailPages.values().forEachIndexed { index, currentTab ->
-                Tab(
-                    selected = selectedTabIndex.value == index,
-                    selectedContentColor = activeColor,
-                    unselectedContentColor = defaultColor,
-                    onClick = {
-                        scope.launch {
-                            pagerState.animateScrollToPage(currentTab.ordinal)
-                        }
-                    },
-                    text = {
-                        Text( text = currentTab.pageName)
+
+        Row(
+            modifier = Modifier
+
+                .fillMaxWidth()
+
+        ){
+            headerList.forEach {
+                Column(
+                    modifier = Modifier
+                        .weight(1f),
+                ) {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = 16.sp,
+                            color = if(it == activeHeader) activeColor else defaultColor
+                        ),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(bottom = 10.dp)
+                            .clickable {
+                                activeHeader = it
+                            }
+                    )
+                    if(it == activeHeader){
+                        Divider(
+                            modifier = Modifier
+                                .padding(top = 10.dp)
+                                .height(4.dp)
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(14.dp)),
+                            color = LightBlue
+                        )
                     }
-                )
-            }
-        }
+                    else{
+                        Divider(
+                            modifier = Modifier
+                                .padding(top = 10.dp)
+                                .fillMaxWidth()
+                        )
+                    }
 
-
-        HorizontalPager(
-            state = pagerState,
-
-        ) {
-            var current = MovieDetailPages.values()[selectedTabIndex.value]
-
-            when(current){
-                MovieDetailPages.Overview -> Overview(overview = movie.overview)
-                MovieDetailPages.Detail -> Detail()
-                MovieDetailPages.Trailer -> movie.videos?.let { Trailers(it) }
+                }
 
             }
         }
 
+        when(activeHeader){
+            headerList[0] -> {
+                movie.videos?.let {
+                    Trailers(it)
+                }
+            }
+            headerList[1] -> Overview(movie.overview)
+            headerList[2] -> Detail()
+        }
 
     }
 }
@@ -280,13 +287,9 @@ fun Trailers(videos : Videos){
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
-            .padding(top = 25.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(top = 25.dp)
     ) {
-        var trailer = videos.results.find { it.name == "Official Trailer" }
-
-        trailer?.let {
+        videos.results.forEach { video ->
             Text(
                 modifier = Modifier
                     .padding(bottom = 10.dp, start = 10.dp),
@@ -297,11 +300,10 @@ fun Trailers(videos : Videos){
             )
 
             YouTubePlayer(
-                videoId = it.key,
+                videoId = video.id,
                 lifecycleOwner = LocalLifecycleOwner.current
             )
         }
-
 
     }
 
