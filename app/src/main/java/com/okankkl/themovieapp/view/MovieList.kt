@@ -96,7 +96,7 @@ fun Search(){
                     width = Dimension.fillToConstraints
 
                 },
-            hint = "Hangi filmi arıyorsun?",
+            hint = "Which movie are you looking for?",
             value = search,
             onValueChange = {
                 search = it

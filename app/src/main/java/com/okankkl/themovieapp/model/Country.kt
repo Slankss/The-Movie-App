@@ -6,7 +6,5 @@ import kotlinx.serialization.Serializable
 
 
 data class Country(
-    @SerializedName("iso_3166_1")
-    var iso : String,
     var name : String
 )

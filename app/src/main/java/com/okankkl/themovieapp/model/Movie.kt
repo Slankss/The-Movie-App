@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName
 
 
 data class Movie(
-    var adult : String,
     @SerializedName("backdrop_path")
     var backdropPath : String,
     var id : Int,
@@ -28,11 +27,7 @@ data class Movie(
 
     @SerializedName("genre_ids")
     var genreIds : List<Int> = listOf<Int>()
-    @SerializedName("belongs_to_collection")
-    var belongsToCollection : BelongsToCollection? = null
-    var budget : Int = 0
     var genres : List<Genres> = listOf<Genres>()
-    var homepage : String = ""
     @SerializedName("imdb_id")
     var imdbId : String = ""
     @SerializedName("production_companies")
@@ -49,11 +44,11 @@ data class Movie(
 
 
     constructor(
-        adult: String,backdropPath: String,genreIds : List<Int>,id: Int,originalLanguage: String,
+        backdropPath: String,genreIds : List<Int>,id: Int,originalLanguage: String,
         originalTitle: String,overview: String,popularity: Double,posterPath: String,
         releaseDate: String, title: String,video: Boolean,voteAverage: Double,voteCount: Int,
                 )
-            : this(adult, backdropPath, id, originalLanguage, originalTitle, overview, popularity,
+            : this(backdropPath, id, originalLanguage, originalTitle, overview, popularity,
         posterPath, releaseDate, title, video, voteAverage, voteCount)
     {
         this.genreIds = genreIds
@@ -61,21 +56,17 @@ data class Movie(
 
 
     constructor(
-        adult: String,backdropPath: String,belongsToCollection : BelongsToCollection?,budget : Int,
-        genres : List<Genres>,homepage : String,id: Int,imdbId : String,originalLanguage: String,
+       backdropPath: String, genres : List<Genres>,id: Int,imdbId : String,originalLanguage: String,
         originalTitle: String, overview: String, popularity: Double, posterPath: String,
         productionCompanies : List<Company>,productionCountries : List<Country>,releaseDate: String,
         revenue : Int,runtime : Int,spokenLanguages : List<Language>,status: String, tagline : String,
         title: String,video: Boolean,voteAverage: Double, voteCount: Int,videos : Videos
 
         )
-            : this(adult, backdropPath, id, originalLanguage, originalTitle, overview, popularity,
+            : this(backdropPath, id, originalLanguage, originalTitle, overview, popularity,
         posterPath, releaseDate, title, video, voteAverage, voteCount)
     {
         this.genres = genres
-        this.belongsToCollection = belongsToCollection
-        this.budget = budget
-        this.homepage = homepage
         this.imdbId = imdbId
         this.productionCompanies = productionCompanies
         this.productionCountries = productionCountries

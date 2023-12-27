@@ -23,4 +23,22 @@ interface MovieApi
         @Query("append_to_response") appendToVideos: String = "videos"
     ) : Response<Movie>
 
+    @GET("/3/movie/top_rated")
+    suspend fun getTopRatedMovies(
+        @Query("api_key") apiKey : String = API_KEY
+    ) : Response<MovieResponse>
+
+    @GET("/3/movie/now_playing")
+    suspend fun getNowPlayingMovies(
+        @Query("api_key") apiKey : String = API_KEY
+    ) : Response<MovieResponse>
+
+    @GET("/3/movie/{id}/similar")
+    suspend fun getSimilarMovies(
+        @Path("id") id : Int,
+        @Query("api_key") apiKey : String = API_KEY
+    ) : Response<MovieResponse>
+
+
+
 }

@@ -2,6 +2,7 @@ package com.okankkl.themovieapp.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.okankkl.themovieapp.enum_sealed.MovieListType
 import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.repository.MovieRepositoryImp
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +22,7 @@ class MovieListViewModel
 
     fun getMoviesFromInternet(){
         viewModelScope.launch {
-            _movieList.value =  repository.getMovieList()
+            _movieList.value =  repository.getSimilarMovies(695721)
         }
 
     }

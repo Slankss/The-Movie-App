@@ -11,10 +11,7 @@ data class Videos(
 
 @Serializable
 data class Video(
-    @SerializedName("iso_639_1")
-    var iso639 : String,
-    @SerializedName("iso_3166_1")
-    var iso3166 : String,
+
     var name : String,
     @SerializedName("published_at")
     var publishedAt : String,

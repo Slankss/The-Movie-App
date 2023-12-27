@@ -42,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.okankkl.themovieapp.components.YouTubePlayer
+import com.okankkl.themovieapp.enum_sealed.MovieDetailPages
 import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.Videos
@@ -76,10 +77,7 @@ fun MovieDetail(navController: NavController,movieId : Int?)
                 Failed(errorMsg = (movie.value as Resources.Failed).errorMsg)
             }
         }
-
-
     }
-
 }
 
 @Composable
@@ -183,7 +181,6 @@ fun TopHeader(movie: Movie ){
                                         )
                                     }
                                 }
-
                         )
                     }
                     else{
@@ -212,8 +209,7 @@ fun Content(movie: Movie){
     var defaultColor = Color(0x99FFFFFF)
     var activeColor = Color(0xFFFFFFFF)
 
-    var activeHeader by remember { mutableStateOf("Overview") }
-    var headerList by remember { mutableStateOf(listOf("Trailer","Overview","Details")) }
+    var activeHeader by remember { mutableStateOf(MovieDetailPages.Overview) }
 
     Column(
         modifier = Modifier
@@ -226,26 +222,27 @@ fun Content(movie: Movie){
                 .fillMaxWidth()
 
         ){
-            headerList.forEach {
+            for(page in MovieDetailPages.values()){
+
                 Column(
                     modifier = Modifier
                         .weight(1f),
                 ) {
                     Text(
-                        text = it,
+                        text = page.pageName,
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontSize = 16.sp,
-                            color = if(it == activeHeader) activeColor else defaultColor
+                            color = if(page == activeHeader) activeColor else defaultColor
                         ),
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .padding(bottom = 10.dp)
                             .clickable {
-                                activeHeader = it
+                                activeHeader = page
                             }
                     )
-                    if(it == activeHeader){
+                    if(page == activeHeader){
                         Divider(
                             modifier = Modifier
                                 .padding(top = 10.dp)
@@ -269,13 +266,13 @@ fun Content(movie: Movie){
         }
 
         when(activeHeader){
-            headerList[0] -> {
+            MovieDetailPages.Trailer -> {
                 movie.videos?.let {
                     Trailers(it)
                 }
             }
-            headerList[1] -> Overview(movie.overview)
-            headerList[2] -> Detail()
+            MovieDetailPages.Overview -> Overview(movie.overview)
+            MovieDetailPages.Detail -> Detail()
         }
 
     }
@@ -283,30 +280,27 @@ fun Content(movie: Movie){
 
 @Composable
 fun Trailers(videos : Videos){
-
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
             .padding(top = 25.dp)
     ) {
-        videos.results.forEach { video ->
+        videos.results.firstOrNull { it.type == "Trailer"}?.let { video ->
             Text(
                 modifier = Modifier
                     .padding(bottom = 10.dp, start = 10.dp),
-                text = "Trailer",
+                text = video.name,
                 style = MaterialTheme.typography.labelLarge.copy(
                     color = Color(0xB3FFFFFF)
                 )
             )
 
             YouTubePlayer(
-                videoId = video.id,
+                videoId = video.key,
                 lifecycleOwner = LocalLifecycleOwner.current
             )
         }
-
     }
-
 }
 
 @Composable
