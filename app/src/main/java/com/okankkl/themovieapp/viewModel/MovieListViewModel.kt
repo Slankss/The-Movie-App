@@ -22,7 +22,8 @@ class MovieListViewModel
 
     fun getMoviesFromInternet(){
         viewModelScope.launch {
-            _movieList.value =  repository.getSimilarMovies(695721)
+            _movieList.value =  repository.getMovieList(MovieListType.Popular)
+                //repository.getSimilarMovies(695721)
         }
 
     }

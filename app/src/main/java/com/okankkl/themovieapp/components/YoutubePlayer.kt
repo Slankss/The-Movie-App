@@ -1,5 +1,6 @@
 package com.okankkl.themovieapp.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +12,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LifecycleOwner
+import com.okankkl.themovieapp.ui.theme.BackgroundColor
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
@@ -23,8 +25,10 @@ fun YouTubePlayer(
     val videoState = remember{ mutableStateOf(false) }
     AndroidView(
         modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp)),
+            .background(
+                color = BackgroundColor
+            )
+            .fillMaxWidth(),
         factory = { context ->
         YouTubePlayerView(context = context).apply {
             lifecycleOwner.lifecycle.addObserver(this)
