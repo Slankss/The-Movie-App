@@ -1,5 +1,6 @@
 package com.okankkl.themovieapp.api
 
+import com.google.android.gms.common.api.internal.ApiKey
 import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.response.MovieResponse
 import com.okankkl.themovieapp.util.Util.API_KEY
@@ -37,6 +38,11 @@ interface MovieApi
     suspend fun getSimilarMovies(
         @Path("id") id : Int,
         @Query("api_key") apiKey : String = API_KEY
+    ) : Response<MovieResponse>
+    
+    @GET("/3/trending/movie/week")
+    suspend fun getTrendingMovies(
+            @Query("api_key") aiKey : String = API_KEY
     ) : Response<MovieResponse>
 
 

@@ -16,6 +16,7 @@ class MovieRepositoryImp
                 MovieListType.Popular -> movieApi.getPopularMovies()
                 MovieListType.TopRated -> movieApi.getTopRatedMovies()
                 MovieListType.NowPlaying -> movieApi.getNowPlayingMovies()
+                MovieListType.Trending -> movieApi.getTrendingMovies()
             }
 
             if(response.isSuccessful){
@@ -66,4 +67,26 @@ class MovieRepositoryImp
             Resources.Failed(e.localizedMessage!!)
         }
     }
+    
+    override suspend fun getTrendingMovies(): Resources
+    {
+        return try {
+            val response = movieApi.getTrendingMovies()
+        
+            if(response.isSuccessful){
+                response.body()?.let {
+                    return@let Resources.Success(it.results)
+                } ?: Resources.Failed("Error")
+            }
+            else{
+                Resources.Failed("Error")
+            }
+        } catch (e:Exception){
+            Resources.Failed(e.localizedMessage!!)
+        }
+    }
+}
+
+fun getResource(){
+
 }

@@ -8,4 +8,5 @@ interface MovieRepository
     suspend fun getMovieList(movieListType: MovieListType) : Resources
     suspend fun getMovieDetail(id : Int) : Resources
     suspend fun getSimilarMovies(id : Int) : Resources
+    suspend fun getTrendingMovies() : Resources
 }

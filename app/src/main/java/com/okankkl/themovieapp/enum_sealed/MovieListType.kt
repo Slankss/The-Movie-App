@@ -1,8 +1,19 @@
 package com.okankkl.themovieapp.enum_sealed
 
-enum class MovieListType
+enum class MovieListType(
+    title : String
+)
 {
-    Popular,
-    TopRated,
-    NowPlaying
+    Popular(
+        title =  "Popular"
+    ),
+    TopRated(
+        title = "Top Rated"
+    ),
+    NowPlaying(
+        title = "Now Playing"
+    ),
+    Trending(
+        title = "Trending"
+    )
 }

@@ -334,7 +334,7 @@ fun SimilarMovies(similarMovies : List<Movie>,navController: NavController){
         items(similarMovies){ movie ->
             if(movie.backdropPath != null && movie.backdropPath!!.isNotEmpty())
                 SimilarMovie(movie = movie){ id ->
-                    navController.navigate("${Pages.MovieDetail.name}/${id}")
+                    navController.navigate("${Pages.MovieDetail.route}/${id}")
                 }
         }
     }
