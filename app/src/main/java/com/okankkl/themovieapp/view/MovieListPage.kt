@@ -103,8 +103,13 @@ fun TrendMovies(movies : List<Movie>){
     )
 
     LaunchedEffect(key1 = time, block = {
-        snapshotFlow { pageState.currentPage }.collect { page ->
-            time = 0
+        while(true){
+            if(time == 5){
+                pageState.animateScrollToPage(pageState.currentPage +1)
+                time = 0
+            }
+            delay(1000L)
+            time++
         }
     })
 
@@ -143,7 +148,7 @@ fun TrendMovies(movies : List<Movie>){
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .background(
-                        color = Color(0x24FFFFFF)
+                        color = Color(0x4D012022)
                     )
                     .fillMaxWidth()
                     .padding(5.dp),
@@ -175,11 +180,6 @@ fun TrendMovies(movies : List<Movie>){
             )
         }
     }
-    Text(
-        text = time.toString()
-
-    )
-
 }
 
 @Composable
