@@ -1,5 +1,6 @@
 package com.okankkl.themovieapp.components
 
+import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,14 +16,16 @@ import androidx.lifecycle.LifecycleOwner
 import com.okankkl.themovieapp.ui.theme.BackgroundColor
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.FullscreenListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFramePlayerOptions
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import androidx.compose.runtime.*
 
 @Composable
 fun YouTubePlayer(
     videoId : String,
     lifecycleOwner : LifecycleOwner
 ){
-    val videoState = remember{ mutableStateOf(false) }
     AndroidView(
         modifier = Modifier
             .background(
@@ -30,18 +33,20 @@ fun YouTubePlayer(
             )
             .fillMaxWidth(),
         factory = { context ->
+
         YouTubePlayerView(context = context).apply {
+            addYouTubePlayerListener(
+                object  : AbstractYouTubePlayerListener(){
+                    override fun onReady(youTubePlayer: YouTubePlayer)
+                    {
+                        youTubePlayer.loadVideo(videoId,0f)
+
+                        super.onReady(youTubePlayer)
+                    }
+
+
+                })
             lifecycleOwner.lifecycle.addObserver(this)
-            var youtubePlayerListener = object  : AbstractYouTubePlayerListener(){
-                override fun onReady(youTubePlayer: YouTubePlayer)
-                {
-                    youTubePlayer.loadVideo(videoId,0f)
-                    super.onReady(youTubePlayer)
-                }
-            }
-            addYouTubePlayerListener(youtubePlayerListener)
-
-
         }
     })
 

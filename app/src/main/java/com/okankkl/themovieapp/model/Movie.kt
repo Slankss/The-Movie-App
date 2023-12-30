@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class Movie(
     @SerializedName("backdrop_path")
-    var backdropPath : String,
+    var backdropPath : String?,
     var id : Int,
     @SerializedName("original_language")
     var originalLanguage : String,
@@ -14,7 +14,7 @@ data class Movie(
     var overview : String,
     var popularity : Double,
     @SerializedName("poster_path")
-    var posterPath : String,
+    var posterPath : String?,
     @SerializedName("release_date")
     var releaseDate : String,
     var title : String,
@@ -44,8 +44,8 @@ data class Movie(
 
 
     constructor(
-        backdropPath: String,genreIds : List<Int>,id: Int,originalLanguage: String,
-        originalTitle: String,overview: String,popularity: Double,posterPath: String,
+        backdropPath: String?,genreIds : List<Int>,id: Int,originalLanguage: String,
+        originalTitle: String,overview: String,popularity: Double,posterPath: String?,
         releaseDate: String, title: String,video: Boolean,voteAverage: Double,voteCount: Int,
                 )
             : this(backdropPath, id, originalLanguage, originalTitle, overview, popularity,
@@ -56,8 +56,8 @@ data class Movie(
 
 
     constructor(
-       backdropPath: String, genres : List<Genres>,id: Int,imdbId : String,originalLanguage: String,
-        originalTitle: String, overview: String, popularity: Double, posterPath: String,
+       backdropPath: String?, genres : List<Genres>,id: Int,imdbId : String,originalLanguage: String,
+        originalTitle: String, overview: String, popularity: Double, posterPath: String?,
         productionCompanies : List<Company>,productionCountries : List<Country>,releaseDate: String,
         revenue : Int,runtime : Int,spokenLanguages : List<Language>,status: String, tagline : String,
         title: String,video: Boolean,voteAverage: Double, voteCount: Int,videos : Videos

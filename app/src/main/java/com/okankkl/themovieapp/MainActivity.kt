@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -23,7 +24,7 @@ import com.okankkl.themovieapp.ui.theme.BackgroundColor
 import com.okankkl.themovieapp.ui.theme.TheMovieAppTheme
 import com.okankkl.themovieapp.view.Favourites
 import com.okankkl.themovieapp.view.MovieDetail
-import com.okankkl.themovieapp.view.MovieList
+import com.okankkl.themovieapp.view.Home
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -58,14 +59,14 @@ fun AppActivity()
         modifier = Modifier,
         containerColor = BackgroundColor
     ) {
-        NavHost(navController = navController, startDestination = Pages.MovieList.name){
+        NavHost(navController = navController, startDestination = Pages.Home.route){
 
-            composable(route = Pages.MovieList.name){
-                MovieList(navController = navController)
+            composable(route = Pages.Home.route){
+                Home(navController = navController)
             }
 
             composable(
-                route = "${Pages.MovieDetail.name}/{movieId}",
+                route = "${Pages.MovieDetail.route}/{movieId}",
                 arguments = listOf(navArgument("movieId"){
                     type = NavType.IntType
                 })
@@ -74,7 +75,7 @@ fun AppActivity()
                 MovieDetail(navController = navController,backStackEntry.arguments?.getInt("movieId"))
             }
 
-            composable(route = Pages.Favourites.name){
+            composable(route = Pages.Favourites.route){
                 Favourites(navController = navController)
             }
 

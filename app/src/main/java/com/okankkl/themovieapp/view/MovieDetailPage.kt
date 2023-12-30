@@ -1,31 +1,39 @@
 package com.okankkl.themovieapp.view
 
 import android.annotation.SuppressLint
+import android.widget.TableLayout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -34,28 +42,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.okankkl.themovieapp.R
-import com.okankkl.themovieapp.ui.theme.LightBlue
 import androidx.compose.runtime.*
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.toLowerCase
+import androidx.compose.ui.text.withStyle
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.okankkl.themovieapp.components.GenreBox
 import com.okankkl.themovieapp.components.YouTubePlayer
-import com.okankkl.themovieapp.enum_sealed.MovieDetailPages
+import com.okankkl.themovieapp.enum_sealed.Pages
 import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.enum_sealed.Resources
-import com.okankkl.themovieapp.model.Videos
 import com.okankkl.themovieapp.util.Util.IMAGE_BASE_URL
 import com.okankkl.themovieapp.viewModel.MovieDetailViewModel
-import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.util.Date
 import java.util.Locale
 
 @Composable
@@ -63,6 +65,7 @@ fun MovieDetail(navController: NavController,movieId : Int?)
 {
     var movieViewModel : MovieDetailViewModel = hiltViewModel()
     var movie = movieViewModel.movie.collectAsState()
+    var similarMovies = movieViewModel.similarMovies.collectAsState()
 
     SideEffect {
         if(movieId != null){
@@ -70,31 +73,37 @@ fun MovieDetail(navController: NavController,movieId : Int?)
         }
     }
 
-    when(movie.value){
-        is Resources.Loading -> Loading()
-        is Resources.Success -> {
-            Success(
-                movie = (movie.value as Resources.Success).data as Movie
-            )
-        }
-        is Resources.Failed -> {
-            Failed(errorMsg = (movie.value as Resources.Failed).errorMsg)
-        }
-    }
-}
-
-@Composable
-fun Success(movie : Movie){
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ){
-        TopHeader(movie = movie)
-        Content(movie = movie)
+        when(movie.value){
+            is Resources.Loading -> Loading()
+            is Resources.Success -> {
+                TopHeader(
+                    movie = (movie.value as Resources.Success).data as Movie
+                )
+                Content(movie = (movie.value as Resources.Success).data as Movie)
+            }
+            is Resources.Failed -> {
+                Failed(errorMsg = (movie.value as Resources.Failed).errorMsg)
+            }
+        }
+        when(similarMovies.value){
+            is Resources.Loading -> Loading()
+            is Resources.Success -> {
+                SimilarMovies(
+                    similarMovies = (similarMovies.value as Resources.Success).data as List<Movie>,
+                    navController = navController)
+            }
+            is Resources.Failed -> {
+                Failed(errorMsg = (movie.value as Resources.Failed).errorMsg)
+            }
+        }
     }
-
 }
+
 
 @Composable
 fun TopHeader(movie: Movie ){
@@ -109,21 +118,11 @@ fun TopHeader(movie: Movie ){
                 YouTubePlayer(videoId = video.key, lifecycleOwner = LocalLifecycleOwner.current)
             }
         }
-        Icon(
-            painter = painterResource(id = R.drawable.ic_fullscreen),
-            contentDescription = "Full screen",
-            tint = Color.White,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = 25.dp, bottom = 65.dp)
-        )
 
     }
-
-
-
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun Content(movie: Movie){
 
@@ -181,7 +180,7 @@ fun Content(movie: Movie){
         )
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(50.dp)
+            horizontalArrangement = Arrangement.spacedBy(25.dp)
         ){
             Column(){
                 Text(
@@ -209,6 +208,19 @@ fun Content(movie: Movie){
                     modifier = Modifier
                         .padding(bottom= 10.dp)
                 )
+
+                FlowRow(
+                    maxItemsInEachRow = 2,
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    movie.genres.forEach { genre ->
+                        GenreBox(
+                            modifier = Modifier
+                                .padding(end = 15.dp),
+                            genreName = genre.name
+                        )
+                    }
+                }
             }
         }
 
@@ -303,6 +315,86 @@ fun Content(movie: Movie){
     }
 }
 
+@Composable
+fun SimilarMovies(similarMovies : List<Movie>,navController: NavController){
+
+    Text(
+        text = "Similar movies",
+        style = MaterialTheme.typography.labelLarge.copy(
+            fontSize = 16.sp
+        ),
+        modifier = Modifier
+            .padding(bottom = 15.dp, start = 25.dp,end = 25.dp)
+    )
+
+    LazyRow(
+        modifier = Modifier
+            .padding(start = 25.dp , end = 25.dp, bottom = 10.dp)
+    ){
+        items(similarMovies){ movie ->
+            if(movie.backdropPath != null && movie.backdropPath!!.isNotEmpty())
+                SimilarMovie(movie = movie){ id ->
+                    navController.navigate("${Pages.MovieDetail.name}/${id}")
+                }
+        }
+    }
+}
+
+@Composable
+fun SimilarMovie(movie: Movie,onClick : (Int) -> Unit){
+
+    Column(
+        modifier = Modifier
+            .padding(end = 20.dp)
+            .size(150.dp)
+
+    ){
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(16.dp))
+                .clickable {
+                    onClick(movie.id)
+                }
+        ){
+            AsyncImage(
+                model = IMAGE_BASE_URL+movie.backdropPath,
+                contentDescription = "movie image",
+                modifier = Modifier,
+                contentScale = ContentScale.Crop
+            )
+        }
+        Text(
+            modifier = Modifier
+                .padding(top = 10.dp),
+            text = buildAnnotatedString {
+                withStyle(
+                    style = SpanStyle(
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color.White
+                    )
+
+                ){
+                    append(movie.title)
+                }
+                withStyle(
+                    style = SpanStyle(
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color(0xFFBCBCBC)
+                    )
+                ){
+                    val date = LocalDate.parse(movie.releaseDate)
+                    val year = date.year.toString()
+                    append(" ($year)")
+                }
+            }
+        )
+
+
+    }
+
+}
 
 @SuppressLint("SimpleDateFormat")
 fun convertDate(dateString : String) : String{
@@ -311,4 +403,33 @@ fun convertDate(dateString : String) : String{
         .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
     return "$month ${date.dayOfMonth}, ${date.year}"
 
+}
+
+@Composable
+private fun Loading(){
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+    ){
+        CircularProgressIndicator(
+            modifier = Modifier
+                .padding(vertical = 20.dp)
+                .align(Alignment.Center)
+        )
+    }
+}
+
+@Composable
+private fun Failed(errorMsg : String){
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+    ){
+        Text(
+            text = errorMsg,
+            fontSize = 18.sp,
+            modifier = Modifier
+                .align(Alignment.Center)
+        )
+    }
 }
