@@ -13,3 +13,4 @@ val Transparent = Color(0xFFFFFF)
 
 val BackgroundColor = Color(0xFF012022)
 val LightBlue = Color(0xFF4BEDF7)
+val StatusBarColor = Color(0xFF010E0F)

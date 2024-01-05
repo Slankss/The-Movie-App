@@ -112,6 +112,8 @@ dependencies {
     implementation "com.google.code.gson:gson:2.10.1"
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
+    // Data Store
+    implementation "androidx.datastore:datastore-preferences:1.0.0"
 
     // Coil
     implementation("io.coil-kt:coil-compose:2.5.0")

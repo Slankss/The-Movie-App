@@ -1,10 +1,8 @@
 package com.okankkl.themovieapp.view
 
-import android.annotation.SuppressLint
-import android.widget.TableLayout
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,16 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,7 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -43,11 +35,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.okankkl.themovieapp.R
 import androidx.compose.runtime.*
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.window.Popup
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.okankkl.themovieapp.components.GenreBox
@@ -58,14 +52,16 @@ import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.util.Util.IMAGE_BASE_URL
 import com.okankkl.themovieapp.viewModel.MovieDetailViewModel
 import java.time.LocalDate
-import java.util.Locale
+import com.okankkl.themovieapp.extensions.*
+import com.okankkl.themovieapp.components.*
+import com.okankkl.themovieapp.ui.theme.StatusBarColor
 
 @Composable
 fun MovieDetail(navController: NavController,movieId : Int?)
 {
-    var movieViewModel : MovieDetailViewModel = hiltViewModel()
-    var movie = movieViewModel.movie.collectAsState()
-    var similarMovies = movieViewModel.similarMovies.collectAsState()
+    val movieViewModel : MovieDetailViewModel = hiltViewModel()
+    val movie = movieViewModel.movie.collectAsState()
+    val similarMovies = movieViewModel.similarMovies.collectAsState()
 
     SideEffect {
         if(movieId != null){
@@ -78,13 +74,35 @@ fun MovieDetail(navController: NavController,movieId : Int?)
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ){
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = StatusBarColor
+                )
+        ){
+            Icon(
+                painterResource(id = R.drawable.ic_back),
+                contentDescription = "Return home page",
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(start = 20.dp, bottom = 10.dp)
+                    .size(36.dp)
+                    .blur(1.dp)
+                    .clickable {
+                        navController.popBackStack(Pages.Home.route, inclusive = false)
+                    },
+                tint = Color.LightGray
+            )
+        }
+
         when(movie.value){
             is Resources.Loading -> Loading()
             is Resources.Success -> {
-                TopHeader(
+                MovieTrailer(
                     movie = (movie.value as Resources.Success).data as Movie
                 )
-                Content(movie = (movie.value as Resources.Success).data as Movie)
+                MovieContent(movie = (movie.value as Resources.Success).data as Movie)
             }
             is Resources.Failed -> {
                 Failed(errorMsg = (movie.value as Resources.Failed).errorMsg)
@@ -106,8 +124,7 @@ fun MovieDetail(navController: NavController,movieId : Int?)
 
 
 @Composable
-fun TopHeader(movie: Movie ){
-
+fun MovieTrailer(movie: Movie ){
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,6 +134,18 @@ fun TopHeader(movie: Movie ){
             results.firstOrNull { it.type == "Trailer"}?.let { video ->
                 YouTubePlayer(videoId = video.key, lifecycleOwner = LocalLifecycleOwner.current)
             }
+                ?: Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ){
+                AsyncImage(
+                    model = IMAGE_BASE_URL+movie.backdropPath,
+                    contentDescription = "Movie Poster",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .height(200.dp)
+                )
+            }
         }
 
     }
@@ -124,11 +153,12 @@ fun TopHeader(movie: Movie ){
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun Content(movie: Movie){
+fun MovieContent(movie: Movie){
 
     Column(
         modifier = Modifier
-            .padding(vertical = 15.dp, horizontal = 25.dp)
+            .padding(vertical = 15.dp, horizontal = 25.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
 
         Text(
@@ -140,8 +170,7 @@ fun Content(movie: Movie){
         )
 
         Row(
-            modifier = Modifier
-                .padding(top = 20.dp),
+            modifier = Modifier,
             verticalAlignment = Alignment.CenterVertically
         ){
             Icon(
@@ -173,24 +202,17 @@ fun Content(movie: Movie){
 
         Divider(
             modifier = Modifier
-                .padding(vertical = 20.dp)
                 .background(color = Color.White)
                 .height(1.dp)
                 .fillMaxWidth()
         )
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(25.dp)
+            horizontalArrangement = Arrangement.spacedBy(25.dp),
+            modifier = Modifier
         ){
-            Column(){
-                Text(
-                    text = "Release date",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontSize = 16.sp
-                    ),
-                    modifier = Modifier
-                        .padding(bottom= 10.dp)
-                )
+            Column {
+                ContentHeader(header = "Release date")
                 Text(
                     text = convertDate(movie.releaseDate),
                     style = MaterialTheme.typography.bodyLarge.copy(
@@ -199,16 +221,8 @@ fun Content(movie: Movie){
                     )
                 )
             }
-            Column(){
-                Text(
-                    text = "Genre",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontSize = 16.sp
-                    ),
-                    modifier = Modifier
-                        .padding(bottom= 10.dp)
-                )
-
+            Column {
+                ContentHeader(header = "Genre")
                 FlowRow(
                     maxItemsInEachRow = 2,
                     verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -226,34 +240,25 @@ fun Content(movie: Movie){
 
         Divider(
             modifier = Modifier
-                .padding(vertical = 20.dp)
                 .background(color = Color.White)
                 .height(1.dp)
                 .fillMaxWidth()
         )
 
-        Text(
-            text = "Overview",
-            style = MaterialTheme.typography.labelLarge.copy(
-                fontSize = 16.sp
-            ),
-            modifier = Modifier
-                .padding(bottom= 10.dp)
-        )
-
-        Text(
-            text = movie.overview,
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Light,
-                color = Color(0xFFBCBCBC),
-                textAlign = TextAlign.Justify
+        Column {
+            ContentHeader(header = "Overview")
+            Text(
+                text = movie.overview,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Light,
+                    color = Color(0xFFBCBCBC),
+                    textAlign = TextAlign.Justify
+                )
             )
-        )
-
+        }
         Row(
-            modifier = Modifier
-                .padding(vertical = 20.dp),
+            modifier = Modifier,
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(30.dp)
         ){
@@ -305,14 +310,21 @@ fun Content(movie: Movie){
                         .padding(start = 5.dp)
                 )
             }
-
-
-
         }
 
-
-
     }
+}
+
+@Composable
+fun ContentHeader(header : String){
+    Text(
+        text = header,
+        style = MaterialTheme.typography.labelLarge.copy(
+            fontSize = 16.sp
+        ),
+        modifier = Modifier
+            .padding(bottom= 10.dp)
+    )
 }
 
 @Composable
@@ -329,43 +341,49 @@ fun SimilarMovies(similarMovies : List<Movie>,navController: NavController){
 
     LazyRow(
         modifier = Modifier
-            .padding(start = 25.dp , end = 25.dp, bottom = 10.dp)
     ){
-        items(similarMovies){ movie ->
-            if(movie.backdropPath != null && movie.backdropPath!!.isNotEmpty())
-                SimilarMovie(movie = movie){ id ->
-                    navController.navigate("${Pages.MovieDetail.route}/${id}")
-                }
+        val filterSimilarList = similarMovies
+            .filter { it.backdropPath != null && it.backdropPath!!.isNotEmpty()}
+
+        itemsIndexed(filterSimilarList){index,movie ->
+            SimilarMovie(
+                movie = movie,
+                index = index
+            ){ id ->
+                   navController.navigate("${Pages.MovieDetail.route}/${id}")
+            }
+
         }
     }
 }
 
 @Composable
-fun SimilarMovie(movie: Movie,onClick : (Int) -> Unit){
+fun SimilarMovie(movie: Movie,index : Int,onClick : (Int) -> Unit){
 
     Column(
         modifier = Modifier
-            .padding(end = 20.dp)
-            .size(150.dp)
-
-    ){
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(16.dp))
-                .clickable {
-                    onClick(movie.id)
-                }
-        ){
-            AsyncImage(
-                model = IMAGE_BASE_URL+movie.backdropPath,
-                contentDescription = "movie image",
-                modifier = Modifier,
-                contentScale = ContentScale.Crop
+            .padding(
+                start = if(index == 0) 20.dp else 0.dp,
+                end = 20.dp,
+                bottom = 10.dp
             )
+    ){
+        Poster(
+            posterPath = movie.backdropPath!!,
+            id = movie.id,
+            modifier = Modifier
+                .size(100.dp)
+
+        ){
+             onClick(it)
         }
+
         Text(
             modifier = Modifier
-                .padding(top = 10.dp),
+                .width(100.dp)
+                .padding(
+                    top = 10.dp
+                ),
             text = buildAnnotatedString {
                 withStyle(
                     style = SpanStyle(
@@ -396,40 +414,5 @@ fun SimilarMovie(movie: Movie,onClick : (Int) -> Unit){
 
 }
 
-@SuppressLint("SimpleDateFormat")
-fun convertDate(dateString : String) : String{
-    val date = LocalDate.parse(dateString)
-    val month = date.month.name.lowercase(Locale.ROOT)
-        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
-    return "$month ${date.dayOfMonth}, ${date.year}"
 
-}
 
-@Composable
-private fun Loading(){
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-    ){
-        CircularProgressIndicator(
-            modifier = Modifier
-                .padding(vertical = 20.dp)
-                .align(Alignment.Center)
-        )
-    }
-}
-
-@Composable
-private fun Failed(errorMsg : String){
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-    ){
-        Text(
-            text = errorMsg,
-            fontSize = 18.sp,
-            modifier = Modifier
-                .align(Alignment.Center)
-        )
-    }
-}

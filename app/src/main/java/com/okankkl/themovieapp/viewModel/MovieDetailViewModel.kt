@@ -3,8 +3,7 @@ package com.okankkl.themovieapp.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.okankkl.themovieapp.enum_sealed.Resources
-import com.okankkl.themovieapp.repository.MovieRepositoryImp
-import com.okankkl.themovieapp.response.MovieResponse
+import com.okankkl.themovieapp.repository.RepositoryImp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MovieDetailViewModel
     @Inject
-    constructor(var repository: MovieRepositoryImp
+    constructor(var repository: RepositoryImp
 ) : ViewModel()
 {
     private val _movie = MutableStateFlow<Resources>(Resources.Loading)

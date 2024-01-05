@@ -19,11 +19,19 @@ enum class Pages(
         title = "Favourites"
     ),
     MovieList(
-        route = "home",
+        route = "home_movies",
         title = "Movies"
     ),
     TvSeriesList(
-        route = "home",
+        route = "home_tv_series",
         title = "Tv Series"
+    ),
+    TvSeriesDetail(
+        route = "tv_series",
+        title = "Tv Series"
+    ),
+    ViewAll(
+        route = "view_all",
+        title = "View All"
     )
 }

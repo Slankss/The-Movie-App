@@ -1,81 +1,48 @@
 package com.okankkl.themovieapp.model
 
+import androidx.room.Entity
 import com.google.gson.annotations.SerializedName
 
-
+@Entity(tableName = "Movie")
 data class Movie(
     @SerializedName("backdrop_path")
     var backdropPath : String?,
     var id : Int,
-    @SerializedName("original_language")
-    var originalLanguage : String,
-    @SerializedName("original_title")
-    var originalTitle : String,
-    var overview : String,
     var popularity : Double,
     @SerializedName("poster_path")
     var posterPath : String?,
     @SerializedName("release_date")
     var releaseDate : String,
     var title : String,
-    var video : Boolean,
     @SerializedName("vote_average")
-    var voteAverage : Double,
-    @SerializedName("vote_count")
-    var voteCount : Int
+    var voteAverage : Double
 ){
-
-    @SerializedName("genre_ids")
-    var genreIds : List<Int> = listOf<Int>()
-    var genres : List<Genres> = listOf<Genres>()
+    var genres : List<Genres> = listOf()
     @SerializedName("imdb_id")
     var imdbId : String = ""
-    @SerializedName("production_companies")
-    var productionCompanies : List<Company> = listOf<Company>()
-    @SerializedName("production_countries")
-    var productionCountries : List<Country> = listOf<Country>()
     var status : String = ""
-    var tagline : String = ""
     var videos : Videos? = null
     var revenue : Int = 0
     var runtime = 0
-    @SerializedName("spoken_languages")
-    var spokenLanguages : List<Language> = listOf<Language>()
-
+    var overview : String = ""
 
     constructor(
-        backdropPath: String?,genreIds : List<Int>,id: Int,originalLanguage: String,
-        originalTitle: String,overview: String,popularity: Double,posterPath: String?,
-        releaseDate: String, title: String,video: Boolean,voteAverage: Double,voteCount: Int,
-                )
-            : this(backdropPath, id, originalLanguage, originalTitle, overview, popularity,
-        posterPath, releaseDate, title, video, voteAverage, voteCount)
-    {
-        this.genreIds = genreIds
-    }
-
-
-    constructor(
-       backdropPath: String?, genres : List<Genres>,id: Int,imdbId : String,originalLanguage: String,
-        originalTitle: String, overview: String, popularity: Double, posterPath: String?,
-        productionCompanies : List<Company>,productionCountries : List<Country>,releaseDate: String,
-        revenue : Int,runtime : Int,spokenLanguages : List<Language>,status: String, tagline : String,
-        title: String,video: Boolean,voteAverage: Double, voteCount: Int,videos : Videos
-
-        )
-            : this(backdropPath, id, originalLanguage, originalTitle, overview, popularity,
-        posterPath, releaseDate, title, video, voteAverage, voteCount)
+       backdropPath: String?, genres : List<Genres>,id: Int,imdbId : String,
+       overview: String, popularity: Double, posterPath: String?,
+       releaseDate: String,
+       revenue : Int,runtime : Int,status: String,
+       title: String,voteAverage: Double, videos : Videos
+    )
+            : this(backdropPath, id, popularity, posterPath, releaseDate, title, voteAverage)
     {
         this.genres = genres
         this.imdbId = imdbId
-        this.productionCompanies = productionCompanies
-        this.productionCountries = productionCountries
         this.status = status
-        this.tagline = tagline
         this.videos = videos
         this.revenue = revenue
         this.runtime = runtime
-        this.spokenLanguages = spokenLanguages
+        this.overview = overview
+
     }
 
 

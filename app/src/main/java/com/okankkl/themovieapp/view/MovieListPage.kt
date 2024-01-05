@@ -13,15 +13,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerDefaults
-import androidx.compose.foundation.pager.PagerSnapDistance
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,52 +36,78 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.okankkl.themovieapp.enum_sealed.Pages
 import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.Movie
-import com.okankkl.themovieapp.ui.theme.BackgroundColor
 import com.okankkl.themovieapp.ui.theme.LightBlue
 import com.okankkl.themovieapp.util.Util
-import com.okankkl.themovieapp.viewModel.MovieListViewModel
+import com.okankkl.themovieapp.viewModel.listViewModel
 import androidx.compose.runtime.*
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import kotlinx.coroutines.delay
+import com.okankkl.themovieapp.enum_sealed.Categories
+import com.okankkl.themovieapp.enum_sealed.DataType
+import com.okankkl.themovieapp.components.*
 
 @Composable
-fun MovieList(navController: NavController){
+fun MovieList(navController: NavController,listViewModel: listViewModel){
 
-    val movieListViewModel : MovieListViewModel = hiltViewModel()
-    val movieList = movieListViewModel.movieList.collectAsState()
+    val popularMovies = listViewModel.popularMovies.collectAsState()
+    val trendMovies = listViewModel.trendMovies.collectAsState()
+    val topRatedMovies = listViewModel.topRatedMovies.collectAsState()
+    val nowPlayingMovies = listViewModel.nowPlayingMovies.collectAsState()
+
+    fun currentList(moviesType: Categories) : Resources?{
+        return when(moviesType){
+            Categories.Popular -> popularMovies.value
+            Categories.Trending -> trendMovies.value
+            Categories.TopRated -> topRatedMovies.value
+            Categories.NowPlaying -> nowPlayingMovies.value
+            else -> null
+        }
+    }
 
     SideEffect {
-        movieListViewModel.getMoviesFromInternet()
+        listViewModel.getMovies()
+
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(top = 10.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
 
-        when(movieList.value){
-            is Resources.Loading -> Loading()
-            is Resources.Success -> {
-                TrendMovies(movies = (movieList.value as Resources.Success).data as List<Movie>)
+        Categories.values().forEach { type ->
+            val currentState = currentList(type)
+            if(currentState != null){
 
-                PosterList(
-                    movieList = (movieList.value as Resources.Success).data as List<Movie>,
-                    navController)
-
-            }
-            is Resources.Failed -> {
-                Failed(
-                    errorMsg = (movieList.value as Resources.Failed).errorMsg
-                )
+                when(currentState){
+                    is Resources.Loading -> Loading()
+                    is Resources.Success -> {
+                        if(type == Categories.Trending){
+                            TrendMovies(
+                                movies = (currentState as Resources.Success).data as List<Movie>,
+                                navController = navController
+                            )
+                        }
+                        else{
+                            MovieList(
+                                movieList = (currentState as Resources.Success).data as List<Movie>,
+                                moviesType = type,
+                                navController)
+                        }
+                    }
+                    is Resources.Failed -> {
+                        Failed(
+                            errorMsg = (currentState as Resources.Failed).errorMsg
+                        )
+                    }
+                }
             }
         }
-
 
     }
 
@@ -90,19 +115,20 @@ fun MovieList(navController: NavController){
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TrendMovies(movies : List<Movie>){
+fun TrendMovies(movies : List<Movie>,navController: NavController){
 
     var time by remember { mutableStateOf(0) }
 
     var pageState = rememberPagerState(
         pageCount = {
-            4
+            movies.size
         },
         initialPage = 0,
 
     )
 
     LaunchedEffect(key1 = time, block = {
+        /*
         while(true){
             if(time == 5){
                 pageState.animateScrollToPage(pageState.currentPage +1)
@@ -111,92 +137,76 @@ fun TrendMovies(movies : List<Movie>){
             delay(1000L)
             time++
         }
+
+         */
     })
-
-
-    HorizontalPager(
-        state = pageState,
-        modifier = Modifier.fillMaxWidth()
-
-    )
-    { page ->
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 25.dp)
-                .height(200.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .shadow(
-                    elevation = 4.dp,
-                    shape = RoundedCornerShape(12.dp)
-                ),
-        ){
-            AsyncImage(
-                model = Util.IMAGE_BASE_URL +movies[page].backdropPath,
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .clickable {
-                        //onClick(movie.id)
-                    },
-                contentScale = ContentScale.Crop
-            )
-            Text(
-                text = movies[page].title,
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .background(
-                        color = Color(0x4D012022)
-                    )
-                    .fillMaxWidth()
-                    .padding(5.dp),
-                style = MaterialTheme.typography.headlineLarge.copy(
-
-                ),
-
-
-            )
-        }
-    }
-    Row(
+    Column(
         modifier = Modifier
-            .wrapContentHeight()
-            .fillMaxWidth()
-            .padding(bottom = 10.dp, top = 10.dp),
-        horizontalArrangement = Arrangement.Center
-    ){
-        repeat(pageState.pageCount) { iteration ->
-            val color = if(pageState.currentPage == iteration) LightBlue else Color.White
+            .padding(top = 10.dp)
+    ) {
+        HorizontalPager(
+            state = pageState,
+            modifier = Modifier.fillMaxWidth()
+        )
+        { page ->
+
             Box(
                 modifier = Modifier
-                    .padding(2.dp)
-                    .clip(CircleShape)
-                    .background(
-                        color = color
+                    .fillMaxWidth()
+                    .padding(horizontal = 25.dp)
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .shadow(
+                        elevation = 4.dp,
+                        shape = RoundedCornerShape(12.dp)
+                    ),
+            ){
+                AsyncImage(
+                    model = Util.IMAGE_BASE_URL +movies[page].backdropPath,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable {
+                            navController.navigate("${Pages.MovieDetail.route}/${movies[page].id}")
+                        },
+                    contentScale = ContentScale.Crop
+                )
+                Text(
+                    text = movies[page].title,
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .background(
+                            color = Color(0x4D012022)
+                        )
+                        .fillMaxWidth()
+                        .padding(5.dp),
+                    style = MaterialTheme.typography.headlineLarge.copy(
+
+                    ),
+
+
                     )
-                    .size(8.dp)
-            )
+            }
         }
-    }
-}
-
-@Composable
-fun PosterList(movieList : List<Movie>, navController: NavController){
-
-    LazyVerticalGrid(
-        modifier = Modifier
-            .padding(horizontal = 5.dp),
-        columns = GridCells.Fixed(2)
-    ){
-        items(movieList){movie ->
-            if(movie.posterPath != null && movie.posterPath!!.isNotEmpty()){
-                Poster(
-                    movie = movie
-                ){ movieId ->
-                    navController.navigate("${Pages.MovieDetail.route}/${movieId}")
-                }
+        Row(
+            modifier = Modifier
+                .wrapContentHeight()
+                .fillMaxWidth()
+                .padding(bottom = 10.dp, top = 20.dp),
+            horizontalArrangement = Arrangement.Center
+        ){
+            repeat(pageState.pageCount) { iteration ->
+                val color = if(pageState.currentPage == iteration) LightBlue else Color(0x24FFFFFF)
+                Box(
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .clip(CircleShape)
+                        .background(
+                            color = color
+                        )
+                        .size(8.dp)
+                )
             }
         }
     }
@@ -204,32 +214,70 @@ fun PosterList(movieList : List<Movie>, navController: NavController){
 }
 
 @Composable
-fun Poster(movie : Movie, onClick : (Int) -> Unit){
+fun MovieList(movieList : List<Movie>,moviesType : Categories, navController: NavController){
 
-    Box(
+    Column(
         modifier = Modifier
-            .height(250.dp)
+            .padding(bottom = 10.dp)
     ){
-        AsyncImage(
-            model = Util.IMAGE_BASE_URL +movie.posterPath,
-            contentDescription = null,
+        Box(
             modifier = Modifier
-                .padding(15.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .clickable {
-                    onClick(movie.id)
-                },
-            contentScale = ContentScale.FillBounds
-        )
-    }
+                .fillMaxWidth()
+                .padding(bottom = 10.dp)
+        ){
+            Text(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(start = 15.dp),
+                text = moviesType.title,
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    fontSize = 16.sp
+                )
+            )
+            Text(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 15.dp)
+                    .clickable {
+                        navController.navigate("${Pages.ViewAll.route}/${DataType.Movie().name}&${moviesType.title}")
+                    },
+                text = "view all",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = 14.sp,
+                    color = Color(0xB3FFFFFF)
+                )
+            )
+        }
+        LazyRow(
+            modifier = Modifier
+        ){
+            itemsIndexed(movieList){index ,movie ->
+                if(movie.posterPath != null && movie.posterPath!!.isNotEmpty()){
+                    Poster(
+                        posterPath = movie.posterPath!!,
+                        id = movie.id,
+                        modifier = Modifier
+                            .height(150.dp)
+                            .padding(
+                                start = if(index == 0) 15.dp else 0.dp,
+                                end = 15.dp
+                            )
 
+                    ){ movieId ->
+                        navController.navigate("${Pages.MovieDetail.route}/${movieId}")
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
 private fun Loading(){
     Box(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .padding(vertical = 50.dp)
     ){
         CircularProgressIndicator(
             modifier = Modifier
@@ -243,7 +291,8 @@ private fun Loading(){
 private fun Failed(errorMsg : String){
     Box(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .padding(vertical = 100.dp)
     ){
         Text(
             text = errorMsg,

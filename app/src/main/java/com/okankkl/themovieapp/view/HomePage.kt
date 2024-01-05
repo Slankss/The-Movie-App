@@ -1,7 +1,5 @@
 package com.okankkl.themovieapp.view
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,13 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,26 +21,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
 import com.okankkl.themovieapp.R
 import com.okankkl.themovieapp.components.SearchTextField
-import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.enum_sealed.Pages
-import com.okankkl.themovieapp.enum_sealed.Resources
-import com.okankkl.themovieapp.util.Util.IMAGE_BASE_URL
-import com.okankkl.themovieapp.viewModel.MovieListViewModel
+import com.okankkl.themovieapp.viewModel.listViewModel
 
 @Composable
 fun Home(navController: NavController)
 {
-    var selected by remember { mutableStateOf(Pages.MovieList) }
+    val listViewModel : listViewModel = hiltViewModel()
+    var selectedPage = listViewModel.selectedPage.collectAsState()
 
     Column(
         modifier = Modifier
@@ -55,7 +44,7 @@ fun Home(navController: NavController)
     ) {
         Row(
             modifier = Modifier
-                .padding(top = 25.dp, bottom = 25.dp)
+                .padding(top = 25.dp)
                 .align(Alignment.CenterHorizontally)
                 .border(
                     width = 1.dp,
@@ -68,10 +57,10 @@ fun Home(navController: NavController)
               modifier = Modifier
                   .clip(RoundedCornerShape(14.dp))
                   .background(
-                      color = if (selected == Pages.MovieList) Color.White else Color.Transparent
+                      color = if (selectedPage.value == Pages.MovieList) Color.White else Color.Transparent
                   )
                   .clickable {
-                      selected = Pages.MovieList
+                      listViewModel.setSelectedPage(Pages.MovieList)
                   }
           ){
               Text(
@@ -80,7 +69,7 @@ fun Home(navController: NavController)
                       .align(Alignment.Center)
                       .padding(horizontal = 25.dp, vertical = 10.dp),
                   style = MaterialTheme.typography.labelLarge.copy(
-                      color = if(selected == Pages.MovieList) Color.Black else Color.White,
+                      color = if(selectedPage.value == Pages.MovieList) Color.Black else Color.White,
                       fontSize = 16.sp
                   )
               )
@@ -90,10 +79,10 @@ fun Home(navController: NavController)
               modifier = Modifier
                   .clip(RoundedCornerShape(14.dp))
                   .background(
-                      color = if (selected == Pages.TvSeriesList) Color.White else Color.Transparent
+                      color = if (selectedPage.value == Pages.TvSeriesList) Color.White else Color.Transparent
                   )
                   .clickable {
-                      selected = Pages.TvSeriesList
+                      listViewModel.setSelectedPage(Pages.TvSeriesList)
                   }
           ){
               Text(
@@ -102,20 +91,18 @@ fun Home(navController: NavController)
                       .align(Alignment.Center)
                       .padding(horizontal = 25.dp, vertical = 10.dp),
                   style = MaterialTheme.typography.labelLarge.copy(
-                      color = if(selected == Pages.TvSeriesList) Color.Black else Color.White,
+                      color = if(selectedPage.value == Pages.TvSeriesList) Color.Black else Color.White,
                       fontSize = 16.sp
                   )
               )
           }
         }
 
-        when(selected){
-            Pages.TvSeriesList -> TvSeriesList(navController = navController)
-            else -> MovieList(navController = navController)
+        when(selectedPage.value){
+            Pages.TvSeriesList -> TvSeriesList(navController = navController,listViewModel = listViewModel)
+            else -> MovieList(navController = navController,listViewModel = listViewModel)
         }
     }
-
-
 }
 
 @Composable
