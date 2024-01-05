@@ -1,20 +1,33 @@
 package com.okankkl.themovieapp.repository
-import com.okankkl.themovieapp.api.api
+import android.provider.SyncStateContract.Constants
+import androidx.paging.Config
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.PagingSourceFactory
+import com.okankkl.themovieapp.api.TmdbApi
+import com.okankkl.themovieapp.data_source.MovieDataSource
+import com.okankkl.themovieapp.data_source.MovieDataSourceImp
 import com.okankkl.themovieapp.enum_sealed.Categories
 import com.okankkl.themovieapp.enum_sealed.Resources
+import com.okankkl.themovieapp.model.Movie
+import com.okankkl.themovieapp.paging_source.MoviePagingSource
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class RepositoryImp
     @Inject
-    constructor(var api : api) : Repository
+    constructor(
+            private val tmdbApi : TmdbApi
+    ) : Repository
 {
     override suspend fun getMovieList(category: Categories, page : Int): Resources
     {
         return try {
             val response = if(category == Categories.Trending){
-                api.getTrendingMovies()
+                tmdbApi.getTrendingMovies()
             } else {
-                api.getMovies(category.path,1)
+                tmdbApi.getMovies(category.path,1)
             }
 
             if(response.isSuccessful){
@@ -34,7 +47,7 @@ class RepositoryImp
     {
         return try
         {
-            val response = api.getMovie(id = id)
+            val response = tmdbApi.getMovie(id = id)
             if(response.isSuccessful){
                 response.body()?.let {
                     Resources.Success(data = it)
@@ -51,7 +64,7 @@ class RepositoryImp
     override suspend fun getSimilarMovies(id: Int): Resources
     {
         return try {
-            val response = api.getSimilarMovies(id = 695721)
+            val response = tmdbApi.getSimilarMovies(id = 695721)
 
             if(response.isSuccessful){
                 response.body()?.let {
@@ -65,14 +78,30 @@ class RepositoryImp
             Resources.Failed(e.localizedMessage!!)
         }
     }
-
+    
+    override suspend fun getMoviesPage(category: Categories): Flow<PagingData<Movie>>
+    {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                prefetchDistance = 2
+            ),
+            pagingSourceFactory = {
+                MoviePagingSource(
+                    movieDataSource = MovieDataSourceImp(tmdbApi),
+                    category = category
+                )
+            }
+        ).flow
+    }
+    
     override suspend fun getTvSeriesList(category: Categories, page : Int): Resources
     {
         return try {
             val response = if(category == Categories.Trending){
-                api.getTrendingTvSeries()
+                tmdbApi.getTrendingTvSeries()
             } else {
-                api.getTvSeries(category.path,1)
+                tmdbApi.getTvSeries(category.path,1)
             }
 
             if(response.isSuccessful){
@@ -91,7 +120,7 @@ class RepositoryImp
     override suspend fun getTvSeriesDetail(id: Int): Resources
     {
         return try {
-            val response = api.getTvSeries(id = id)
+            val response = tmdbApi.getTvSeries(id = id)
 
             if(response.isSuccessful){
                 response.body()?.let { tvSeries ->
@@ -109,7 +138,7 @@ class RepositoryImp
     override suspend fun getSimilarTvSeries(id: Int): Resources
     {
         return try {
-            val response = api.getSimilarTvSeries(id = id)
+            val response = tmdbApi.getSimilarTvSeries(id = id)
 
             if(response.isSuccessful){
                 response.body()?.let { tvSeries ->

@@ -1,10 +1,13 @@
 package com.okankkl.themovieapp.module
 
 import android.content.Context
-import androidx.compose.ui.platform.LocalContext
-import androidx.datastore.core.DataStore
-import com.okankkl.themovieapp.api.api
+import com.okankkl.themovieapp.api.TmdbApi
+import com.okankkl.themovieapp.data_source.MovieDataSource
+import com.okankkl.themovieapp.data_source.MovieDataSourceImp
 import com.okankkl.themovieapp.model.StoreData
+import com.okankkl.themovieapp.repository.Repository
+import com.okankkl.themovieapp.repository.RepositoryImp
+import com.okankkl.themovieapp.use_case.GetMoviesUseCase
 import com.okankkl.themovieapp.util.Util.BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -19,21 +22,43 @@ import javax.inject.Singleton
 @Module
 class AppModule
 {
-
     @Singleton
     @Provides
-    fun provideRetrofit() : api{
+    fun provideRetrofit() : TmdbApi{
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(api::class.java)
+            .create(TmdbApi::class.java)
     }
-
     @Singleton
     @Provides
     fun provideStoreData(@ApplicationContext appContext : Context) : StoreData {
         return StoreData(appContext)
+    }
+    
+    @Singleton
+    @Provides
+    fun provideMovieDataSource(
+            api: TmdbApi) : MovieDataSource{
+        return MovieDataSourceImp(api)
+    }
+    
+    @Singleton
+    @Provides
+    fun provideRepository(
+            api: TmdbApi
+    ) : Repository
+    {
+        return RepositoryImp(api)
+    }
+    
+    @Singleton
+    @Provides
+    fun provideMovieUseCase(
+            repository: Repository
+    ): GetMoviesUseCase{
+        return GetMoviesUseCase(repository)
     }
 
 }
