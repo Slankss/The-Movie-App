@@ -1,4 +1,4 @@
-package com.okankkl.themovieapp.use_case
+package com.okankkl.themovieapp.paging.use_case
 
 import androidx.paging.PagingData
 import com.okankkl.themovieapp.enum_sealed.Categories

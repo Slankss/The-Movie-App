@@ -2,12 +2,12 @@ package com.okankkl.themovieapp.module
 
 import android.content.Context
 import com.okankkl.themovieapp.api.TmdbApi
-import com.okankkl.themovieapp.data_source.MovieDataSource
-import com.okankkl.themovieapp.data_source.MovieDataSourceImp
+import com.okankkl.themovieapp.paging.data_source.MovieDataSource
+import com.okankkl.themovieapp.paging.data_source.MovieDataSourceImp
 import com.okankkl.themovieapp.model.StoreData
 import com.okankkl.themovieapp.repository.Repository
 import com.okankkl.themovieapp.repository.RepositoryImp
-import com.okankkl.themovieapp.use_case.GetMoviesUseCase
+import com.okankkl.themovieapp.paging.use_case.GetMoviesUseCase
 import com.okankkl.themovieapp.util.Util.BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -24,7 +24,8 @@ class AppModule
 {
     @Singleton
     @Provides
-    fun provideRetrofit() : TmdbApi{
+    fun provideRetrofit() : TmdbApi
+    {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
@@ -40,7 +41,9 @@ class AppModule
     @Singleton
     @Provides
     fun provideMovieDataSource(
-            api: TmdbApi) : MovieDataSource{
+            api: TmdbApi
+    ) : MovieDataSource
+    {
         return MovieDataSourceImp(api)
     }
     
@@ -57,7 +60,8 @@ class AppModule
     @Provides
     fun provideMovieUseCase(
             repository: Repository
-    ): GetMoviesUseCase{
+    ): GetMoviesUseCase
+    {
         return GetMoviesUseCase(repository)
     }
 

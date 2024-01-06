@@ -1,8 +1,8 @@
-package com.okankkl.themovieapp.paging_source
+package com.okankkl.themovieapp.paging.paging_source
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.okankkl.themovieapp.data_source.MovieDataSource
+import com.okankkl.themovieapp.paging.data_source.MovieDataSource
 import com.okankkl.themovieapp.enum_sealed.Categories
 import com.okankkl.themovieapp.model.Movie
 import retrofit2.HttpException

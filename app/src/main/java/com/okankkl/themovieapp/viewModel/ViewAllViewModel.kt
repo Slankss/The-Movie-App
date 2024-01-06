@@ -9,7 +9,7 @@ import com.okankkl.themovieapp.enum_sealed.DataType
 import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.repository.RepositoryImp
-import com.okankkl.themovieapp.use_case.GetMoviesUseCase
+import com.okankkl.themovieapp.paging.use_case.GetMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
