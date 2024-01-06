@@ -29,7 +29,6 @@ data class TvSeries(
     var numberOfSeasons : Int = 0
     var videos : Videos? = null
 
-
     constructor(backdropPath: String?,firstAirDate: String,id: Int,overview: String,
                 posterPath: String?,name: String,voteAverage: Double,
                 createdBy: List<CreatedBy>, episodeRuntime : List<Int>,genres: List<Genres>,lastAirDate : String,
@@ -45,6 +44,4 @@ data class TvSeries(
             this.numberOfSeasons = numberOfSeasons
             this.videos = videos
         }
-
-
 }
