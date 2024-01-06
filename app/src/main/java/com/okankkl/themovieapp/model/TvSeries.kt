@@ -30,8 +30,8 @@ data class TvSeries(
     var videos : Videos? = null
 
 
-    constructor(backdropPath: String?,firstAirDate: String,id: Int,originalName: String,overview: String,
-                posterPath: String?,name: String,voteAverage: Double,voteCount: Int,originalLanguage: String,
+    constructor(backdropPath: String?,firstAirDate: String,id: Int,overview: String,
+                posterPath: String?,name: String,voteAverage: Double,
                 createdBy: List<CreatedBy>, episodeRuntime : List<Int>,genres: List<Genres>,lastAirDate : String,
                 numberOfEpisodes : Int,numberOfSeasons : Int,videos : Videos?
 

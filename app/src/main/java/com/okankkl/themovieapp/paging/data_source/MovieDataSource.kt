@@ -1,4 +1,4 @@
-package com.okankkl.themovieapp.data_source
+package com.okankkl.themovieapp.paging.data_source
 
 import com.okankkl.themovieapp.enum_sealed.Categories
 import com.okankkl.themovieapp.model.Movie
