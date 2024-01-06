@@ -5,12 +5,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.okankkl.themovieapp.enum_sealed.Categories
+import com.okankkl.themovieapp.enum_sealed.DataType
 import com.okankkl.themovieapp.enum_sealed.Resources
+import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.repository.RepositoryImp
 import com.okankkl.themovieapp.paging.use_case.GetMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,10 +29,10 @@ class ViewAllViewModel
     private var _contentList = MutableStateFlow<Resources>(Resources.Loading)
     var contentList = _contentList.asStateFlow()
 
-    private val _displayState : MutableStateFlow<PagingData<Any>> = MutableStateFlow(PagingData.empty())
-    val displayState get() = _displayState
+    private val _movieState : MutableStateFlow<PagingData<Movie>> = MutableStateFlow(PagingData.empty())
+    val movieState get() = _movieState
     
-    fun LoadDisplay(){
+    fun LoadMovies(){
         viewModelScope.launch {
             getMoviesUseCase.execute(
                 categories = Categories.Popular,
@@ -37,12 +40,11 @@ class ViewAllViewModel
                 .distinctUntilChanged()
                 .cachedIn(viewModelScope)
                 .collect{
-                    _displayState.value = it
+                    _movieState.value = it
                 }
         }
     }
-
-    /*
+    
     fun getContent(dataType: String,category : String,page: Int){
             viewModelScope.launch {
                 if(dataType == DataType.Movie().name){
@@ -69,5 +71,4 @@ class ViewAllViewModel
 
 
 
-     */
 }

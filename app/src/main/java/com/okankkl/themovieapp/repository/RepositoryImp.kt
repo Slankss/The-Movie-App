@@ -6,12 +6,12 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSourceFactory
 import com.okankkl.themovieapp.api.TmdbApi
-import com.okankkl.themovieapp.paging.data_source.MovieDataSource
-import com.okankkl.themovieapp.paging.data_source.MovieDataSourceImp
+import com.okankkl.themovieapp.data_source.MovieDataSource
+import com.okankkl.themovieapp.data_source.MovieDataSourceImp
 import com.okankkl.themovieapp.enum_sealed.Categories
 import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.Movie
-import com.okankkl.themovieapp.paging.paging_source.MoviePagingSource
+import com.okankkl.themovieapp.paging_source.MoviePagingSource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

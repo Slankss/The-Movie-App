@@ -1,10 +1,10 @@
 package com.okankkl.themovieapp.api
 
-import android.provider.ContactsContract.Data
-import com.okankkl.themovieapp.enum_sealed.DataType
 import com.okankkl.themovieapp.model.Movie
+import com.okankkl.themovieapp.model.TvSeries
 import com.okankkl.themovieapp.response.MovieResponse
 import com.okankkl.themovieapp.response.ResponseDto
+import com.okankkl.themovieapp.response.TvSeriesResponse
 import com.okankkl.themovieapp.util.Util.API_KEY
 import retrofit2.Response
 import retrofit2.http.GET
@@ -19,35 +19,57 @@ interface TmdbApi
             @Query("page") page : Int,
             @Query("api_key") apiKey : String = API_KEY
     ) : ResponseDto<List<Movie>>
-
-    @GET("/3/{type}/{category}")
-    suspend fun getDisplayList(
-        @Path("type") type : String,
+    @GET("/3/movie/{category}")
+    suspend fun getMovies(
         @Path("category") category : String,
         @Query("page") page : Int,
         @Query("api_key") apiKey : String = API_KEY
     ) : Response<MovieResponse>
 
-    @GET("/3/{type}/{id}")
-    suspend fun getDisplayDetail(
-        @Path("type") type : String,
+    @GET("/3/movie/{id}")
+    suspend fun getMovie(
         @Path("id") id : Int,
         @Query("api_key") apiKey : String = API_KEY,
         @Query("append_to_response") appendToVideos: String = "videos"
     ) : Response<Movie>
 
-    @GET("/3/{type}/{id}/similar")
-    suspend fun getSimilarDisplayList(
-        @Path("type") type : String,
+
+    @GET("/3/movie/{id}/similar")
+    suspend fun getSimilarMovies(
         @Path("id") id : Int,
         @Query("api_key") apiKey : String = API_KEY
     ) : Response<MovieResponse>
-
-    @GET("/3/trending/{type}/week")
-    suspend fun getTrendingdDisplayList(
-        @Path("type") type: String,
-        @Query("api_key") apiKey : String = API_KEY
+    
+    @GET("/3/trending/movie/week")
+    suspend fun getTrendingMovies(
+        @Query("api_key") aiKey : String = API_KEY
     ) : Response<MovieResponse>
+
+    @GET("/3/tv/{category}")
+    suspend fun getTvSeries(
+        @Path("category") category : String,
+        @Query("page") page : Int,
+        @Query("api_key") apiKey : String = API_KEY
+    ) : Response<TvSeriesResponse>
+
+
+    @GET("/3/trending/tv/week")
+    suspend fun getTrendingTvSeries(
+        @Query("api_key") apiKey : String = API_KEY
+    ) : Response<TvSeriesResponse>
+
+    @GET("/3/tv/{id}")
+    suspend fun getTvSeries(
+        @Path("id") id : Int,
+        @Query("api_key") apiKey : String = API_KEY,
+        @Query("append_to_response") appendToVideos: String = "videos"
+    ) : Response<TvSeries>
+
+    @GET("/3/tv/{id}/similar")
+    suspend fun getSimilarTvSeries(
+        @Path("id") id : Int,
+        @Query("api_key") apiKey : String = API_KEY
+    ) : Response<TvSeriesResponse>
 
 
 

@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.okankkl.themovieapp.viewModel.TvSeriesDetailViewModel
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,24 +50,22 @@ import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.TvSeries
 import com.okankkl.themovieapp.util.Util
 import com.okankkl.themovieapp.components.*
-import com.okankkl.themovieapp.enum_sealed.DataType
 import com.okankkl.themovieapp.enum_sealed.Pages
 import com.okankkl.themovieapp.model.CreatedBy
 import java.time.LocalDate
 import com.okankkl.themovieapp.extensions.*
 import com.okankkl.themovieapp.ui.theme.StatusBarColor
-import com.okankkl.themovieapp.viewModel.DisplayDetailViewModel
 
 @Composable
 fun TvSeriesDetail(navController : NavController,tvSeriesId : Int?){
 
-    val displayDetailViewModel : DisplayDetailViewModel = hiltViewModel()
-    val tvSeries = displayDetailViewModel.display.collectAsState()
-    val similarDisplayList = displayDetailViewModel.similarDisplayList.collectAsState()
+    val tvSeriesViewModel : TvSeriesDetailViewModel = hiltViewModel()
+    val tvSeries = tvSeriesViewModel.tvSeries.collectAsState()
+    val similarTvSeries = tvSeriesViewModel.similarTvSeries.collectAsState()
 
     SideEffect {
         if(tvSeriesId != null){
-            displayDetailViewModel.getDisplay(DataType.TvSeries(),tvSeriesId)
+            tvSeriesViewModel.getTvSeries(tvSeriesId)
         }
     }
 
@@ -109,15 +108,15 @@ fun TvSeriesDetail(navController : NavController,tvSeriesId : Int?){
                 Failed(errorMsg = (tvSeries.value as Resources.Failed).errorMsg)
             }
         }
-        when(similarDisplayList.value){
+        when(similarTvSeries.value){
             is Resources.Loading -> Loading()
             is Resources.Success -> {
                 SimilarTvSeriesList(
-                    similarTvSeries = (similarDisplayList.value as Resources.Success).data as List<TvSeries>,
+                    similarTvSeries = (similarTvSeries.value as Resources.Success).data as List<TvSeries>,
                     navController = navController)
             }
             is Resources.Failed -> {
-                Failed(errorMsg = (similarDisplayList.value as Resources.Failed).errorMsg)
+                Failed(errorMsg = (similarTvSeries.value as Resources.Failed).errorMsg)
             }
         }
     }

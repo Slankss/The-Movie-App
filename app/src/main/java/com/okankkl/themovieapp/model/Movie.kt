@@ -3,7 +3,7 @@ package com.okankkl.themovieapp.model
 import androidx.room.Entity
 import com.google.gson.annotations.SerializedName
 
-
+@Entity(tableName = "Movie")
 data class Movie(
     @SerializedName("backdrop_path")
     var backdropPath : String?,

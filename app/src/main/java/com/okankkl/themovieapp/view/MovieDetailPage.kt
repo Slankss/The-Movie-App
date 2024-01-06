@@ -41,6 +41,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.window.Popup
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.okankkl.themovieapp.components.GenreBox
@@ -49,23 +50,22 @@ import com.okankkl.themovieapp.enum_sealed.Pages
 import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.util.Util.IMAGE_BASE_URL
-import com.okankkl.themovieapp.viewModel.DisplayDetailViewModel
+import com.okankkl.themovieapp.viewModel.MovieDetailViewModel
 import java.time.LocalDate
 import com.okankkl.themovieapp.extensions.*
 import com.okankkl.themovieapp.components.*
-import com.okankkl.themovieapp.enum_sealed.DataType
 import com.okankkl.themovieapp.ui.theme.StatusBarColor
 
 @Composable
 fun MovieDetail(navController: NavController,movieId : Int?)
 {
-    val displayDetailViewModel : DisplayDetailViewModel = hiltViewModel()
-    val display = displayDetailViewModel.display.collectAsState()
-    val similarMovies = displayDetailViewModel.similarDisplayList.collectAsState()
+    val movieViewModel : MovieDetailViewModel = hiltViewModel()
+    val movie = movieViewModel.movie.collectAsState()
+    val similarMovies = movieViewModel.similarMovies.collectAsState()
 
     SideEffect {
         if(movieId != null){
-            displayDetailViewModel.getDisplay(DataType.Movie(),movieId)
+            movieViewModel.getMovie(movieId)
         }
     }
 
@@ -96,16 +96,16 @@ fun MovieDetail(navController: NavController,movieId : Int?)
             )
         }
 
-        when(display.value){
+        when(movie.value){
             is Resources.Loading -> Loading()
             is Resources.Success -> {
                 MovieTrailer(
-                    movie = (display.value as Resources.Success).data as Movie
+                    movie = (movie.value as Resources.Success).data as Movie
                 )
-                MovieContent(movie = (display.value as Resources.Success).data as Movie)
+                MovieContent(movie = (movie.value as Resources.Success).data as Movie)
             }
             is Resources.Failed -> {
-                Failed(errorMsg = (display.value as Resources.Failed).errorMsg)
+                Failed(errorMsg = (movie.value as Resources.Failed).errorMsg)
             }
         }
         when(similarMovies.value){
@@ -116,7 +116,7 @@ fun MovieDetail(navController: NavController,movieId : Int?)
                     navController = navController)
             }
             is Resources.Failed -> {
-                Failed(errorMsg = (display.value as Resources.Failed).errorMsg)
+                Failed(errorMsg = (movie.value as Resources.Failed).errorMsg)
             }
         }
     }

@@ -9,10 +9,10 @@ import javax.inject.Inject
 
 class GetMoviesUseCase
     @Inject
-    constructor(private val repository : Repository) : BaseUseCase<Unit, Flow<PagingData<Any>>>
+    constructor(private val repository : Repository) : BaseUseCase<Unit, Flow<PagingData<Movie>>>
 {
-    override suspend fun execute(categories: Categories,input: Unit): Flow<PagingData<Any>>
+    override suspend fun execute(categories: Categories,input: Unit): Flow<PagingData<Movie>>
     {
-        return repository.getPages(categories)
+        return repository.getMoviesPage(categories)
     }
 }
