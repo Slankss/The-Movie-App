@@ -2,6 +2,7 @@ package com.okankkl.themovieapp.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.okankkl.themovieapp.enum_sealed.DataType
 import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.repository.RepositoryImp
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,21 +12,21 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MovieDetailViewModel
+class DisplayDetailViewModel
     @Inject
     constructor(var repository: RepositoryImp
 ) : ViewModel()
 {
-    private val _movie = MutableStateFlow<Resources>(Resources.Loading)
-    var movie = _movie.asStateFlow()
+    private val _display = MutableStateFlow<Resources>(Resources.Loading)
+    var display = _display.asStateFlow()
 
-    private val _similarMovies = MutableStateFlow<Resources>(Resources.Loading)
-    var similarMovies = _similarMovies.asStateFlow()
+    private val _similarDisplayList = MutableStateFlow<Resources>(Resources.Loading)
+    var similarDisplayList = _similarDisplayList.asStateFlow()
 
-    fun getMovie(id : Int){
+    fun getDisplay(type : DataType,id : Int){
         viewModelScope.launch {
-            _movie.value = repository.getMovieDetail(id)
-            _similarMovies.value = repository.getSimilarMovies(id)
+            _display.value = repository.getDisplayDetail(type,id)
+            _similarDisplayList.value = repository.getSimilarDisplayList(type,id)
         }
     }
 

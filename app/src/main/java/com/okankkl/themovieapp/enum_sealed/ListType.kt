@@ -27,8 +27,15 @@ enum class Categories(
     )
 }
 
-sealed class DataType{
-    class Movie(val name : String = "movie") : DataType()
-    class TvSeries(val name : String = "tv_series") : DataType()
+sealed class DataType(var title : String,var path : String){
+    class Movie(
+        path: String = "movie",
+        title: String = "Movies"
+    ) : DataType(title,path)
+
+    class TvSeries(
+        path : String = "tv",
+        title: String = "TV Series"
+    ) : DataType(title,path)
 }
 

@@ -1,5 +1,6 @@
 package com.okankkl.themovieapp.view
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,7 +22,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,14 +43,15 @@ import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.ui.theme.LightBlue
 import com.okankkl.themovieapp.util.Util
-import com.okankkl.themovieapp.viewModel.listViewModel
+import com.okankkl.themovieapp.viewModel.ListViewModel
 import androidx.compose.runtime.*
 import com.okankkl.themovieapp.enum_sealed.Categories
 import com.okankkl.themovieapp.enum_sealed.DataType
 import com.okankkl.themovieapp.components.*
+import com.okankkl.themovieapp.model.TvSeries
 
 @Composable
-fun MovieList(navController: NavController,listViewModel: listViewModel){
+fun MovieList(navController: NavController,listViewModel: ListViewModel){
 
     val popularMovies = listViewModel.popularMovies.collectAsState()
     val trendMovies = listViewModel.trendMovies.collectAsState()
@@ -69,7 +70,6 @@ fun MovieList(navController: NavController,listViewModel: listViewModel){
 
     SideEffect {
         listViewModel.getMovies()
-
     }
 
     Column(
@@ -88,21 +88,22 @@ fun MovieList(navController: NavController,listViewModel: listViewModel){
                     is Resources.Loading -> Loading()
                     is Resources.Success -> {
                         if(type == Categories.Trending){
+                            Log.w("arabam",currentState.data.toString())
                             TrendMovies(
-                                movies = (currentState as Resources.Success).data as List<Movie>,
+                                movies = currentState.data as List<Movie> ,
                                 navController = navController
                             )
                         }
                         else{
                             MovieList(
-                                movieList = (currentState as Resources.Success).data as List<Movie>,
+                                movieList = currentState.data as List<Movie>,
                                 moviesType = type,
                                 navController)
                         }
                     }
                     is Resources.Failed -> {
                         Failed(
-                            errorMsg = (currentState as Resources.Failed).errorMsg
+                            errorMsg = currentState.errorMsg
                         )
                     }
                 }
@@ -149,7 +150,6 @@ fun TrendMovies(movies : List<Movie>,navController: NavController){
             modifier = Modifier.fillMaxWidth()
         )
         { page ->
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -184,8 +184,6 @@ fun TrendMovies(movies : List<Movie>,navController: NavController){
                     style = MaterialTheme.typography.headlineLarge.copy(
 
                     ),
-
-
                     )
             }
         }
@@ -210,7 +208,6 @@ fun TrendMovies(movies : List<Movie>,navController: NavController){
             }
         }
     }
-
 }
 
 @Composable
@@ -239,7 +236,7 @@ fun MovieList(movieList : List<Movie>,moviesType : Categories, navController: Na
                     .align(Alignment.CenterEnd)
                     .padding(end = 15.dp)
                     .clickable {
-                        navController.navigate("${Pages.ViewAll.route}/${DataType.Movie().name}&${moviesType.title}")
+                        navController.navigate("${Pages.ViewAll.route}/${DataType.Movie().title}&${moviesType.title}")
                     },
                 text = "view all",
                 style = MaterialTheme.typography.labelLarge.copy(
@@ -269,36 +266,5 @@ fun MovieList(movieList : List<Movie>,moviesType : Categories, navController: Na
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun Loading(){
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 50.dp)
-    ){
-        CircularProgressIndicator(
-            modifier = Modifier
-                .align(Alignment.Center),
-            color = Color.White
-        )
-    }
-}
-
-@Composable
-private fun Failed(errorMsg : String){
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 100.dp)
-    ){
-        Text(
-            text = errorMsg,
-            fontSize = 24.sp,
-            modifier = Modifier
-                .align(Alignment.Center)
-        )
     }
 }

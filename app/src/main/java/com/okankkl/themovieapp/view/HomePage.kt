@@ -30,12 +30,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.okankkl.themovieapp.R
 import com.okankkl.themovieapp.components.SearchTextField
 import com.okankkl.themovieapp.enum_sealed.Pages
-import com.okankkl.themovieapp.viewModel.listViewModel
+import com.okankkl.themovieapp.viewModel.ListViewModel
 
 @Composable
 fun Home(navController: NavController)
 {
-    val listViewModel : listViewModel = hiltViewModel()
+    val listViewModel : ListViewModel = hiltViewModel()
     var selectedPage = listViewModel.selectedPage.collectAsState()
 
     Column(

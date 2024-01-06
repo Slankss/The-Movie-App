@@ -3,6 +3,7 @@ package com.okankkl.themovieapp.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.okankkl.themovieapp.enum_sealed.Categories
+import com.okankkl.themovieapp.enum_sealed.DataType
 import com.okankkl.themovieapp.enum_sealed.Pages
 import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.StoreData
@@ -17,7 +18,7 @@ import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @HiltViewModel
-class listViewModel
+class ListViewModel
     @Inject
     constructor(var repository: RepositoryImp, var storeData : StoreData) : ViewModel()
 {
@@ -57,13 +58,11 @@ class listViewModel
     }
     fun getMovies(){
         viewModelScope.launch {
-
             movieUpdateTime = storeData.getMovieUpdateTime.first()
             val currentDate = LocalDateTime.now()
             if(movieUpdateTime == null || movieUpdateTime!!.isEmpty()){
                 refreshMovies()
                 storeData.saveMovieUpdateTime(currentDate.toString())
-
             }
             else{
                 val lastUpdateTime = LocalDateTime.parse(movieUpdateTime)
@@ -72,17 +71,16 @@ class listViewModel
                     refreshMovies()
                     storeData.saveMovieUpdateTime(currentDate.toString())
                 }
-
             }
         }
     }
 
     fun refreshMovies(){
         viewModelScope.launch {
-            _popularMovies.value =  repository.getMovieList(Categories.Popular,1)
-            _trendMovies.value = repository.getMovieList(Categories.Trending,1)
-            _topRatedMovies.value = repository.getMovieList(Categories.TopRated,1)
-            _nowPlayingMovies.value = repository.getMovieList(Categories.NowPlaying,1)
+            _popularMovies.value =  repository.getDisplayList(DataType.Movie(),Categories.Popular,1)
+            _trendMovies.value = repository.getDisplayList(DataType.Movie(),Categories.Trending,1)
+            _topRatedMovies.value = repository.getDisplayList(DataType.Movie(),Categories.TopRated,1)
+            _nowPlayingMovies.value = repository.getDisplayList(DataType.Movie(),Categories.NowPlaying,1)
         }
     }
 
@@ -109,10 +107,10 @@ class listViewModel
 
     fun refreshTvSeries(){
         viewModelScope.launch {
-            _popularTvSeries.value = repository.getTvSeriesList(Categories.Popular,1)
-            _trendTvSeries.value = repository.getTvSeriesList(Categories.Trending,1)
-            _topRatedTvSeries.value = repository.getTvSeriesList(Categories.TopRated,1)
-            _onTheAirTvSeries.value = repository.getTvSeriesList(Categories.OnTheAir,1)
+            _popularTvSeries.value = repository.getDisplayList(DataType.TvSeries(),Categories.Popular,1)
+            _trendTvSeries.value = repository.getDisplayList(DataType.TvSeries(),Categories.Trending,1)
+            _topRatedTvSeries.value = repository.getDisplayList(DataType.TvSeries(),Categories.TopRated,1)
+            _onTheAirTvSeries.value = repository.getDisplayList(DataType.TvSeries(),Categories.OnTheAir,1)
         }
     }
 

@@ -12,21 +12,21 @@ import java.lang.Exception
 class MoviePagingSource(
     private val movieDataSource : MovieDataSource,
     var category : Categories
-) : PagingSource<Int, Movie>()
+) : PagingSource<Int, Any>()
 {
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Movie>
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Any>
     {
         return try
         {
             val currentPage = params.key ?: 1
-            val movies = movieDataSource.getMovies(
+            val response = movieDataSource.getMovies(
                 category = category,
                 pageNumber = currentPage
             )
             LoadResult.Page(
-                data =  movies.results!!,
+                data =  response.results!!,
                 prevKey = if(currentPage == 1) null else currentPage - 1,
-                nextKey = if(movies.results.isEmpty()) null else movies.page!! + 1
+                nextKey = if(response.results.isEmpty()) null else response.page!! + 1
             )
         } catch (exception: IOException) {
             return LoadResult.Error(exception)
@@ -35,7 +35,7 @@ class MoviePagingSource(
         }
     }
     
-    override fun getRefreshKey(state: PagingState<Int, Movie>): Int?
+    override fun getRefreshKey(state: PagingState<Int, Any>): Int?
     {
         return state.anchorPosition
     }

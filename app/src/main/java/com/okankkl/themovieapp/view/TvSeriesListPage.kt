@@ -37,24 +37,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.okankkl.themovieapp.R
 import com.okankkl.themovieapp.enum_sealed.Categories
 import com.okankkl.themovieapp.enum_sealed.Pages
 import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.TvSeries
 import com.okankkl.themovieapp.ui.theme.LightBlue
 import com.okankkl.themovieapp.util.Util
-import com.okankkl.themovieapp.viewModel.listViewModel
+import com.okankkl.themovieapp.viewModel.ListViewModel
 import com.okankkl.themovieapp.components.*
 import com.okankkl.themovieapp.enum_sealed.DataType
 
 @Composable
-fun TvSeriesList(navController: NavController,listViewModel: listViewModel){
+fun TvSeriesList(navController: NavController,listViewModel: ListViewModel){
 
     val popularTvSeries = listViewModel.popularTvSeries.collectAsState()
     val trendTvSeries = listViewModel.trendTvSeries.collectAsState()
@@ -91,20 +89,20 @@ fun TvSeriesList(navController: NavController,listViewModel: listViewModel){
                     is Resources.Success -> {
                         if(tvSeriesType == Categories.Trending){
                             TrendTvSeries(
-                                tvSeries = (currentState as Resources.Success).data as List<TvSeries>,
+                                tvSeries = currentState.data as List<TvSeries>,
                                 navController = navController
                             )
                         }
                         else{
                             TvSeriesList(
-                                tvSeries = (currentState as Resources.Success).data as List<TvSeries>,
+                                tvSeries = currentState.data as List<TvSeries>,
                                 tvSeriesType = tvSeriesType,
                                 navController)
                         }
                     }
                     is Resources.Failed -> {
                         Failed(
-                            errorMsg = (currentState as Resources.Failed).errorMsg
+                            errorMsg =currentState.errorMsg
                         )
                     }
                 }
@@ -242,7 +240,7 @@ fun TvSeriesList(tvSeries : List<TvSeries>, tvSeriesType: Categories , navContro
                     .align(Alignment.CenterEnd)
                     .padding(end = 15.dp)
                     .clickable {
-                        navController.navigate("${Pages.ViewAll.route}/${DataType.TvSeries().name}&${tvSeriesType.title}")
+                        navController.navigate("${Pages.ViewAll.route}/${DataType.TvSeries().title}&${tvSeriesType.title}")
                     },
                 text = "view all",
                 style = MaterialTheme.typography.labelLarge.copy(
