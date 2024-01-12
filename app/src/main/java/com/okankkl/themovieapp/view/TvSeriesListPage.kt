@@ -60,8 +60,9 @@ fun TvSeriesList(navController: NavController,listViewModel: listViewModel){
     val trendTvSeries = listViewModel.trendTvSeries.collectAsState()
     val topRatedSeries = listViewModel.topRatedTvSeries.collectAsState()
     val onTheAirTvSeries = listViewModel.onTheAirTvSeries.collectAsState()
+    val loadingState = listViewModel.loadingState.collectAsState()
 
-    fun currentList(tvSeriesType: Categories) : Resources?
+    fun getTvSeriesList(tvSeriesType: Categories) : List<TvSeries>?
     {
         return when(tvSeriesType){
             Categories.Popular -> popularTvSeries.value
@@ -72,47 +73,40 @@ fun TvSeriesList(navController: NavController,listViewModel: listViewModel){
         }
     }
 
-    SideEffect {
+    LaunchedEffect(key1 = true) {
         listViewModel.getTvSeries()
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(vertical = 10.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        Categories.values().forEach { tvSeriesType ->
-            val currentState = currentList(tvSeriesType)
-            if(currentState != null){
-                when(currentState){
-                    is Resources.Loading -> Loading()
-                    is Resources.Success -> {
-                        if(tvSeriesType == Categories.Trending){
-                            TrendTvSeries(
-                                tvSeries = (currentState as Resources.Success).data as List<TvSeries>,
-                                navController = navController
-                            )
-                        }
-                        else{
-                            TvSeriesList(
-                                tvSeries = (currentState as Resources.Success).data as List<TvSeries>,
-                                tvSeriesType = tvSeriesType,
-                                navController)
-                        }
-                    }
-                    is Resources.Failed -> {
-                        Failed(
-                            errorMsg = (currentState as Resources.Failed).errorMsg
-                        )
+    ){
+        if(loadingState.value){
+            Loading(modifier = Modifier.align(Alignment.Center))
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 10.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Categories.values().forEach { tvSeriesType ->
+                val tvSeriesList = getTvSeriesList(tvSeriesType)
+                if(!tvSeriesList.isNullOrEmpty()){
+                    if(tvSeriesType == Categories.Trending){
+                        TrendTvSeries(tvSeries = tvSeriesList, navController = navController)
+                    } else {
+                        TvSeriesContentList(tvSeries = tvSeriesList, tvSeriesType = tvSeriesType, navController = navController)
                     }
                 }
+
             }
 
         }
-
     }
+
 
 }
 
@@ -217,7 +211,7 @@ fun TrendTvSeries(tvSeries : List<TvSeries>, navController: NavController){
 }
 
 @Composable
-fun TvSeriesList(tvSeries : List<TvSeries>, tvSeriesType: Categories , navController: NavController){
+fun TvSeriesContentList(tvSeries : List<TvSeries>, tvSeriesType: Categories , navController: NavController){
 
     Column(
         modifier = Modifier
@@ -242,11 +236,11 @@ fun TvSeriesList(tvSeries : List<TvSeries>, tvSeriesType: Categories , navContro
                     .align(Alignment.CenterEnd)
                     .padding(end = 15.dp)
                     .clickable {
-                        navController.navigate("${Pages.ViewAll.route}/${DataType.TvSeries().name}&${tvSeriesType.title}")
+                        navController.navigate("${Pages.ViewAll.route}/${DataType.TvSeries().path}&${tvSeriesType.path}")
                     },
                 text = "view all",
                 style = MaterialTheme.typography.labelLarge.copy(
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
                     color = Color(0xB3FFFFFF)
                 )
             )
@@ -262,7 +256,7 @@ fun TvSeriesList(tvSeries : List<TvSeries>, tvSeriesType: Categories , navContro
                         modifier = Modifier
                             .height(150.dp)
                             .padding(
-                                start = if(index == 0) 15.dp else 0.dp,
+                                start = if (index == 0) 15.dp else 0.dp,
                                 end = 15.dp
                             )
                     ){ tvSeriesId ->

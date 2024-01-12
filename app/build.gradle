@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
@@ -19,6 +21,11 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
+        }
+        kapt {
+            arguments {
+                arg("room.schemaLocation","$projectDir/schemas")
+            }
         }
     }
 
@@ -51,7 +58,7 @@ android {
 dependencies {
     def nav_version = "2.7.5"
     def hilt_version = "2.49"
-    def room_version = "2.5.1"
+    def room_version = "2.6.1"
 
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
@@ -123,9 +130,16 @@ dependencies {
     implementation "androidx.paging:paging-runtime:$pagingVersion"
     implementation "androidx.paging:paging-compose:$pagingVersion"
 
+    // Bottom Navigation
+    implementation "androidx.compose.material:material:1.5.4"
+
+    // Lottie
+    def lottieVersion = "4.0.0"
+    implementation("com.airbnb.android:lottie-compose:4.0.0")
+
 
 }
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         languageVersion = "1.9"
     }

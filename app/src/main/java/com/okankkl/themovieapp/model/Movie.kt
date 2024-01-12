@@ -1,27 +1,43 @@
 package com.okankkl.themovieapp.model
 
+import android.util.Log
+import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
+import com.okankkl.themovieapp.enum_sealed.Categories
 
-@Entity(tableName = "Movie")
+@Entity
 data class Movie(
+    @ColumnInfo(defaultValue = "")
     @SerializedName("backdrop_path")
     var backdropPath : String?,
+    @PrimaryKey
     var id : Int,
     var popularity : Double,
+    @ColumnInfo(defaultValue = "")
     @SerializedName("poster_path")
     var posterPath : String?,
     @SerializedName("release_date")
     var releaseDate : String,
     var title : String,
     @SerializedName("vote_average")
-    var voteAverage : Double
+    var voteAverage : Double,
+    @ColumnInfo(defaultValue = "")
+    var category  : String = " "
 ){
+    @Ignore
     var genres : List<Genres> = listOf()
+    @Ignore
     var videos : Videos? = null
+    @Ignore
     var revenue : Int = 0
+    @Ignore
     var runtime = 0
+    @Ignore
     var overview : String = ""
+
 
     constructor(
         backdropPath: String?, genres : List<Genres>,id: Int,
@@ -38,5 +54,7 @@ data class Movie(
         this.overview = overview
 
     }
+
+
 
 }

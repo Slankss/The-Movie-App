@@ -2,12 +2,15 @@ package com.okankkl.themovieapp.module
 
 import android.content.Context
 import com.okankkl.themovieapp.api.TmdbApi
-import com.okankkl.themovieapp.paging.data_source.MovieDataSource
-import com.okankkl.themovieapp.paging.data_source.MovieDataSourceImp
+import com.okankkl.themovieapp.dao.Dao
+import com.okankkl.themovieapp.paging.data_source.DataSourcesImp
 import com.okankkl.themovieapp.model.StoreData
+import com.okankkl.themovieapp.paging.data_source.DataSources
 import com.okankkl.themovieapp.repository.Repository
 import com.okankkl.themovieapp.repository.RepositoryImp
 import com.okankkl.themovieapp.paging.use_case.GetMoviesUseCase
+import com.okankkl.themovieapp.paging.use_case.GetTvSeriesUseCase
+import com.okankkl.themovieapp.util.AppDatabase
 import com.okankkl.themovieapp.util.Util.BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -37,23 +40,32 @@ class AppModule
     fun provideStoreData(@ApplicationContext appContext : Context) : StoreData {
         return StoreData(appContext)
     }
+
+    @Singleton
+    @Provides
+    fun provideDao(@ApplicationContext appContext : Context) : Dao{
+        return AppDatabase
+            .getDatabase(appContext)
+            .dao()
+    }
     
     @Singleton
     @Provides
     fun provideMovieDataSource(
             api: TmdbApi
-    ) : MovieDataSource
+    ) : DataSources
     {
-        return MovieDataSourceImp(api)
+        return DataSourcesImp(api)
     }
     
     @Singleton
     @Provides
     fun provideRepository(
-            api: TmdbApi
+            api: TmdbApi,
+            dao: Dao
     ) : Repository
     {
-        return RepositoryImp(api)
+        return RepositoryImp(api,dao)
     }
     
     @Singleton
@@ -63,6 +75,15 @@ class AppModule
     ): GetMoviesUseCase
     {
         return GetMoviesUseCase(repository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideTvSeriesUseCase(
+        repository: Repository
+    ): GetTvSeriesUseCase
+    {
+        return GetTvSeriesUseCase(repository)
     }
 
 }

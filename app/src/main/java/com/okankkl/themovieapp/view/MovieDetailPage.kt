@@ -97,7 +97,7 @@ fun MovieDetail(navController: NavController,movieId : Int?)
         }
 
         when(movie.value){
-            is Resources.Loading -> Loading()
+            is Resources.Loading -> Loading(Modifier)
             is Resources.Success -> {
                 MovieTrailer(
                     movie = (movie.value as Resources.Success).data as Movie
@@ -109,7 +109,7 @@ fun MovieDetail(navController: NavController,movieId : Int?)
             }
         }
         when(similarMovies.value){
-            is Resources.Loading -> Loading()
+            is Resources.Loading -> Loading(Modifier)
             is Resources.Success -> {
                 SimilarMovies(
                     similarMovies = (similarMovies.value as Resources.Success).data as List<Movie>,
@@ -270,7 +270,7 @@ fun MovieContent(movie: Movie){
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_favourite),
+                    painter = painterResource(id = R.drawable.ic_fav_unselected),
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier

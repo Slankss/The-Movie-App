@@ -71,6 +71,13 @@ interface TmdbApi
         @Query("api_key") apiKey : String = API_KEY
     ) : Response<TvSeriesResponse>
 
+    @GET("/3/tv/{category}")
+    suspend fun getTvSeriesPage(
+        @Path("category") category : String,
+        @Query("page") page : Int,
+        @Query("api_key") apiKey : String = API_KEY
+    ) : ResponseDto<List<TvSeries>>
+
 
 
 }

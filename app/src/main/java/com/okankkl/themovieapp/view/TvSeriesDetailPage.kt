@@ -97,7 +97,7 @@ fun TvSeriesDetail(navController : NavController,tvSeriesId : Int?){
         }
 
         when(tvSeries.value){
-            is Resources.Loading -> Loading()
+            is Resources.Loading -> Loading(Modifier)
             is Resources.Success -> {
                 TvSeriesTrailer(
                     tvSeries = (tvSeries.value as Resources.Success).data as TvSeries
@@ -109,7 +109,7 @@ fun TvSeriesDetail(navController : NavController,tvSeriesId : Int?){
             }
         }
         when(similarTvSeries.value){
-            is Resources.Loading -> Loading()
+            is Resources.Loading -> Loading(Modifier)
             is Resources.Success -> {
                 SimilarTvSeriesList(
                     similarTvSeries = (similarTvSeries.value as Resources.Success).data as List<TvSeries>,
@@ -339,7 +339,7 @@ fun TvSeriesContent(tvSeries: TvSeries){
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_favourite),
+                    painter = painterResource(id = R.drawable.ic_fav_unselected),
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier

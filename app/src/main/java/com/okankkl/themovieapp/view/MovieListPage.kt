@@ -1,5 +1,12 @@
 package com.okankkl.themovieapp.view
 
+import android.annotation.SuppressLint
+import android.util.Log
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,6 +56,7 @@ import com.okankkl.themovieapp.enum_sealed.Categories
 import com.okankkl.themovieapp.enum_sealed.DataType
 import com.okankkl.themovieapp.components.*
 
+@SuppressLint("UnusedContentLambdaTargetStateParameter")
 @Composable
 fun MovieList(navController: NavController,listViewModel: listViewModel){
 
@@ -56,59 +64,43 @@ fun MovieList(navController: NavController,listViewModel: listViewModel){
     val trendMovies = listViewModel.trendMovies.collectAsState()
     val topRatedMovies = listViewModel.topRatedMovies.collectAsState()
     val nowPlayingMovies = listViewModel.nowPlayingMovies.collectAsState()
+    val loadingState = listViewModel.loadingState.collectAsState()
 
-    fun currentList(moviesType: Categories) : Resources?{
-        return when(moviesType){
-            Categories.Popular -> popularMovies.value
-            Categories.Trending -> trendMovies.value
-            Categories.TopRated -> topRatedMovies.value
-            Categories.NowPlaying -> nowPlayingMovies.value
-            else -> null
-        }
-    }
 
-    SideEffect {
+
+    LaunchedEffect(key1 = true){
         listViewModel.getMovies()
-
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 10.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-
-        Categories.values().forEach { type ->
-            val currentState = currentList(type)
-            if(currentState != null){
-
-                when(currentState){
-                    is Resources.Loading -> Loading()
-                    is Resources.Success -> {
-                        if(type == Categories.Trending){
-                            TrendMovies(
-                                movies = (currentState as Resources.Success).data as List<Movie>,
-                                navController = navController
-                            )
-                        }
-                        else{
-                            MovieList(
-                                movieList = (currentState as Resources.Success).data as List<Movie>,
-                                moviesType = type,
-                                navController)
-                        }
+    ){
+        if(loadingState.value){
+            Loading(
+                modifier = Modifier
+                    .align(Alignment.Center)
+            )
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 10.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Categories.values().forEach { type ->
+                val movieList = listViewModel.getMovieList(type)
+                if(!movieList.isNullOrEmpty()){
+                    if(type == Categories.Trending){
+                        TrendMovies(movies = movieList, navController = navController)
+                    } else {
+                        MovieContentList(movieList = movieList, moviesType = type, navController = navController)
                     }
-                    is Resources.Failed -> {
-                        Failed(
-                            errorMsg = (currentState as Resources.Failed).errorMsg
-                        )
-                    }
+                    listViewModel.setLoadingState(false)
                 }
             }
         }
-
     }
 
 }
@@ -182,10 +174,7 @@ fun TrendMovies(movies : List<Movie>,navController: NavController){
                         .fillMaxWidth()
                         .padding(5.dp),
                     style = MaterialTheme.typography.headlineLarge.copy(
-
                     ),
-
-
                     )
             }
         }
@@ -214,7 +203,7 @@ fun TrendMovies(movies : List<Movie>,navController: NavController){
 }
 
 @Composable
-fun MovieList(movieList : List<Movie>,moviesType : Categories, navController: NavController){
+fun MovieContentList(movieList : List<Movie>,moviesType : Categories, navController: NavController){
 
     Column(
         modifier = Modifier
@@ -239,11 +228,11 @@ fun MovieList(movieList : List<Movie>,moviesType : Categories, navController: Na
                     .align(Alignment.CenterEnd)
                     .padding(end = 15.dp)
                     .clickable {
-                        navController.navigate("${Pages.ViewAll.route}/${DataType.Movie().name}&${moviesType.title}")
+                        navController.navigate("${Pages.ViewAll.route}/${DataType.Movie().path}&${moviesType.path}")
                     },
                 text = "view all",
                 style = MaterialTheme.typography.labelLarge.copy(
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
                     color = Color(0xB3FFFFFF)
                 )
             )
@@ -259,7 +248,7 @@ fun MovieList(movieList : List<Movie>,moviesType : Categories, navController: Na
                         modifier = Modifier
                             .height(150.dp)
                             .padding(
-                                start = if(index == 0) 15.dp else 0.dp,
+                                start = if (index == 0) 15.dp else 0.dp,
                                 end = 15.dp
                             )
 
@@ -269,36 +258,5 @@ fun MovieList(movieList : List<Movie>,moviesType : Categories, navController: Na
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun Loading(){
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 50.dp)
-    ){
-        CircularProgressIndicator(
-            modifier = Modifier
-                .align(Alignment.Center),
-            color = Color.White
-        )
-    }
-}
-
-@Composable
-private fun Failed(errorMsg : String){
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 100.dp)
-    ){
-        Text(
-            text = errorMsg,
-            fontSize = 24.sp,
-            modifier = Modifier
-                .align(Alignment.Center)
-        )
     }
 }

@@ -1,8 +1,14 @@
 package com.okankkl.themovieapp.view
 
+import android.annotation.SuppressLint
+import android.util.Log
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,11 +38,15 @@ import com.okankkl.themovieapp.components.SearchTextField
 import com.okankkl.themovieapp.enum_sealed.Pages
 import com.okankkl.themovieapp.viewModel.listViewModel
 
+@SuppressLint("UnusedContentLambdaTargetStateParameter")
 @Composable
 fun Home(navController: NavController)
 {
     val listViewModel : listViewModel = hiltViewModel()
     var selectedPage = listViewModel.selectedPage.collectAsState()
+
+    LaunchedEffect(true){
+    }
 
     Column(
         modifier = Modifier
@@ -98,10 +108,16 @@ fun Home(navController: NavController)
           }
         }
 
-        when(selectedPage.value){
-            Pages.TvSeriesList -> TvSeriesList(navController = navController,listViewModel = listViewModel)
-            else -> MovieList(navController = navController,listViewModel = listViewModel)
+        AnimatedContent(
+            targetState = selectedPage,
+            label = "Home"
+        ) {
+            when(selectedPage.value){
+                Pages.TvSeriesList -> TvSeriesList(navController = navController,listViewModel = listViewModel)
+                else -> MovieList(navController = navController,listViewModel = listViewModel)
+            }
         }
+
     }
 }
 
@@ -149,7 +165,7 @@ fun Search(){
                 }
         ){
             Icon(
-                painterResource(id = R.drawable.ic_favourite),
+                painterResource(id = R.drawable.ic_fav_unselected),
                 tint = Color.White,
                 contentDescription = "Favourites",
                 modifier = Modifier

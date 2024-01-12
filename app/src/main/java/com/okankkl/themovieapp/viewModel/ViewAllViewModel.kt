@@ -6,14 +6,13 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.okankkl.themovieapp.enum_sealed.Categories
 import com.okankkl.themovieapp.enum_sealed.DataType
-import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.Movie
+import com.okankkl.themovieapp.model.TvSeries
 import com.okankkl.themovieapp.repository.RepositoryImp
 import com.okankkl.themovieapp.paging.use_case.GetMoviesUseCase
+import com.okankkl.themovieapp.paging.use_case.GetTvSeriesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,19 +22,28 @@ class ViewAllViewModel
     @Inject
     constructor(
             val repository : RepositoryImp,
-            val getMoviesUseCase: GetMoviesUseCase
+            val getMoviesUseCase: GetMoviesUseCase,
+            val getTvSeriesUseCase: GetTvSeriesUseCase
         ) : ViewModel()
 {
-    private var _contentList = MutableStateFlow<Resources>(Resources.Loading)
-    var contentList = _contentList.asStateFlow()
 
     private val _movieState : MutableStateFlow<PagingData<Movie>> = MutableStateFlow(PagingData.empty())
     val movieState get() = _movieState
+
+    private val _tvSeriesState : MutableStateFlow<PagingData<TvSeries>> = MutableStateFlow(PagingData.empty())
+    val tvSeriesState get() = _tvSeriesState
+
+    fun load(type: String, category: String){
+        when(getType(type)){
+            is DataType.TvSeries -> loadTvSeries(category)
+            is DataType.Movie -> loadMovies(category)
+        }
+    }
     
-    fun LoadMovies(){
+    private fun loadMovies(category : String){
         viewModelScope.launch {
             getMoviesUseCase.execute(
-                categories = Categories.Popular,
+                category = getCategory(category),
                 input = Unit)
                 .distinctUntilChanged()
                 .cachedIn(viewModelScope)
@@ -44,31 +52,34 @@ class ViewAllViewModel
                 }
         }
     }
-    
-    fun getContent(dataType: String,category : String,page: Int){
-            viewModelScope.launch {
-                if(dataType == DataType.Movie().name){
-                    _contentList.value = when(category){
-                        Categories.Popular.title -> repository.getMovieList(Categories.Popular,page)
-                        Categories.TopRated.title -> repository.getMovieList(Categories.TopRated,page)
-                        Categories.Trending.title -> repository.getMovieList(Categories.Trending,page)
-                        Categories.NowPlaying.title -> repository.getMovieList(Categories.NowPlaying,page)
-                        else -> Resources.Failed(errorMsg = "The movies could not loaded")
-                    }
-                }
-                else{
-                    _contentList.value = when(category){
-                        Categories.Popular.title -> repository.getTvSeriesList(Categories.Popular,page)
-                        Categories.TopRated.title -> repository.getTvSeriesList(Categories.TopRated,page)
-                        Categories.Trending.title -> repository.getTvSeriesList(Categories.Trending,page)
-                        Categories.OnTheAir.title -> repository.getTvSeriesList(Categories.OnTheAir,page)
-                        else -> Resources.Failed(errorMsg = "The tv series could not loaded")
-                    }
-                }
-            }
 
+    private fun loadTvSeries(category: String){
+        viewModelScope.launch {
+            getTvSeriesUseCase.execute(
+                category = getCategory(category),
+                input = Unit)
+                .distinctUntilChanged()
+                .cachedIn(viewModelScope)
+                .collect{
+                    _tvSeriesState.value = it
+                }
         }
+    }
 
-
+    fun getType(type: String) : DataType{
+        return when(type){
+            DataType.Movie().path -> DataType.Movie()
+            else ->DataType.TvSeries()
+        }
+    }
+    fun getCategory(category: String) : Categories{
+        return when(category){
+            Categories.Trending.path -> Categories.Trending
+            Categories.TopRated.path -> Categories.TopRated
+            Categories.NowPlaying.path -> Categories.NowPlaying
+            Categories.OnTheAir.path -> Categories.OnTheAir
+            else -> Categories.Popular
+        }
+    }
 
 }

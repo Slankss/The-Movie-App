@@ -24,8 +24,8 @@ class MovieDetailViewModel
 
     fun getMovie(id : Int){
         viewModelScope.launch {
-            _movie.value = repository.getMovieDetail(id)
-            _similarMovies.value = repository.getSimilarMovies(id)
+            _movie.value = repository.getMovieDetailFromAPI(id)
+            _similarMovies.value = repository.getSimilarMoviesFromAPI(id)
         }
     }
 
