@@ -40,7 +40,6 @@ fun YouTubePlayer(
                     override fun onReady(youTubePlayer: YouTubePlayer)
                     {
                         youTubePlayer.loadVideo(videoId,0f)
-
                         super.onReady(youTubePlayer)
                     }
 

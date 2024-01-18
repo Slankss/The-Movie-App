@@ -2,6 +2,7 @@ package com.okankkl.themovieapp.repository
 
 import androidx.paging.PagingData
 import com.okankkl.themovieapp.enum_sealed.Categories
+import com.okankkl.themovieapp.enum_sealed.DisplayType
 import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.Favourite
 import com.okankkl.themovieapp.model.Movie
@@ -33,7 +34,8 @@ interface Repository
     suspend fun addTvSeriesListToRoom(tvSeriesList : List<TvSeries>)
     suspend fun deleteTvSeriesListFromRoom()
 
-    suspend fun getFavourites() : List<Favourite>
+    suspend fun getFavourites(displayType: DisplayType) : List<Favourite>
+    suspend fun getFavourite(contentId : Int) : Favourite?
     suspend fun addFavourite(favourite: Favourite)
-    suspend fun deleteFavourite(favourite: Favourite)
+    suspend fun deleteFavourite(contentId: Int)
 }

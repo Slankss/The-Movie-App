@@ -1,8 +1,13 @@
 package com.okankkl.themovieapp.view
 
 
+import androidx.compose.foundation.Indication
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -36,6 +42,7 @@ import androidx.navigation.NavController
 import com.okankkl.themovieapp.R
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -54,6 +61,8 @@ import com.okankkl.themovieapp.viewModel.MovieDetailViewModel
 import java.time.LocalDate
 import com.okankkl.themovieapp.extensions.*
 import com.okankkl.themovieapp.components.*
+import com.okankkl.themovieapp.ui.theme.LightBlue
+import com.okankkl.themovieapp.ui.theme.OceanPalet4
 import com.okankkl.themovieapp.ui.theme.StatusBarColor
 
 @Composable
@@ -66,6 +75,7 @@ fun MovieDetail(navController: NavController,movieId : Int?)
     SideEffect {
         if(movieId != null){
             movieViewModel.getMovie(movieId)
+            movieViewModel.getFavourite(movieId)
         }
     }
 
@@ -102,7 +112,7 @@ fun MovieDetail(navController: NavController,movieId : Int?)
                 MovieTrailer(
                     movie = (movie.value as Resources.Success).data as Movie
                 )
-                MovieContent(movie = (movie.value as Resources.Success).data as Movie)
+                MovieContent(movie = (movie.value as Resources.Success).data as Movie,movieViewModel)
             }
             is Resources.Failed -> {
                 Failed(errorMsg = (movie.value as Resources.Failed).errorMsg)
@@ -153,7 +163,9 @@ fun MovieTrailer(movie: Movie ){
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun MovieContent(movie: Movie){
+fun MovieContent(movie: Movie,movieViewModel: MovieDetailViewModel){
+
+    val favouriteState = movieViewModel.favouriteState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -257,58 +269,48 @@ fun MovieContent(movie: Movie){
                 )
             )
         }
-        Row(
-            modifier = Modifier,
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(30.dp)
+        Box(
+            modifier = Modifier
+                .align(Alignment.End)
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    if(favouriteState.value == null){
+                        movieViewModel.addFavourite(movie)
+                    }
+                    else{
+                        movieViewModel.deleteFavourite(movie)
+                    }
+                }
+            ,
         ){
             Row(
                 modifier = Modifier
-                    .clickable {
-
-                    },
+                    .padding(horizontal = 10.dp, vertical = 5.dp)
+                    .align(Alignment.CenterEnd),
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_fav_unselected),
-                    contentDescription = null,
-                    tint = Color.White,
+                Text(
+                    text = if(favouriteState.value == null) "Favorilere Ekle" else "Favorilerden Çıkar",
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = 14.sp,
+                        color = Color(0x99FFFFFF)
+                    ),
                     modifier = Modifier
+                )
+                Icon(
+                    painter = if(favouriteState.value == null) painterResource(id = R.drawable.ic_fav_unselected) else painterResource(
+                        id = R.drawable.ic_fav_selected
+                    ),
+                    contentDescription = null,
+                    tint = if(favouriteState.value == null) Color.White else OceanPalet4,
+                    modifier = Modifier
+                        .padding(start = 10.dp)
                         .size(16.dp)
-                )
-                Text(
-                    text = "Favoriye Ekle",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontSize = 14.sp,
-                        color = Color(0x99FFFFFF)
-                    ),
-                    modifier = Modifier
-                        .padding(start = 5.dp)
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .clickable {
 
-                    },
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_share),
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier
-                        .size(18.dp)
                 )
-                Text(
-                    text = "Paylaş",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontSize = 14.sp,
-                        color = Color(0x99FFFFFF)
-                    ),
-                    modifier = Modifier
-                        .padding(start = 5.dp)
-                )
+
             }
         }
 

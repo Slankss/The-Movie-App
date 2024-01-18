@@ -6,6 +6,7 @@ import com.okankkl.themovieapp.api.TmdbApi
 import com.okankkl.themovieapp.dao.Dao
 import com.okankkl.themovieapp.paging.data_source.DataSourcesImp
 import com.okankkl.themovieapp.enum_sealed.Categories
+import com.okankkl.themovieapp.enum_sealed.DisplayType
 import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.Favourite
 import com.okankkl.themovieapp.model.Movie
@@ -76,9 +77,14 @@ class RepositoryImp
         dao.deleteTvSeries()
     }
 
-    override suspend fun getFavourites(): List<Favourite>
+    override suspend fun getFavourites(displayType: DisplayType): List<Favourite>
     {
-        return dao.getFavourites()
+        return dao.getFavourites(displayType.path)
+    }
+
+    override suspend fun getFavourite(contentId : Int): Favourite?
+    {
+        return dao.getFavourite(contentId)
     }
 
     override suspend fun addFavourite(favourite: Favourite)
@@ -86,9 +92,9 @@ class RepositoryImp
         dao.addFavourite(favourite)
     }
 
-    override suspend fun deleteFavourite(favourite: Favourite)
+    override suspend fun deleteFavourite(contentId: Int)
     {
-        dao.deleteFavourite(favourite)
+        dao.deleteFavourite(contentId)
     }
 
     override suspend fun getMovieDetailFromAPI(id: Int): Resources

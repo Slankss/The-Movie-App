@@ -27,11 +27,17 @@ enum class Categories(
     )
 }
 
-sealed class DataType(
-    var title : String,
-    var path : String
+enum class DisplayType(
+    var path : String,
+    var title : String
 ){
-    class Movie(path : String = "movie",title: String = "Movies") : DataType(path = path, title = title)
-    class TvSeries(path : String = "tv_series",title : String = "TV Series") : DataType(path = path, title = title)
+    Movie(
+        path = "movie",
+        title = "Movies"
+    ),
+    TvSeries(
+        path = "tv_series",
+        title = "TV Series"
+    )
 }
 

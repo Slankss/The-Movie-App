@@ -1,14 +1,10 @@
 package com.okankkl.themovieapp.view
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,13 +32,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.okankkl.themovieapp.R
 import com.okankkl.themovieapp.components.SearchTextField
 import com.okankkl.themovieapp.enum_sealed.Pages
-import com.okankkl.themovieapp.viewModel.listViewModel
+import com.okankkl.themovieapp.viewModel.ListViewModel
 
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
 @Composable
 fun Home(navController: NavController)
 {
-    val listViewModel : listViewModel = hiltViewModel()
+    val listViewModel : ListViewModel = hiltViewModel()
     var selectedPage = listViewModel.selectedPage.collectAsState()
 
     LaunchedEffect(true){
@@ -50,62 +46,11 @@ fun Home(navController: NavController)
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            modifier = Modifier
-                .padding(top = 25.dp)
-                .align(Alignment.CenterHorizontally)
-                .border(
-                    width = 1.dp,
-                    color = Color.White,
-                    shape = RoundedCornerShape(12.dp)
-                )
-        ) {
-
-          Box(
-              modifier = Modifier
-                  .clip(RoundedCornerShape(14.dp))
-                  .background(
-                      color = if (selectedPage.value == Pages.MovieList) Color.White else Color.Transparent
-                  )
-                  .clickable {
-                      listViewModel.setSelectedPage(Pages.MovieList)
-                  }
-          ){
-              Text(
-                  text = Pages.MovieList.title,
-                  modifier = Modifier
-                      .align(Alignment.Center)
-                      .padding(horizontal = 25.dp, vertical = 10.dp),
-                  style = MaterialTheme.typography.labelLarge.copy(
-                      color = if(selectedPage.value == Pages.MovieList) Color.Black else Color.White,
-                      fontSize = 16.sp
-                  )
-              )
-          }
-
-          Box(
-              modifier = Modifier
-                  .clip(RoundedCornerShape(14.dp))
-                  .background(
-                      color = if (selectedPage.value == Pages.TvSeriesList) Color.White else Color.Transparent
-                  )
-                  .clickable {
-                      listViewModel.setSelectedPage(Pages.TvSeriesList)
-                  }
-          ){
-              Text(
-                  text = Pages.TvSeriesList.title,
-                  modifier = Modifier
-                      .align(Alignment.Center)
-                      .padding(horizontal = 25.dp, vertical = 10.dp),
-                  style = MaterialTheme.typography.labelLarge.copy(
-                      color = if(selectedPage.value == Pages.TvSeriesList) Color.Black else Color.White,
-                      fontSize = 16.sp
-                  )
-              )
-          }
+        TopMenu(selectedPage){ page ->
+            listViewModel.setSelectedPage(page)
         }
 
         AnimatedContent(
@@ -118,6 +63,63 @@ fun Home(navController: NavController)
             }
         }
 
+    }
+}
+
+@Composable
+fun TopMenu(selectedPage : State<Pages>,setSelectedPage :(Pages) -> Unit){
+    Row(
+        modifier = Modifier
+            .padding(top = 25.dp)
+            .border(
+                width = 1.dp,
+                color = Color.White,
+                shape = RoundedCornerShape(12.dp)
+            )
+    ) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(14.dp))
+                .background(
+                    color = if (selectedPage.value == Pages.MovieList) Color.White else Color.Transparent
+                )
+                .clickable {
+                    setSelectedPage(Pages.MovieList)
+                }
+        ){
+            Text(
+                text = Pages.MovieList.title,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(horizontal = 25.dp, vertical = 10.dp),
+                style = MaterialTheme.typography.labelLarge.copy(
+                    color = if(selectedPage.value == Pages.MovieList) Color.Black else Color.White,
+                    fontSize = 16.sp
+                )
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(14.dp))
+                .background(
+                    color = if (selectedPage.value == Pages.TvSeriesList) Color.White else Color.Transparent
+                )
+                .clickable {
+                    setSelectedPage(Pages.TvSeriesList)
+                }
+        ){
+            Text(
+                text = Pages.TvSeriesList.title,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(horizontal = 25.dp, vertical = 10.dp),
+                style = MaterialTheme.typography.labelLarge.copy(
+                    color = if(selectedPage.value == Pages.TvSeriesList) Color.Black else Color.White,
+                    fontSize = 16.sp
+                )
+            )
+        }
     }
 }
 

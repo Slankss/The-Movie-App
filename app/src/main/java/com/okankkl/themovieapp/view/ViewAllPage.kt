@@ -1,6 +1,9 @@
 package com.okankkl.themovieapp.view
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -12,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,7 +28,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.okankkl.themovieapp.components.Poster
-import com.okankkl.themovieapp.enum_sealed.DataType
+import com.okankkl.themovieapp.enum_sealed.DisplayType
 import com.okankkl.themovieapp.enum_sealed.Pages
 import com.okankkl.themovieapp.model.TvSeries
 
@@ -55,8 +59,8 @@ fun ViewAll(navController: NavController,dataType : String?,category : String?){
         }
 
         when(dataType){
-            DataType.Movie().path -> MoviePages(viewAllViewModel,navController)
-            DataType.TvSeries().path -> TvSeriesPages(viewAllViewModel,navController)
+            DisplayType.Movie.path -> MoviePages(viewAllViewModel,navController)
+            DisplayType.TvSeries.path -> TvSeriesPages(viewAllViewModel,navController)
         }
 
     }
@@ -86,6 +90,16 @@ fun MoviePages(viewAllViewModel: ViewAllViewModel,navController: NavController){
                 ){ movieId ->
                     navController.navigate(Pages.MovieDetail.route+"/"+movieId)
                 }
+            }
+            else{
+                Box(
+                    modifier = Modifier
+                        .height(150.dp)
+                        .background(Color(0x0F5A5A5A))
+                        .clickable {
+                            navController.navigate(Pages.TvSeriesDetail.route+"/"+movie.id)
+                        },
+                )
             }
         }
         moviesPagingItems.apply {
@@ -127,16 +141,26 @@ fun TvSeriesPages(viewAllViewModel: ViewAllViewModel, navController: NavControll
     ){
 
         items(tvSeriesPagingItems.itemCount){ index ->
-            val movie = tvSeriesPagingItems[index]
-            if(movie!!.posterPath != null && movie.posterPath!!.isNotEmpty()){
+            val tvSeries = tvSeriesPagingItems[index]
+            if(tvSeries!!.posterPath != null && tvSeries.posterPath!!.isNotEmpty()){
                 Poster(
-                    posterPath = movie.posterPath!!,
-                    id = movie.id,
+                    posterPath = tvSeries.posterPath!!,
+                    id = tvSeries.id,
                     modifier = Modifier
                         .height(150.dp)
                 ){ tvSeriesId ->
                     navController.navigate(Pages.TvSeriesDetail.route+"/"+tvSeriesId)
                 }
+            }
+            else{
+                Box(
+                    modifier = Modifier
+                        .height(150.dp)
+                        .background(Color(0x0F5A5A5A))
+                        .clickable {
+                            navController.navigate(Pages.TvSeriesDetail.route+"/"+tvSeries.id)
+                        },
+                )
             }
 
         }

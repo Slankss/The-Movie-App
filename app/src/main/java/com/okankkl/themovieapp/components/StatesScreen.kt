@@ -18,7 +18,9 @@ fun Loading(
     Box(
         modifier = modifier
     ){
-        CircularProgressIndicator()
+        CircularProgressIndicator(
+            modifier = Modifier.align(Alignment.Center)
+        )
     }
 }
 

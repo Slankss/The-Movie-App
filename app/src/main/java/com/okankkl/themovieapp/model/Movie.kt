@@ -32,7 +32,7 @@ data class Movie(
     @Ignore
     var videos : Videos? = null
     @Ignore
-    var revenue : Int = 0
+    var revenue : Long = 0
     @Ignore
     var runtime = 0
     @Ignore
@@ -42,7 +42,7 @@ data class Movie(
     constructor(
         backdropPath: String?, genres : List<Genres>,id: Int,
         overview: String, popularity: Double, posterPath: String?,
-        releaseDate: String, revenue : Int,runtime : Int, title: String,voteAverage: Double,
+        releaseDate: String, revenue : Long,runtime : Int, title: String,voteAverage: Double,
         videos : Videos
     )
             : this(backdropPath, id, popularity, posterPath, releaseDate, title, voteAverage)

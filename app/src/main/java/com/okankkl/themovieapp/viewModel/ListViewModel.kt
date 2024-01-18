@@ -1,6 +1,5 @@
 package com.okankkl.themovieapp.viewModel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.okankkl.themovieapp.enum_sealed.Categories
@@ -22,7 +21,7 @@ import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @HiltViewModel
-class listViewModel
+class ListViewModel
     @Inject
     constructor(var repository: RepositoryImp, var storeData : StoreData) : ViewModel()
 {
@@ -86,7 +85,6 @@ class listViewModel
             movieUpdateTime = storeData.getMovieUpdateTime.first()
             val currentDate = LocalDateTime.now()
             if(movieUpdateTime == null || movieUpdateTime!!.isEmpty()){
-                Log.w("arabam","get movies from api")
                 getMoviesFromAPI()
                 storeData.saveMovieUpdateTime(currentDate.toString())
 
@@ -96,10 +94,8 @@ class listViewModel
                 val difference = lastUpdateTime.until(currentDate, ChronoUnit.MINUTES)
                 if(difference >= 5){
                     getMoviesFromAPI()
-                    Log.w("arabam","get movies from api")
                     storeData.saveMovieUpdateTime(currentDate.toString())
                 } else {
-                    Log.w("arabam","get movies from Room")
                     getMoviesFromRoom()
                 }
 

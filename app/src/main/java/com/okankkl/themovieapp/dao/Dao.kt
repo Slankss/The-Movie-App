@@ -32,12 +32,15 @@ interface Dao
     @Query("DELETE FROM TvSeries")
     fun deleteTvSeries()
 
-    @Query("SELECT * FROM Favourites ORDER BY id DESC")
-    fun getFavourites() : List<Favourite>
+    @Query("SELECT * FROM Favourites WHERE type = :displayType ORDER BY id DESC")
+    fun getFavourites(displayType : String) : List<Favourite>
+
+    @Query("SELECT * FROM Favourites WHERE contentId = :contentId")
+    fun getFavourite(contentId: Int) : Favourite?
 
     @Insert
     fun addFavourite(favourite: Favourite)
 
-    @Delete
-    fun deleteFavourite(favourite: Favourite)
+    @Query("DELETE FROM Favourites WHERE contentId = :contentId")
+    fun deleteFavourite(contentId : Int)
 }

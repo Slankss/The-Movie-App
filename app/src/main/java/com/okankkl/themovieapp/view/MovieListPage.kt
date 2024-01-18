@@ -1,12 +1,6 @@
 package com.okankkl.themovieapp.view
 
 import android.annotation.SuppressLint
-import android.util.Log
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,11 +22,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
@@ -46,19 +38,18 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.okankkl.themovieapp.enum_sealed.Pages
-import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.ui.theme.LightBlue
 import com.okankkl.themovieapp.util.Util
-import com.okankkl.themovieapp.viewModel.listViewModel
+import com.okankkl.themovieapp.viewModel.ListViewModel
 import androidx.compose.runtime.*
 import com.okankkl.themovieapp.enum_sealed.Categories
-import com.okankkl.themovieapp.enum_sealed.DataType
 import com.okankkl.themovieapp.components.*
+import com.okankkl.themovieapp.enum_sealed.DisplayType
 
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
 @Composable
-fun MovieList(navController: NavController,listViewModel: listViewModel){
+fun MovieList(navController: NavController,listViewModel: ListViewModel){
 
     val popularMovies = listViewModel.popularMovies.collectAsState()
     val trendMovies = listViewModel.trendMovies.collectAsState()
@@ -228,7 +219,7 @@ fun MovieContentList(movieList : List<Movie>,moviesType : Categories, navControl
                     .align(Alignment.CenterEnd)
                     .padding(end = 15.dp)
                     .clickable {
-                        navController.navigate("${Pages.ViewAll.route}/${DataType.Movie().path}&${moviesType.path}")
+                        navController.navigate("${Pages.ViewAll.route}/${DisplayType.Movie.path}&${moviesType.path}")
                     },
                 text = "view all",
                 style = MaterialTheme.typography.labelLarge.copy(

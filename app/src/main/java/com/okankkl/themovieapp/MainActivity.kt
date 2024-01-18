@@ -300,7 +300,7 @@ fun AppActivity()
                     }
                 )
                 { backStackEntry ->
-                    MovieDetail(navController = navController,backStackEntry.arguments?.getInt("movieId"))
+                    MovieDetail(navController = navController,backStackEntry.arguments?.getInt("movieId"),)
                 }
 
                 composable(

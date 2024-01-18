@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.okankkl.themovieapp.enum_sealed.Categories
-import com.okankkl.themovieapp.enum_sealed.DataType
+import com.okankkl.themovieapp.enum_sealed.DisplayType
 import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.model.TvSeries
 import com.okankkl.themovieapp.repository.RepositoryImp
@@ -35,8 +35,8 @@ class ViewAllViewModel
 
     fun load(type: String, category: String){
         when(getType(type)){
-            is DataType.TvSeries -> loadTvSeries(category)
-            is DataType.Movie -> loadMovies(category)
+            DisplayType.TvSeries -> loadTvSeries(category)
+            DisplayType.Movie -> loadMovies(category)
         }
     }
     
@@ -66,10 +66,10 @@ class ViewAllViewModel
         }
     }
 
-    fun getType(type: String) : DataType{
+    fun getType(type: String) : DisplayType{
         return when(type){
-            DataType.Movie().path -> DataType.Movie()
-            else ->DataType.TvSeries()
+            DisplayType.Movie.path -> DisplayType.Movie
+            else ->DisplayType.TvSeries
         }
     }
     fun getCategory(category: String) : Categories{
