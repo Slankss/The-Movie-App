@@ -52,22 +52,8 @@ import com.okankkl.themovieapp.enum_sealed.DisplayType
 @Composable
 fun TvSeriesList(navController: NavController,listViewModel: ListViewModel){
 
-    val popularTvSeries = listViewModel.popularTvSeries.collectAsState()
-    val trendTvSeries = listViewModel.trendTvSeries.collectAsState()
-    val topRatedSeries = listViewModel.topRatedTvSeries.collectAsState()
-    val onTheAirTvSeries = listViewModel.onTheAirTvSeries.collectAsState()
     val loadingState = listViewModel.loadingState.collectAsState()
-
-    fun getTvSeriesList(tvSeriesType: Categories) : List<TvSeries>?
-    {
-        return when(tvSeriesType){
-            Categories.Popular -> popularTvSeries.value
-            Categories.Trending -> trendTvSeries.value
-            Categories.TopRated -> topRatedSeries.value
-            Categories.OnTheAir -> onTheAirTvSeries.value
-            else -> null
-        }
-    }
+    val allTvSeriesList = listViewModel.allTvSeriesList.collectAsState()
 
     LaunchedEffect(key1 = true) {
         listViewModel.getTvSeries()
@@ -88,19 +74,21 @@ fun TvSeriesList(navController: NavController,listViewModel: ListViewModel){
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            listViewModel.setLoadingState(allTvSeriesList.value.isEmpty())
+
             Categories.values().forEach { tvSeriesType ->
-                val tvSeriesList = getTvSeriesList(tvSeriesType)
-                if(!tvSeriesList.isNullOrEmpty()){
+                val tvSeriesList = allTvSeriesList.value
+                    .filter{ it.category.split(",").contains(tvSeriesType.path)}
+                    .sortedByDescending{ it.voteAverage }
+                    .distinctBy { it.id }
+                if(tvSeriesList.isNotEmpty()){
                     if(tvSeriesType == Categories.Trending){
                         TrendTvSeries(tvSeries = tvSeriesList, navController = navController)
                     } else {
                         TvSeriesContentList(tvSeries = tvSeriesList, tvSeriesType = tvSeriesType, navController = navController)
                     }
-                    listViewModel.setLoadingState(false)
                 }
-
             }
-
         }
     }
 

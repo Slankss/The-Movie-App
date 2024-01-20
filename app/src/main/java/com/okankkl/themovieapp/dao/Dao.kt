@@ -14,8 +14,8 @@ import com.okankkl.themovieapp.model.TvSeries
 @Dao
 interface Dao
 {
-    @Query("SELECT * FROM Movie WHERE category LIKE '%' || :category || '%' ORDER BY :order_by DESC")
-    fun getMovies(category : String,order_by : String) : List<Movie>
+    @Query("SELECT * FROM Movie")
+    fun getMovies() : List<Movie>
 
     @Upsert
     suspend fun addMovies(movieList : List<Movie>)
@@ -23,8 +23,8 @@ interface Dao
     @Query("DELETE FROM Movie")
     fun deleteMovies()
 
-    @Query("SELECT * FROM TvSeries WHERE category LIKE '%' || :category || '%'")
-    fun getTvSeries(category : String) : List<TvSeries>
+    @Query("SELECT * FROM TvSeries ")
+    fun getTvSeries() : List<TvSeries>
 
     @Upsert
     suspend fun addTvSeries(movieList : List<TvSeries>)

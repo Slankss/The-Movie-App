@@ -26,11 +26,11 @@ interface Repository
 
     suspend fun getTvSeriesPage(category: Categories): Flow<PagingData<TvSeries>>
 
-    suspend fun getMovieListFromRoom(category : Categories) : List<Movie>
+    suspend fun getMovieListFromRoom() : List<Movie>
     suspend fun addMovieListToRoom(movieList : List<Movie>)
     suspend fun deleteMovieListFromRoom()
 
-    suspend fun getTvSeriesListFromRoom(category: Categories) : List<TvSeries>
+    suspend fun getTvSeriesListFromRoom() : List<TvSeries>
     suspend fun addTvSeriesListToRoom(tvSeriesList : List<TvSeries>)
     suspend fun deleteTvSeriesListFromRoom()
 

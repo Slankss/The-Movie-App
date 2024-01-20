@@ -34,7 +34,7 @@ class RepositoryImp
 
             if(response.isSuccessful){
                 response.body()?.results?.map { movie ->
-                    movie.category = ""
+                    movie.category = category.path
                     return@map movie
                 }
                     ?: listOf<Movie>()
@@ -47,9 +47,9 @@ class RepositoryImp
         }
     }
 
-    override suspend fun getMovieListFromRoom(category: Categories): List<Movie>
+    override suspend fun getMovieListFromRoom(): List<Movie>
     {
-        return dao.getMovies(category.path,"popularity")
+        return dao.getMovies()
     }
 
     override suspend fun addMovieListToRoom(movieList: List<Movie>)
@@ -62,9 +62,9 @@ class RepositoryImp
         dao.deleteMovies()
     }
 
-    override suspend fun getTvSeriesListFromRoom(category: Categories): List<TvSeries>
+    override suspend fun getTvSeriesListFromRoom(): List<TvSeries>
     {
-        return dao.getTvSeries(category.path)
+        return dao.getTvSeries()
     }
 
     override suspend fun addTvSeriesListToRoom(tvSeriesList: List<TvSeries>)
@@ -160,7 +160,7 @@ class RepositoryImp
 
             if(response.isSuccessful){
                 response.body()?.results?.map { tvSeries ->
-                    tvSeries.category = ""
+                    tvSeries.category = category.path
                     return@map tvSeries
                 } ?: listOf()
             }

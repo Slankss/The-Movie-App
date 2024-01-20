@@ -1,6 +1,7 @@
 package com.okankkl.themovieapp.view
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -51,13 +52,9 @@ import com.okankkl.themovieapp.enum_sealed.DisplayType
 @Composable
 fun MovieList(navController: NavController,listViewModel: ListViewModel){
 
-    val popularMovies = listViewModel.popularMovies.collectAsState()
-    val trendMovies = listViewModel.trendMovies.collectAsState()
-    val topRatedMovies = listViewModel.topRatedMovies.collectAsState()
-    val nowPlayingMovies = listViewModel.nowPlayingMovies.collectAsState()
     val loadingState = listViewModel.loadingState.collectAsState()
 
-
+    val allMovieList = listViewModel.allMovieList.collectAsState()
 
     LaunchedEffect(key1 = true){
         listViewModel.getMovies()
@@ -80,15 +77,24 @@ fun MovieList(navController: NavController,listViewModel: ListViewModel){
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            listViewModel.setLoadingState(allMovieList.value.isEmpty())
+
             Categories.values().forEach { type ->
-                val movieList = listViewModel.getMovieList(type)
-                if(!movieList.isNullOrEmpty()){
+                Log.w("arabam","--------------${type.path}")
+                val movieList = allMovieList.value
+                    .filter { it.category.split(",").contains(type.path)}
+                    .sortedByDescending { it.popularity }
+                    .distinctBy { it.id }
+                movieList.forEach {
+                    Log.w("arabam","${it.title} (${it.category})")
+                }
+
+                if(movieList.isNotEmpty()){
                     if(type == Categories.Trending){
                         TrendMovies(movies = movieList, navController = navController)
                     } else {
                         MovieContentList(movieList = movieList, moviesType = type, navController = navController)
                     }
-                    listViewModel.setLoadingState(false)
                 }
             }
         }
