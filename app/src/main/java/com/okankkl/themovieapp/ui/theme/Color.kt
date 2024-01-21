@@ -18,6 +18,7 @@ val OceanPalet4 = Color(0xFFCAE9FF)
 val OceanPalet5 = Color(0xFF5FA8D3)
 
 val BackgroundColor = Color(0xFF0D1321)
+val BacgroundTransparentColor = Color(0xB30D1321)
 val LightBlue = Color(0xFF4BEDF7)
 val StatusBarColor = Color(0xFF010E0F)
 

@@ -5,6 +5,9 @@ import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,21 +47,25 @@ import com.okankkl.themovieapp.ui.theme.LightBlue
 import com.okankkl.themovieapp.util.Util
 import com.okankkl.themovieapp.viewModel.ListViewModel
 import androidx.compose.runtime.*
+import androidx.compose.ui.unit.Dp
 import com.okankkl.themovieapp.enum_sealed.Categories
 import com.okankkl.themovieapp.components.*
 import com.okankkl.themovieapp.enum_sealed.DisplayType
 
+
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
 @Composable
-fun MovieList(navController: NavController,listViewModel: ListViewModel){
+fun MovieList(navController: NavController, listViewModel: ListViewModel, topPadding: Dp,getMenuVisibility : (Boolean) -> Unit){
 
     val loadingState = listViewModel.loadingState.collectAsState()
-
     val allMovieList = listViewModel.allMovieList.collectAsState()
+    val scrollState = rememberScrollState()
+
 
     LaunchedEffect(key1 = true){
         listViewModel.getMovies()
     }
+
 
     Box(
         modifier = Modifier
@@ -70,28 +77,25 @@ fun MovieList(navController: NavController,listViewModel: ListViewModel){
                     .align(Alignment.Center)
             )
         }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 10.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(scrollState)
+            ,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             listViewModel.setLoadingState(allMovieList.value.isEmpty())
 
             Categories.values().forEach { type ->
-                Log.w("arabam","--------------${type.path}")
                 val movieList = allMovieList.value
                     .filter { it.category.split(",").contains(type.path)}
                     .sortedByDescending { it.popularity }
                     .distinctBy { it.id }
-                movieList.forEach {
-                    Log.w("arabam","${it.title} (${it.category})")
-                }
 
                 if(movieList.isNotEmpty()){
                     if(type == Categories.Trending){
-                        TrendMovies(movies = movieList, navController = navController)
+                        TrendMovies(movies = movieList, navController = navController, topPadding = topPadding)
                     } else {
                         MovieContentList(movieList = movieList, moviesType = type, navController = navController)
                     }
@@ -104,7 +108,7 @@ fun MovieList(navController: NavController,listViewModel: ListViewModel){
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TrendMovies(movies : List<Movie>,navController: NavController){
+fun TrendMovies(movies : List<Movie>,navController: NavController,topPadding: Dp){
 
     var time by remember { mutableStateOf(0) }
 
@@ -131,18 +135,17 @@ fun TrendMovies(movies : List<Movie>,navController: NavController){
     })
     Column(
         modifier = Modifier
-            .padding(top = 10.dp)
+            .padding(top = topPadding, start = 15.dp,end = 15.dp)
     ) {
         HorizontalPager(
             state = pageState,
             modifier = Modifier.fillMaxWidth()
         )
         { page ->
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 25.dp)
+                    .padding(end = 10.dp, start = 10.dp)
                     .height(200.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .shadow(
@@ -171,9 +174,13 @@ fun TrendMovies(movies : List<Movie>,navController: NavController){
                         .fillMaxWidth()
                         .padding(5.dp),
                     style = MaterialTheme.typography.headlineLarge.copy(
+
                     ),
+
+
                     )
             }
+
         }
         Row(
             modifier = Modifier

@@ -10,6 +10,9 @@ data class Favourite(
     var backdropPath : String,
     var posterPath : String,
     var contentId : Int,
+    var date : String,
+    var imdb : Double,
+    var time : String,
     @PrimaryKey(autoGenerate = true)
     var id : Int = 0
 )

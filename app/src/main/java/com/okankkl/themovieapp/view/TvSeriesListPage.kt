@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -50,10 +51,11 @@ import com.okankkl.themovieapp.components.*
 import com.okankkl.themovieapp.enum_sealed.DisplayType
 
 @Composable
-fun TvSeriesList(navController: NavController,listViewModel: ListViewModel){
+fun TvSeriesList(navController: NavController, listViewModel: ListViewModel, topPadding: Dp){
 
     val loadingState = listViewModel.loadingState.collectAsState()
     val allTvSeriesList = listViewModel.allTvSeriesList.collectAsState()
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(key1 = true) {
         listViewModel.getTvSeries()
@@ -70,8 +72,7 @@ fun TvSeriesList(navController: NavController,listViewModel: ListViewModel){
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(vertical = 10.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             listViewModel.setLoadingState(allTvSeriesList.value.isEmpty())
@@ -83,7 +84,7 @@ fun TvSeriesList(navController: NavController,listViewModel: ListViewModel){
                     .distinctBy { it.id }
                 if(tvSeriesList.isNotEmpty()){
                     if(tvSeriesType == Categories.Trending){
-                        TrendTvSeries(tvSeries = tvSeriesList, navController = navController)
+                        TrendTvSeries(tvSeries = tvSeriesList, navController = navController,topPadding = topPadding)
                     } else {
                         TvSeriesContentList(tvSeries = tvSeriesList, tvSeriesType = tvSeriesType, navController = navController)
                     }
@@ -97,7 +98,7 @@ fun TvSeriesList(navController: NavController,listViewModel: ListViewModel){
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TrendTvSeries(tvSeries : List<TvSeries>, navController: NavController){
+fun TrendTvSeries(tvSeries: List<TvSeries>, navController: NavController, topPadding: Dp){
 
     var time by remember { mutableStateOf(0) }
 
@@ -119,12 +120,11 @@ fun TrendTvSeries(tvSeries : List<TvSeries>, navController: NavController){
             delay(1000L)
             time++
         }
-
          */
     })
     Column(
         modifier = Modifier
-
+            .padding(top = topPadding)
     ) {
         HorizontalPager(
             state = pageState,

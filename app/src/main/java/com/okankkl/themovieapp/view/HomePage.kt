@@ -1,16 +1,31 @@
 package com.okankkl.themovieapp.view
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,8 +36,8 @@ import androidx.navigation.NavController
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,7 +46,11 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.okankkl.themovieapp.R
 import com.okankkl.themovieapp.components.SearchTextField
+import com.okankkl.themovieapp.components.TopMenuItem
+import com.okankkl.themovieapp.enum_sealed.DisplayType
 import com.okankkl.themovieapp.enum_sealed.Pages
+import com.okankkl.themovieapp.ui.theme.BacgroundTransparentColor
+import com.okankkl.themovieapp.ui.theme.BackgroundColor
 import com.okankkl.themovieapp.viewModel.ListViewModel
 
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
@@ -39,87 +58,84 @@ import com.okankkl.themovieapp.viewModel.ListViewModel
 fun Home(navController: NavController)
 {
     val listViewModel : ListViewModel = hiltViewModel()
-    var selectedPage = listViewModel.selectedPage.collectAsState()
+    val selectedPage = listViewModel.selectedPage.collectAsState()
+    var menuVisibility by  remember { mutableStateOf(true) }
 
-    LaunchedEffect(true){
-    }
-
-    Column(
+    Box(
         modifier = Modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxSize()
     ) {
-        TopMenu(selectedPage){ page ->
-            listViewModel.setSelectedPage(page)
-        }
 
-        AnimatedContent(
-            targetState = selectedPage,
-            label = "Home"
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+
+
         ) {
             when(selectedPage.value){
-                Pages.TvSeriesList -> TvSeriesList(navController = navController,listViewModel = listViewModel)
-                else -> MovieList(navController = navController,listViewModel = listViewModel)
+                DisplayType.TvSeries -> TvSeriesList(navController = navController,listViewModel = listViewModel,topPadding = 100.dp)
+                else -> MovieList(navController = navController,listViewModel = listViewModel,topPadding = 100.dp){ state ->
+                    menuVisibility = state
+                }
             }
+        }
+
+        TopMenu(selectedPage,menuVisibility){ page ->
+            listViewModel.setSelectedPage(page)
         }
 
     }
 }
 
 @Composable
-fun TopMenu(selectedPage : State<Pages>,setSelectedPage :(Pages) -> Unit){
-    Row(
+fun TopMenu(selectedPage : State<DisplayType>,menuVisibility : Boolean,setSelectedPage :(DisplayType) -> Unit){
+
+    val menuList = Pages.values().filter { it == Pages.MovieList || it == Pages.TvSeriesList }
+    Column(
         modifier = Modifier
-            .padding(top = 25.dp)
-            .border(
-                width = 1.dp,
-                color = Color.White,
-                shape = RoundedCornerShape(12.dp)
-            )
-    ) {
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(14.dp))
-                .background(
-                    color = if (selectedPage.value == Pages.MovieList) Color.White else Color.Transparent
-                )
-                .clickable {
-                    setSelectedPage(Pages.MovieList)
+            .fillMaxWidth()
+            .background(color = BacgroundTransparentColor)
+            .padding(top = 20.dp, start = 25.dp, end = 25.dp)
+            .pointerInput(Unit) {
+                detectTapGestures {
                 }
+            },
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ){
-            Text(
-                text = Pages.MovieList.title,
+            Box(
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(horizontal = 25.dp, vertical = 10.dp),
-                style = MaterialTheme.typography.labelLarge.copy(
-                    color = if(selectedPage.value == Pages.MovieList) Color.Black else Color.White,
-                    fontSize = 16.sp
-                )
+                    .height(25.dp)
+                    .width(25.dp)
+                    .background(color = Color.White)
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.ic_search),
+                contentDescription = "search",
+                tint = Color.White
             )
         }
 
-        Box(
+        Row(
             modifier = Modifier
-                .clip(RoundedCornerShape(14.dp))
-                .background(
-                    color = if (selectedPage.value == Pages.TvSeriesList) Color.White else Color.Transparent
-                )
-                .clickable {
-                    setSelectedPage(Pages.TvSeriesList)
-                }
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            verticalAlignment = Alignment.CenterVertically
         ){
-            Text(
-                text = Pages.TvSeriesList.title,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(horizontal = 25.dp, vertical = 10.dp),
-                style = MaterialTheme.typography.labelLarge.copy(
-                    color = if(selectedPage.value == Pages.TvSeriesList) Color.Black else Color.White,
-                    fontSize = 16.sp
-                )
-            )
+            DisplayType.values().forEachIndexed { index, menu ->
+                val isSelected = selectedPage.value == menu
+                TopMenuItem(displayType = menu, isSelected = isSelected){
+                    setSelectedPage(menu)
+                }
+            }
         }
+
     }
 }
 

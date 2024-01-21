@@ -50,7 +50,9 @@ class MovieDetailViewModel
     fun addFavourite(movie : Movie){
         GlobalScope.launch(Dispatchers.IO) {
             val addJob = launch {
-                val favourite = Favourite(DisplayType.Movie.path,movie.title,movie.backdropPath ?: "",movie.posterPath ?: "",movie.id)
+                val time ="${movie.runtime} minutes"
+                val favourite = Favourite(DisplayType.Movie.path,movie.title,movie.backdropPath ?: "",movie.posterPath ?: "",
+                    movie.id,movie.releaseDate,movie.voteAverage,time)
                 repository.addFavourite(favourite)
             }
             addJob.invokeOnCompletion {

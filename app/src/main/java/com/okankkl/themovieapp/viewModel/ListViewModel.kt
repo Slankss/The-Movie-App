@@ -1,9 +1,13 @@
 package com.okankkl.themovieapp.viewModel
 
 import android.util.Log
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.okankkl.themovieapp.enum_sealed.Categories
+import com.okankkl.themovieapp.enum_sealed.DisplayType
 import com.okankkl.themovieapp.enum_sealed.Pages
 import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.model.StoreData
@@ -26,7 +30,7 @@ class ListViewModel
     @Inject
     constructor(var repository: RepositoryImp, var storeData : StoreData) : ViewModel()
 {
-    private var _selectedPage = MutableStateFlow(Pages.MovieList)
+    private var _selectedPage = MutableStateFlow(DisplayType.Movie)
     var selectedPage = _selectedPage.asStateFlow()
 
     private var _loadingState = MutableStateFlow(true)
@@ -41,7 +45,7 @@ class ListViewModel
     var movieUpdateTime : String? = null
     var tvSeriesUpdateTime : String? = null
 
-    fun setSelectedPage(page : Pages){
+    fun setSelectedPage(page : DisplayType){
         _selectedPage.value = page
         setLoadingState(true)
     }
@@ -49,7 +53,6 @@ class ListViewModel
     fun setLoadingState(state : Boolean){
         _loadingState.value = state
     }
-
 
     fun getMovies(){
         viewModelScope.launch {

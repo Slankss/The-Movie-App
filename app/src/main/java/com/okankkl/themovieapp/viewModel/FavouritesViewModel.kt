@@ -1,10 +1,7 @@
 package com.okankkl.themovieapp.viewModel
 
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.okankkl.themovieapp.enum_sealed.DisplayType
-import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.Favourite
 import com.okankkl.themovieapp.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,6 +28,14 @@ class FavouritesViewModel
         GlobalScope.launch(Dispatchers.IO) {
             _favourites.value = null
             _favourites.value = repository.getFavourites(displayType)
+        }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun deleleteFavourite(favourite : Favourite,displayType: DisplayType){
+        GlobalScope.launch(Dispatchers.IO){
+            repository.deleteFavourite(favourite.contentId)
+            getFavourites(displayType)
         }
     }
 
