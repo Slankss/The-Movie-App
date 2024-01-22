@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Indication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,6 +15,7 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -80,7 +82,7 @@ fun Home(navController: NavController)
             }
         }
 
-        TopMenu(selectedPage,menuVisibility){ page ->
+        TopMenu(navController,selectedPage,menuVisibility){ page ->
             listViewModel.setSelectedPage(page)
         }
 
@@ -88,7 +90,7 @@ fun Home(navController: NavController)
 }
 
 @Composable
-fun TopMenu(selectedPage : State<DisplayType>,menuVisibility : Boolean,setSelectedPage :(DisplayType) -> Unit){
+fun TopMenu(navController: NavController,selectedPage : State<DisplayType>,menuVisibility : Boolean,setSelectedPage :(DisplayType) -> Unit){
 
     val menuList = Pages.values().filter { it == Pages.MovieList || it == Pages.TvSeriesList }
     Column(
@@ -117,7 +119,14 @@ fun TopMenu(selectedPage : State<DisplayType>,menuVisibility : Boolean,setSelect
             Icon(
                 painter = painterResource(id = R.drawable.ic_search),
                 contentDescription = "search",
-                tint = Color.White
+                tint = Color.White,
+                modifier = Modifier
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        navController.navigate(Pages.Search.route)
+                    }
             )
         }
 
@@ -139,60 +148,5 @@ fun TopMenu(selectedPage : State<DisplayType>,menuVisibility : Boolean,setSelect
     }
 }
 
-@Composable
-fun Search(){
 
-    var search by remember { mutableStateOf("")}
-
-    ConstraintLayout(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 15.dp, vertical = 20.dp),
-
-        ){
-        val (searchField,favourites) = createRefs()
-        SearchTextField(
-            modifier = Modifier
-                .constrainAs(searchField){
-                    top.linkTo(parent.top)
-                    end.linkTo(favourites.start, margin = 10.dp)
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                    width = Dimension.fillToConstraints
-
-                },
-            hint = "Which movie are you looking for?",
-            value = search,
-            onValueChange = {
-                search = it
-            }
-        )
-        Box(
-            modifier = Modifier
-                .constrainAs(favourites) {
-                    top.linkTo(parent.top)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(parent.bottom)
-                }
-                .background(
-                    color = Color(0x24FFFFFF),
-                    shape = RoundedCornerShape(12.dp)
-                )
-                .clickable {
-
-                }
-        ){
-            Icon(
-                painterResource(id = R.drawable.ic_fav_unselected),
-                tint = Color.White,
-                contentDescription = "Favourites",
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(10.dp)
-            )
-        }
-
-    }
-
-}
 

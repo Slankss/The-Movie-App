@@ -4,6 +4,7 @@ import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.model.TvSeries
 import com.okankkl.themovieapp.response.MovieResponse
 import com.okankkl.themovieapp.response.ResponseDto
+import com.okankkl.themovieapp.response.SearchResponse
 import com.okankkl.themovieapp.response.TvSeriesResponse
 import com.okankkl.themovieapp.util.Util.API_KEY
 import retrofit2.Response
@@ -78,6 +79,9 @@ interface TmdbApi
         @Query("api_key") apiKey : String = API_KEY
     ) : ResponseDto<List<TvSeries>>
 
-
-
+    @GET("/3/search/multi")
+    suspend fun getSearch(
+        @Query("query") query: String,
+        @Query("api_key") apiKey : String = API_KEY
+    ) : Response<SearchResponse>
 }

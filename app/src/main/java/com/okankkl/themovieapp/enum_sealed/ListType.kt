@@ -36,7 +36,7 @@ enum class DisplayType(
         title = "Movies"
     ),
     TvSeries(
-        path = "tv_series",
+        path = "tv",
         title = "TV Series"
     )
 }

@@ -7,6 +7,7 @@ import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.Favourite
 import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.model.MovieEntity
+import com.okankkl.themovieapp.model.Search
 import com.okankkl.themovieapp.model.TvSeries
 import kotlinx.coroutines.flow.Flow
 
@@ -38,4 +39,5 @@ interface Repository
     suspend fun getFavourite(contentId : Int) : Favourite?
     suspend fun addFavourite(favourite: Favourite)
     suspend fun deleteFavourite(contentId: Int)
+    suspend fun search(query : String) : List<Search>
 }

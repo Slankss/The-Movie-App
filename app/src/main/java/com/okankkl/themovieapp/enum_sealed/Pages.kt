@@ -42,6 +42,10 @@ enum class Pages(
     Splash(
         route = "splash",
         title = "Splash"
+    ),
+    Search(
+        route = "search",
+        title = "Search"
     )
 }
 

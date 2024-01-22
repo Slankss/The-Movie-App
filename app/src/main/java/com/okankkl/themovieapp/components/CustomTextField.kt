@@ -18,7 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,8 +49,10 @@ fun SearchTextField(
             ),
         value = value,
         singleLine = true,
+        cursorBrush = SolidColor(Color(0x80FFFFFF)),
         textStyle = MaterialTheme.typography.bodyLarge.copy(
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            fontSize = 13.sp
         ),
         onValueChange = {
             onValueChange(it)
@@ -58,49 +62,28 @@ fun SearchTextField(
                 modifier = Modifier
                     .padding(10.dp)
             ) {
-
-                val (search,icon) = createRefs()
-
                 Box(
                     modifier = Modifier
-                        .constrainAs(search){
-                            start.linkTo(parent.start)
-                            end.linkTo(icon.start, margin = 10.dp)
-                            top.linkTo(parent.top)
-                            bottom.linkTo(parent.bottom)
-                            width = Dimension.fillToConstraints
-                        }
+                        .fillMaxWidth()
                 ){
                     if(value.isEmpty()){
                         Text(
                             modifier = Modifier,
                             text = hint,
                             style = MaterialTheme.typography.bodyLarge.copy(
-                                color = Color(0xB3FFFFFF)
+                                color = Color(0x80FFFFFF)
                             )
                         )
                     }
                     innerTextField()
                 }
-
-                Icon(
-                    painterResource(id = R.drawable.ic_search),
-                    tint = Color.White,
-                    modifier = Modifier
-                        .constrainAs(icon){
-                              end.linkTo(parent.end)
-                              top.linkTo(parent.top)
-                              bottom.linkTo(parent.bottom)
-                        },
-                    contentDescription = "Favourites"
-                )
             }
-
         }
     )
 
 
 
-
 }
+
+
 

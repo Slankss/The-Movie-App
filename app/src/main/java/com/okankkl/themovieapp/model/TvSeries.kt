@@ -15,7 +15,7 @@ data class TvSeries(
     var firstAirDate : String,
     @PrimaryKey
     var id : Int,
-    var overview : String,
+
     @ColumnInfo(defaultValue = "")
     @SerializedName("poster_path")
     var posterPath : String?,
@@ -45,6 +45,9 @@ data class TvSeries(
     var numberOfEpisodes : Int = 0
 
     @Ignore
+    var overview : String = ""
+
+    @Ignore
     @SerializedName("number_of_seasons")
     var numberOfSeasons : Int = 0
 
@@ -56,8 +59,9 @@ data class TvSeries(
                 createdBy: List<CreatedBy>, episodeRuntime : List<Int>,genres: List<Genres>,lastAirDate : String,
                 numberOfEpisodes : Int,numberOfSeasons : Int,videos : Videos?
 
-        ) : this(backdropPath, firstAirDate, id, overview, posterPath, name, voteAverage){
+        ) : this(backdropPath, firstAirDate, id, posterPath, name, voteAverage){
 
+            this.overview = overview
             this.createdBy = createdBy
             this.episodeRuntime = episodeRuntime
             this.genres = genres

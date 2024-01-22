@@ -1,4 +1,5 @@
 package com.okankkl.themovieapp.repository
+import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -10,6 +11,7 @@ import com.okankkl.themovieapp.enum_sealed.DisplayType
 import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.Favourite
 import com.okankkl.themovieapp.model.Movie
+import com.okankkl.themovieapp.model.Search
 import com.okankkl.themovieapp.model.TvSeries
 import com.okankkl.themovieapp.paging.paging_source.MoviePagingSource
 import com.okankkl.themovieapp.paging.paging_source.TvSeriesPagingSource
@@ -95,6 +97,25 @@ class RepositoryImp
     override suspend fun deleteFavourite(contentId: Int)
     {
         dao.deleteFavourite(contentId)
+    }
+
+    override suspend fun search(query: String): List<Search>
+    {
+        return try
+        {
+            val response = tmdbApi.getSearch(query)
+            if(response.isSuccessful){
+                response.body()?.let { searchResponse ->
+                    return@let searchResponse.results
+                } ?: listOf<Search>()
+            } else {
+                Log.w("arabam","is not succesful")
+                listOf<Search>()
+            }
+        } catch (e : Exception){
+            Log.w("arabam",e.localizedMessage)
+            listOf<Search>()
+        }
     }
 
     override suspend fun getMovieDetailFromAPI(id: Int): Resources

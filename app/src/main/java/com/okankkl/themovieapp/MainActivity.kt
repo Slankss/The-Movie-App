@@ -3,19 +3,12 @@
 package com.okankkl.themovieapp
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.os.Bundle
-import android.service.voice.VoiceInteractionSession.ActivityId
 import android.util.Log
-
 import androidx.activity.ComponentActivity
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
-import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.EaseIn
@@ -28,32 +21,18 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FractionalThreshold
-import androidx.compose.material.Icon
-import androidx.compose.material.rememberSwipeableState
-import androidx.compose.material.swipeable
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -86,27 +65,23 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.okankkl.themovieapp.components.BottomMenuItem
 import com.okankkl.themovieapp.enum_sealed.MenuItems
 import com.okankkl.themovieapp.extensions.isNetworkAvailable
-import com.okankkl.themovieapp.ui.theme.BottomMenuColor
 import com.okankkl.themovieapp.ui.theme.ShadowColor
 import com.okankkl.themovieapp.ui.theme.ShadowColor2
 import com.okankkl.themovieapp.view.News
+import com.okankkl.themovieapp.view.SearchPage
 import com.okankkl.themovieapp.view.SplashScreen
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity()
@@ -173,7 +148,8 @@ fun AppActivity()
 {
     val scope = rememberCoroutineScope()
     val durationMillis = 400
-    var navController = rememberNavController()
+    val navController = rememberNavController()
+    val snackbarHost = remember { SnackbarHostState()}
     var menuVisibility by remember{
         mutableStateOf(false)
     }
@@ -189,6 +165,9 @@ fun AppActivity()
     Scaffold(
         modifier = Modifier,
         containerColor = BackgroundColor,
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHost)
+        },
         bottomBar = {
             BottomNavigation(
                 backgroundColor = BackgroundColor,
@@ -367,13 +346,85 @@ fun AppActivity()
                 }
 
                 composable(
-                    route = Pages.Favourites.route
+                    route = Pages.Search.route,
+                    enterTransition = {
+                        fadeIn(
+                            animationSpec = tween(
+                                durationMillis, easing = LinearEasing
+                            )
+                        ) + slideIntoContainer(
+                            animationSpec = tween(durationMillis, easing = EaseIn),
+                            towards = AnimatedContentTransitionScope.SlideDirection.Start
+                        )
+                    },
+                    exitTransition = {
+                        fadeOut(
+                            animationSpec = tween(
+                                durationMillis, easing = LinearEasing
+                            )
+                        ) + slideOutOfContainer(
+                            animationSpec = tween(durationMillis, easing = EaseOut),
+                            towards = AnimatedContentTransitionScope.SlideDirection.End
+                        )
+                    }
+                ){
+                    SearchPage(navController = navController){ message ->
+                        scope.launch {
+                            snackbarHost.showSnackbar(message = message)
+                        }
+                    }
+                }
+
+                composable(
+                    route = Pages.Favourites.route,
+                    enterTransition = {
+                        fadeIn(
+                            animationSpec = tween(
+                                durationMillis, easing = LinearEasing
+                            )
+                        ) + slideIntoContainer(
+                            animationSpec = tween(durationMillis, easing = EaseIn),
+                            towards = AnimatedContentTransitionScope.SlideDirection.Start
+                        )
+                    },
+                    exitTransition = {
+                        fadeOut(
+                            animationSpec = tween(
+                                durationMillis, easing = LinearEasing
+                            )
+                        ) + slideOutOfContainer(
+                            animationSpec = tween(durationMillis, easing = EaseOut),
+                            towards = AnimatedContentTransitionScope.SlideDirection.End
+                        )
+                    }
                 ){
                     Favourites(navController = navController)
                 }
 
                 composable(
-                    route = Pages.New.route
+                    route = Pages.New.route,
+                    enterTransition = {
+                        fadeIn(
+                            animationSpec = tween(
+                                durationMillis, easing = LinearEasing
+                            )
+                        ) + slideIntoContainer(
+                            animationSpec = tween(durationMillis, easing = EaseIn),
+                            towards = if((navController.previousBackStackEntry?.destination != null) && (navController.previousBackStackEntry?.destination!!.route == Pages.Home.route))
+                                AnimatedContentTransitionScope.SlideDirection.Start else  AnimatedContentTransitionScope.SlideDirection.End
+                        )
+                    },
+                    exitTransition = {
+                        fadeOut(
+                            animationSpec = tween(
+                                durationMillis, easing = LinearEasing
+                            )
+                        ) + slideOutOfContainer(
+                            animationSpec = tween(durationMillis, easing = EaseOut),
+                            towards = if(navController.currentBackStackEntry?.destination != null && navController.currentBackStackEntry?.destination!!.route == Pages.Home.route)
+                                AnimatedContentTransitionScope.SlideDirection.End else  AnimatedContentTransitionScope.SlideDirection.Start
+                        )
+                    }
                 ){
                     News(navController = navController)
                 }
