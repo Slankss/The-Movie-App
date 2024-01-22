@@ -1,6 +1,5 @@
 package com.okankkl.themovieapp.viewModel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.okankkl.themovieapp.enum_sealed.DisplayType
@@ -34,8 +33,8 @@ class MovieDetailViewModel
 
     fun getMovie(id : Int){
         viewModelScope.launch {
-            _movie.value = repository.getMovieDetailFromAPI(id)
-            _similarMovies.value = repository.getSimilarMoviesFromAPI(id)
+            _movie.value = repository.getMovieDetail(id)
+            _similarMovies.value = repository.getSimilarMovies(id)
         }
     }
 

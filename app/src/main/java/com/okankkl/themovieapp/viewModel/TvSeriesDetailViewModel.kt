@@ -52,8 +52,8 @@ class TvSeriesDetailViewModel
         GlobalScope.launch(Dispatchers.IO) {
             val addJob = launch {
                 val time = "${tvSeries.numberOfSeasons } seasons"
-                val favourite = Favourite(DisplayType.TvSeries.path,tvSeries.name,tvSeries.backdropPath ?: "",tvSeries.posterPath ?: "",
-                    tvSeries.id,tvSeries.firstAirDate,tvSeries.voteAverage,time)
+                val favourite = Favourite(DisplayType.TvSeries.path,tvSeries.title,tvSeries.backdropPath ?: "",tvSeries.posterPath ?: "",
+                    tvSeries.id,tvSeries.releaseDate,tvSeries.voteAverage,time)
                 repository.addFavourite(favourite)
             }
             addJob.invokeOnCompletion {

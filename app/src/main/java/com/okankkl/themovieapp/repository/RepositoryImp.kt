@@ -9,6 +9,7 @@ import com.okankkl.themovieapp.paging.data_source.DataSourcesImp
 import com.okankkl.themovieapp.enum_sealed.Categories
 import com.okankkl.themovieapp.enum_sealed.DisplayType
 import com.okankkl.themovieapp.enum_sealed.Resources
+import com.okankkl.themovieapp.model.Display
 import com.okankkl.themovieapp.model.Favourite
 import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.model.Search
@@ -25,7 +26,7 @@ class RepositoryImp
             private val dao : Dao
     ) : Repository
 {
-    override suspend fun getMovieListFromAPI(category: Categories, page : Int): List<Movie>
+    override suspend fun getMovieListFromAPI(category: Categories, page : Int): List<Display>
     {
         return try {
             val response = if(category == Categories.Trending){
@@ -35,48 +36,37 @@ class RepositoryImp
             }
 
             if(response.isSuccessful){
+                Log.w("arabam","issuccesfull")
                 response.body()?.results?.map { movie ->
                     movie.category = category.path
+                    movie.mediaType = DisplayType.Movie.path
                     return@map movie
                 }
                     ?: listOf<Movie>()
             }
             else{
+                Log.w("arabam","is not succesfull")
                 listOf<Movie>()
             }
         } catch (e:Exception){
+            Log.w("arabam",e.localizedMessage)
             listOf<Movie>()
         }
     }
 
-    override suspend fun getMovieListFromRoom(): List<Movie>
+    override suspend fun getDisplaysFromRoom(mediaType : String): List<Display>
     {
-        return dao.getMovies()
+        return dao.getDisplays(mediaType)
     }
 
-    override suspend fun addMovieListToRoom(movieList: List<Movie>)
+    override suspend fun addDisplaysToRoom(displayList: List<Display>)
     {
-        dao.addMovies(movieList)
+        dao.addDisplays(displayList)
     }
 
-    override suspend fun deleteMovieListFromRoom()
+    override suspend fun deleteDisplaysFromRoom(mediaType: String)
     {
-        dao.deleteMovies()
-    }
-
-    override suspend fun getTvSeriesListFromRoom(): List<TvSeries>
-    {
-        return dao.getTvSeries()
-    }
-
-    override suspend fun addTvSeriesListToRoom(tvSeriesList: List<TvSeries>)
-    {
-        dao.addTvSeries(tvSeriesList)
-    }
-
-    override suspend fun deleteTvSeriesListFromRoom()
-    {
-        dao.deleteTvSeries()
+        dao.deleteDisplays(mediaType)
     }
 
     override suspend fun getFavourites(displayType: DisplayType): List<Favourite>
@@ -118,7 +108,7 @@ class RepositoryImp
         }
     }
 
-    override suspend fun getMovieDetailFromAPI(id: Int): Resources
+    override suspend fun getMovieDetail(id: Int): Resources
     {
         return try
         {
@@ -136,7 +126,7 @@ class RepositoryImp
         }
     }
 
-    override suspend fun getSimilarMoviesFromAPI(id: Int): Resources
+    override suspend fun getSimilarMovies(id: Int): Resources
     {
         return try {
             val response = tmdbApi.getSimilarMovies(id = 695721)
@@ -170,7 +160,7 @@ class RepositoryImp
         ).flow
     }
     
-    override suspend fun getTvSeriesList(category: Categories, page : Int): List<TvSeries>
+    override suspend fun getTvSeriesListFromAPI(category: Categories, page : Int): List<TvSeries>
     {
         return try {
             val response = if(category == Categories.Trending){
@@ -182,6 +172,7 @@ class RepositoryImp
             if(response.isSuccessful){
                 response.body()?.results?.map { tvSeries ->
                     tvSeries.category = category.path
+                    tvSeries.mediaType = DisplayType.TvSeries.path
                     return@map tvSeries
                 } ?: listOf()
             }

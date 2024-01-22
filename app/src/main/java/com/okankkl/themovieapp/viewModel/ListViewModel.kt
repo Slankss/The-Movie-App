@@ -1,17 +1,11 @@
 package com.okankkl.themovieapp.viewModel
 
-import android.util.Log
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.okankkl.themovieapp.enum_sealed.Categories
 import com.okankkl.themovieapp.enum_sealed.DisplayType
-import com.okankkl.themovieapp.enum_sealed.Pages
-import com.okankkl.themovieapp.model.Movie
+import com.okankkl.themovieapp.model.Display
 import com.okankkl.themovieapp.model.StoreData
-import com.okankkl.themovieapp.model.TvSeries
 import com.okankkl.themovieapp.repository.RepositoryImp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -36,11 +30,17 @@ class ListViewModel
     private var _loadingState = MutableStateFlow(true)
     var loadingState = _loadingState.asStateFlow()
 
-    private val _allMovieList = MutableStateFlow(listOf<Movie>())
+    private val _allDisplayList = MutableStateFlow(listOf<Display>())
+    val allDisplayList = _allDisplayList.asStateFlow()
+
+    /*
+    private val _allMovieList = MutableStateFlow(listOf<Display>())
     var allMovieList = _allMovieList.asStateFlow()
 
-    private val _allTvSeriesList = MutableStateFlow(listOf<TvSeries>())
+    private val _allTvSeriesList = MutableStateFlow(listOf<Display>())
     var allTvSeriesList = _allTvSeriesList.asStateFlow()
+
+     */
 
     var movieUpdateTime : String? = null
     var tvSeriesUpdateTime : String? = null
@@ -48,6 +48,10 @@ class ListViewModel
     fun setSelectedPage(page : DisplayType){
         _selectedPage.value = page
         setLoadingState(true)
+        if(page == DisplayType.Movie)
+            getMovies()
+        else
+            getTvSeries()
     }
 
     fun setLoadingState(state : Boolean){
@@ -56,7 +60,7 @@ class ListViewModel
 
     fun getMovies(){
         viewModelScope.launch {
-
+            setLoadingState(true)
             movieUpdateTime = storeData.getMovieUpdateTime.first()
             val currentDate = LocalDateTime.now()
             if(movieUpdateTime == null || movieUpdateTime!!.isEmpty()){
@@ -71,7 +75,7 @@ class ListViewModel
                     getMoviesFromAPI()
                     storeData.saveMovieUpdateTime(currentDate.toString())
                 } else {
-                    getMoviesFromRoom()
+                   getMoviesFromRoom()
                 }
 
             }
@@ -81,20 +85,20 @@ class ListViewModel
     @OptIn(DelicateCoroutinesApi::class)
     fun getMoviesFromRoom(){
         GlobalScope.launch(Dispatchers.IO) {
-            _allMovieList.value = repository.getMovieListFromRoom()
+            _allDisplayList.value = repository.getDisplaysFromRoom(DisplayType.Movie.path)
         }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private fun addMoviesToRoom(filteredAllMovieList : List<Movie>)  {
+    private fun addMoviesToRoom(filteredAllMovieList : List<Display>)  {
         GlobalScope.launch(Dispatchers.IO) {
             val deleteJob = launch {
-                repository.deleteMovieListFromRoom()
+                repository.deleteDisplaysFromRoom(DisplayType.Movie.path)
             }
             deleteJob.join()
 
             val addJob = launch {
-                repository.addMovieListToRoom(filteredAllMovieList.toList())
+                repository.addDisplaysToRoom(filteredAllMovieList.toList())
             }
             addJob.join()
         }
@@ -105,7 +109,7 @@ class ListViewModel
     private suspend fun getMoviesFromAPI(){
         GlobalScope.launch(Dispatchers.IO) {
             val apiJob = launch {
-                _allMovieList.value = repository.getMovieListFromAPI(Categories.Popular,1) +
+                _allDisplayList.value = repository.getMovieListFromAPI(Categories.Popular,1) +
                         repository.getMovieListFromAPI(Categories.Trending,1)  +
                         repository.getMovieListFromAPI(Categories.TopRated,1)  +
                         repository.getMovieListFromAPI(Categories.NowPlaying,1)
@@ -113,7 +117,7 @@ class ListViewModel
             }
             apiJob.join()
             apiJob.invokeOnCompletion {
-                if(it == null && _allMovieList.value.isNotEmpty()) setLoadingState(false)
+                if(it == null && _allDisplayList.value.isNotEmpty()) setLoadingState(false)
                 else setLoadingState(true)
             }
             val roomJob = launch {
@@ -126,10 +130,9 @@ class ListViewModel
 
     }
 
-
-
     fun getTvSeries(){
         viewModelScope.launch {
+            setLoadingState(true)
             tvSeriesUpdateTime = storeData.getTvSeriesUpdateTime.first()
             val currentDate = LocalDateTime.now()
             if(tvSeriesUpdateTime == null || tvSeriesUpdateTime!!.isEmpty()){
@@ -154,10 +157,7 @@ class ListViewModel
     @OptIn(DelicateCoroutinesApi::class)
     fun getTvSeriesFromRoom(){
         GlobalScope.launch(Dispatchers.IO) {
-            _allTvSeriesList.value = repository.getTvSeriesListFromRoom() +
-                    repository.getTvSeriesListFromRoom() +
-                    repository.getTvSeriesListFromRoom() +
-                    repository.getTvSeriesListFromRoom()
+            _allDisplayList.value = repository.getDisplaysFromRoom(DisplayType.TvSeries.path)
         }
     }
 
@@ -165,13 +165,13 @@ class ListViewModel
     fun addTvSeriesToRoom(){
         GlobalScope.launch(Dispatchers.IO) {
             val deleteJob = launch {
-                repository.deleteTvSeriesListFromRoom()
+                repository.deleteDisplaysFromRoom(DisplayType.TvSeries.path)
             }
             deleteJob.join()
 
             val addJob = launch {
                 val filteredTvSeriesList = getAllTvSeriesList()
-                repository.addTvSeriesListToRoom(filteredTvSeriesList.toList())
+                repository.addDisplaysToRoom(filteredTvSeriesList.toList())
             }
             addJob.join()
         }
@@ -181,10 +181,10 @@ class ListViewModel
     fun getTvSeriesFromAPI(){
         GlobalScope.launch(Dispatchers.IO) {
             val apiJob = launch {
-                _allTvSeriesList.value = (repository.getTvSeriesList(Categories.Popular,1) +
-                        repository.getTvSeriesList(Categories.Trending,1) +
-                        repository.getTvSeriesList(Categories.TopRated,1) +
-                        repository.getTvSeriesList(Categories.OnTheAir,1)
+                _allDisplayList.value = (repository.getTvSeriesListFromAPI(Categories.Popular,1) +
+                        repository.getTvSeriesListFromAPI(Categories.Trending,1) +
+                        repository.getTvSeriesListFromAPI(Categories.TopRated,1) +
+                        repository.getTvSeriesListFromAPI(Categories.OnTheAir,1)
                         )
             }
             apiJob.join()
@@ -195,25 +195,25 @@ class ListViewModel
         }
     }
 
-    private fun getAllMovieList() : List<Movie> {
-        val list = mutableListOf<Movie>()
+    private fun getAllMovieList() : List<Display> {
+        val list = mutableListOf<Display>()
 
-        _allMovieList.value.forEach { movie ->
-            list.find { it.id == movie.id }?.let {
-                it.category += ("," + movie.category)
-            } ?: list.add(movie)
+        _allDisplayList.value.forEach { display ->
+            list.find { it.id == display.id }?.let {
+                it.category += ("," + display.category)
+            } ?: list.add(display)
         }
 
         return list.toList()
     }
 
-    private fun getAllTvSeriesList() : List<TvSeries> {
-        val list = mutableListOf<TvSeries>()
+    private fun getAllTvSeriesList() : List<Display> {
+        val list = mutableListOf<Display>()
 
-        _allTvSeriesList.value.forEach { tvSeries ->
-            list.find { it.id == tvSeries.id }?.let {
-                it.category += ("," + tvSeries.category)
-            } ?: list.add(tvSeries)
+        _allDisplayList.value.forEach { display ->
+            list.find { it.id == display.id }?.let {
+                it.category += ("," + display.category)
+            } ?: list.add(display)
         }
 
         return list.toList()

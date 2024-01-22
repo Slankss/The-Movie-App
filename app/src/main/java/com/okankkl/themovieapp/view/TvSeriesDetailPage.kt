@@ -169,7 +169,7 @@ fun TvSeriesContent(tvSeries: TvSeries,tvSeriesViewModel : TvSeriesDetailViewMod
     ) {
 
         Text(
-            text = tvSeries.name,
+            text = tvSeries.title,
             style = MaterialTheme.typography.labelLarge.copy(
                 fontSize = 24.sp,
                 lineHeight = 32.sp,
@@ -243,9 +243,9 @@ fun TvSeriesContent(tvSeries: TvSeries,tvSeriesViewModel : TvSeriesDetailViewMod
                 modifier = Modifier
                     .padding(end = 5.dp)
             )
-            if(tvSeries.firstAirDate.isNotEmpty()){
+            if(tvSeries.releaseDate.isNotEmpty()){
                 Text(
-                    text = convertDate(tvSeries.firstAirDate),
+                    text = convertDate(tvSeries.releaseDate),
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 13.sp,
                         color = Color(0xFFBCBCBC)
@@ -511,9 +511,9 @@ fun SimilarTvSeries(tvSeries: TvSeries,index : Int,onClick : (Int) -> Unit){
                     )
 
                 ){
-                    append(tvSeries.name)
+                    append(tvSeries.title)
                 }
-                if(tvSeries.firstAirDate.isNotEmpty()){
+                if(tvSeries.releaseDate.isNotEmpty()){
                     withStyle(
                         style = SpanStyle(
                             fontSize = 12.sp,
@@ -521,7 +521,7 @@ fun SimilarTvSeries(tvSeries: TvSeries,index : Int,onClick : (Int) -> Unit){
                             color = Color(0xFFBCBCBC)
                         )
                     ){
-                        val date = LocalDate.parse(tvSeries.firstAirDate)
+                        val date = LocalDate.parse(tvSeries.releaseDate)
                         val year = date.year.toString()
                         append(" ($year)")
                     }

@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
+import com.okankkl.themovieapp.model.Display
 import com.okankkl.themovieapp.model.Favourite
 import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.model.MovieEntity
@@ -14,23 +15,14 @@ import com.okankkl.themovieapp.model.TvSeries
 @Dao
 interface Dao
 {
-    @Query("SELECT * FROM Movie")
-    fun getMovies() : List<Movie>
+    @Query("SELECT * FROM Display WHERE mediaType = :mediaType")
+    fun getDisplays(mediaType : String) : List<Display>
 
     @Upsert
-    suspend fun addMovies(movieList : List<Movie>)
+    suspend fun addDisplays(movieList : List<Display>)
 
-    @Query("DELETE FROM Movie")
-    fun deleteMovies()
-
-    @Query("SELECT * FROM TvSeries ")
-    fun getTvSeries() : List<TvSeries>
-
-    @Upsert
-    suspend fun addTvSeries(movieList : List<TvSeries>)
-
-    @Query("DELETE FROM TvSeries")
-    fun deleteTvSeries()
+    @Query("DELETE FROM Display WHERE mediaType = :mediaType")
+    fun deleteDisplays(mediaType: String)
 
     @Query("SELECT * FROM Favourites WHERE type = :displayType ORDER BY id DESC")
     fun getFavourites(displayType : String) : List<Favourite>
