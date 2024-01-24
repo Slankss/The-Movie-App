@@ -11,31 +11,18 @@ class Movie(
     popularity : Double,
     voteAverage : Double,
     @SerializedName("title")
-    override var title : String,
+    override var en_title : String,
+    @SerializedName("release_date")
+    override var releaseDate: String,
     category  : String = "",
-    mediaType : String = ""
-) : Display(id,backdropPath,posterPath,popularity,voteAverage,title,category,mediaType)
+    mediaType : String = "movie"
+) : Display(id,backdropPath,posterPath,popularity,voteAverage,en_title,releaseDate,category,mediaType)
 {
 
-    @SerializedName("release_date")
-    override var releaseDate : String = ""
-    @Ignore
-    var genres : List<Genres> = listOf()
-    @Ignore
-    var videos : Videos? = null
     @Ignore
     var revenue : Long = 0
     @Ignore
     var runtime = 0
-    @Ignore
-    var overview : String = ""
-
-
-    constructor(id: Int,backdropPath: String?,posterPath: String?,popularity : Double,voteAverage: Double,title: String,
-                releaseDate: String
-    ) : this(id,backdropPath,posterPath,popularity,voteAverage,title){
-        this.releaseDate = releaseDate
-    }
 
     constructor(
         backdropPath: String?, genres : List<Genres>,id: Int,
@@ -43,16 +30,14 @@ class Movie(
         releaseDate: String, revenue : Long,runtime : Int, title: String,voteAverage: Double,
         videos : Videos
     )
-            : this(id,backdropPath,posterPath,popularity,voteAverage,title)
+            : this(id,backdropPath,posterPath,popularity,voteAverage,title,releaseDate)
     {
         this.genres = genres
         this.videos = videos
         this.revenue = revenue
         this.runtime = runtime
         this.overview = overview
-        this.releaseDate = releaseDate
     }
-
 
 }
 

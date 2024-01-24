@@ -1,60 +1,59 @@
 package com.okankkl.themovieapp.repository
-import android.util.Log
+
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.okankkl.themovieapp.api.TmdbApi
 import com.okankkl.themovieapp.dao.Dao
-import com.okankkl.themovieapp.paging.data_source.DataSourcesImp
 import com.okankkl.themovieapp.enum_sealed.Categories
 import com.okankkl.themovieapp.enum_sealed.DisplayType
 import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.Display
 import com.okankkl.themovieapp.model.Favourite
 import com.okankkl.themovieapp.model.Movie
-import com.okankkl.themovieapp.model.Search
 import com.okankkl.themovieapp.model.TvSeries
+import com.okankkl.themovieapp.paging.data_source.DataSourcesImp
 import com.okankkl.themovieapp.paging.paging_source.MoviePagingSource
 import com.okankkl.themovieapp.paging.paging_source.TvSeriesPagingSource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class RepositoryImp
-    @Inject
-    constructor(
-            private val tmdbApi : TmdbApi,
-            private val dao : Dao
-    ) : Repository
+@Inject
+constructor(
+    private val tmdbApi: TmdbApi,
+    private val dao: Dao
+) : Repository
 {
-    override suspend fun getMovieListFromAPI(category: Categories, page : Int): List<Display>
+    override suspend fun getMoviesFromAPI(category: Categories, page: Int): List<Movie>
     {
-        return try {
-            val response = if(category == Categories.Trending){
+        return try
+        {
+            val response = if (category == Categories.Trending)
+            {
                 tmdbApi.getTrendingMovies()
-            } else {
-                tmdbApi.getMovies(category.path,1)
+            } else
+            {
+                tmdbApi.getMovies(category.path, 1)
             }
 
-            if(response.isSuccessful){
-                Log.w("arabam","issuccesfull")
+            if (response.isSuccessful)
+            {
                 response.body()?.results?.map { movie ->
                     movie.category = category.path
-                    movie.mediaType = DisplayType.Movie.path
                     return@map movie
-                }
-                    ?: listOf<Movie>()
+                } ?: emptyList()
+            } else
+            {
+                emptyList()
             }
-            else{
-                Log.w("arabam","is not succesfull")
-                listOf<Movie>()
-            }
-        } catch (e:Exception){
-            Log.w("arabam",e.localizedMessage)
-            listOf<Movie>()
+        } catch (e: Exception)
+        {
+            emptyList()
         }
     }
 
-    override suspend fun getDisplaysFromRoom(mediaType : String): List<Display>
+    override suspend fun getDisplaysFromRoom(mediaType: String): List<Display>
     {
         return dao.getDisplays(mediaType)
     }
@@ -74,9 +73,9 @@ class RepositoryImp
         return dao.getFavourites(displayType.path)
     }
 
-    override suspend fun getFavourite(contentId : Int): Favourite?
+    override suspend fun getFavourite(contentId: Int, displayType: String): Favourite?
     {
-        return dao.getFavourite(contentId)
+        return dao.getFavourite(contentId, displayType)
     }
 
     override suspend fun addFavourite(favourite: Favourite)
@@ -84,27 +83,28 @@ class RepositoryImp
         dao.addFavourite(favourite)
     }
 
-    override suspend fun deleteFavourite(contentId: Int)
+    override suspend fun deleteFavourite(contentId: Int, displayType: String)
     {
-        dao.deleteFavourite(contentId)
+        dao.deleteFavourite(contentId, displayType)
     }
 
-    override suspend fun search(query: String): List<Search>
+    override suspend fun search(query: String): List<Display>
     {
         return try
         {
             val response = tmdbApi.getSearch(query)
-            if(response.isSuccessful){
+            if (response.isSuccessful)
+            {
                 response.body()?.let { searchResponse ->
                     return@let searchResponse.results
-                } ?: listOf<Search>()
-            } else {
-                Log.w("arabam","is not succesful")
-                listOf<Search>()
+                } ?: emptyList()
+            } else
+            {
+                emptyList()
             }
-        } catch (e : Exception){
-            Log.w("arabam",e.localizedMessage)
-            listOf<Search>()
+        } catch (e: Exception)
+        {
+            emptyList()
         }
     }
 
@@ -113,37 +113,39 @@ class RepositoryImp
         return try
         {
             val response = tmdbApi.getMovie(id = id)
-            if(response.isSuccessful){
+            if (response.isSuccessful)
+            {
                 response.body()?.let {
                     Resources.Success(data = it)
                 } ?: Resources.Failed(errorMsg = "Error")
-            }
-            else{
+            } else
+            {
                 Resources.Failed(errorMsg = "Error")
             }
-        } catch (e : Exception){
+        } catch (e: Exception)
+        {
             Resources.Failed(e.message!!)
         }
     }
 
-    override suspend fun getSimilarMovies(id: Int): Resources
+    override suspend fun getSimilarMovies(id: Int): List<Movie>
     {
-        return try {
+        return try
+        {
             val response = tmdbApi.getSimilarMovies(id = 695721)
-
-            if(response.isSuccessful){
-                response.body()?.let {
-                    return@let Resources.Success(it.results)
-                } ?: Resources.Failed("Error")
+            if (response.isSuccessful)
+            {
+                response.body()?.results ?: emptyList()
+            } else
+            {
+                emptyList()
             }
-            else{
-                Resources.Failed("Error")
-            }
-        } catch (e:Exception){
-            Resources.Failed(e.localizedMessage!!)
+        } catch (e: Exception)
+        {
+            emptyList()
         }
     }
-    
+
     override suspend fun getMoviesPage(category: Categories): Flow<PagingData<Movie>>
     {
         return Pager(
@@ -159,64 +161,72 @@ class RepositoryImp
             }
         ).flow
     }
-    
-    override suspend fun getTvSeriesListFromAPI(category: Categories, page : Int): List<TvSeries>
+
+    override suspend fun getTvSeriesListFromAPI(category: Categories, page: Int): List<TvSeries>
     {
-        return try {
-            val response = if(category == Categories.Trending){
+        return try
+        {
+            val response = if (category == Categories.Trending)
+            {
                 tmdbApi.getTrendingTvSeries()
-            } else {
-                tmdbApi.getTvSeries(category.path,1)
+            } else
+            {
+                tmdbApi.getTvSeries(category.path, 1)
             }
 
-            if(response.isSuccessful){
+            if (response.isSuccessful)
+            {
                 response.body()?.results?.map { tvSeries ->
                     tvSeries.category = category.path
-                    tvSeries.mediaType = DisplayType.TvSeries.path
                     return@map tvSeries
-                } ?: listOf()
+                } ?: emptyList()
+            } else
+            {
+                emptyList()
             }
-            else{
-                listOf()
-            }
-        } catch (e:Exception){
-            listOf()
+        } catch (e: Exception)
+        {
+            emptyList()
         }
     }
 
     override suspend fun getTvSeriesDetail(id: Int): Resources
     {
-        return try {
+        return try
+        {
             val response = tmdbApi.getTvSeries(id = id)
 
-            if(response.isSuccessful){
+            if (response.isSuccessful)
+            {
                 response.body()?.let { tvSeries ->
-                    return@let Resources.Success( data = tvSeries )
+                    return@let Resources.Success(data = tvSeries)
                 } ?: Resources.Failed("Error")
-            }
-            else{
+            } else
+            {
                 Resources.Failed("Error")
             }
-        } catch (e:Exception){
+        } catch (e: Exception)
+        {
             Resources.Failed(e.localizedMessage!!)
         }
     }
 
-    override suspend fun getSimilarTvSeries(id: Int): Resources
+    override suspend fun getSimilarTvSeries(id: Int): List<TvSeries>
     {
-        return try {
+        return try
+        {
             val response = tmdbApi.getSimilarTvSeries(id = id)
 
-            if(response.isSuccessful){
-                response.body()?.let { tvSeries ->
-                    return@let Resources.Success( data = tvSeries.results )
-                } ?: Resources.Failed("Error")
+            if (response.isSuccessful)
+            {
+                response.body()?.results ?: emptyList()
+            } else
+            {
+                emptyList()
             }
-            else{
-                Resources.Failed("Error")
-            }
-        } catch (e:Exception){
-            Resources.Failed(e.localizedMessage!!)
+        } catch (e: Exception)
+        {
+            emptyList()
         }
     }
 

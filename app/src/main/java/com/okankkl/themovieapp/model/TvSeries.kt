@@ -13,18 +13,17 @@ class TvSeries(
     popularity : Double,
     voteAverage : Double,
     @SerializedName("name")
-    override var title : String,
-    category : String = "",
-    mediaType: String = ""
-) : Display(id,backdropPath,posterPath,popularity,voteAverage,title,category,mediaType)
-{
+    override var en_title : String,
     @SerializedName("first_air_date")
-    override var releaseDate : String = ""
+    override var releaseDate : String,
+    category : String = "",
+    mediaType: String = "tv"
+) : Display(id,backdropPath,posterPath,popularity,voteAverage,en_title,releaseDate,category,mediaType)
+{
+
     @Ignore
     @SerializedName("created_by")
     var createdBy : List<CreatedBy> = listOf()
-    @Ignore
-    var genres : List<Genres> = listOf()
     @Ignore
     @SerializedName("last_air_date")
     var lastAirDate : String = ""
@@ -32,26 +31,15 @@ class TvSeries(
     @SerializedName("number_of_episodes")
     var numberOfEpisodes : Int = 0
     @Ignore
-    var overview : String = ""
-    @Ignore
     @SerializedName("number_of_seasons")
     var numberOfSeasons : Int = 0
-    @Ignore
-    var videos : Videos? = null
 
-
-    constructor(id: Int,backdropPath: String?,posterPath: String?,popularity : Double,voteAverage: Double,title: String,
-        firstAirDate : String
-    ) : this(id,backdropPath,posterPath,popularity,voteAverage,title){
-        this.releaseDate = firstAirDate
-    }
-
-    constructor(backdropPath: String?, firstAirDate: String,id: Int,overview: String,
+    constructor(backdropPath: String?, releaseDate: String,id: Int,overview: String,
                 posterPath: String?,title: String,voteAverage: Double,
                 createdBy: List<CreatedBy>,genres: List<Genres>,lastAirDate : String,
                 numberOfEpisodes : Int,numberOfSeasons : Int,videos : Videos?,popularity : Double
 
-        ) : this(id,backdropPath,posterPath,popularity,voteAverage,title){
+        ) : this(id,backdropPath,posterPath,popularity,voteAverage,title,releaseDate){
 
             this.overview = overview
             this.createdBy = createdBy
@@ -60,6 +48,6 @@ class TvSeries(
             this.numberOfEpisodes = numberOfEpisodes
             this.numberOfSeasons = numberOfSeasons
             this.videos = videos
-            this.releaseDate = firstAirDate
+
         }
 }

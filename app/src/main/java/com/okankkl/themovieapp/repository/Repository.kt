@@ -14,16 +14,15 @@ import kotlinx.coroutines.flow.Flow
 
 interface Repository
 {
-    suspend fun getMovieListFromAPI(moviesType: Categories, page : Int) : List<Display>
+    suspend fun getMoviesFromAPI(moviesType: Categories, page : Int) : List<Movie>
     suspend fun getMovieDetail(id : Int) : Resources
-    suspend fun getSimilarMovies(id : Int) : Resources
+    suspend fun getSimilarMovies(id : Int) : List<Movie>
 
     
     suspend fun getMoviesPage(category : Categories) : Flow<PagingData<Movie>>
-
-    suspend fun getTvSeriesListFromAPI(tvSeriesType: Categories, page : Int) : List<TvSeries>
+    suspend fun getTvSeriesListFromAPI(category: Categories, page : Int): List<TvSeries>
     suspend fun getTvSeriesDetail(id : Int) : Resources
-    suspend fun getSimilarTvSeries(id : Int) : Resources
+    suspend fun getSimilarTvSeries(id : Int) : List<TvSeries>
 
     suspend fun getTvSeriesPage(category: Categories): Flow<PagingData<TvSeries>>
 
@@ -32,8 +31,8 @@ interface Repository
     suspend fun deleteDisplaysFromRoom(mediaType : String)
 
     suspend fun getFavourites(displayType: DisplayType) : List<Favourite>
-    suspend fun getFavourite(contentId : Int) : Favourite?
+    suspend fun getFavourite(contentId : Int,displayType: String) : Favourite?
     suspend fun addFavourite(favourite: Favourite)
-    suspend fun deleteFavourite(contentId: Int)
-    suspend fun search(query : String) : List<Search>
+    suspend fun deleteFavourite(contentId: Int,displayType: String)
+    suspend fun search(query : String) : List<Display>
 }

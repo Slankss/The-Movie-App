@@ -34,7 +34,7 @@ class FavouritesViewModel
     @OptIn(DelicateCoroutinesApi::class)
     fun deleleteFavourite(favourite : Favourite,displayType: DisplayType){
         GlobalScope.launch(Dispatchers.IO){
-            repository.deleteFavourite(favourite.contentId)
+            repository.deleteFavourite(favourite.contentId,displayType.path)
             getFavourites(displayType)
         }
     }

@@ -33,12 +33,12 @@ import com.okankkl.themovieapp.enum_sealed.Pages
 import com.okankkl.themovieapp.model.TvSeries
 
 @Composable
-fun ViewAll(navController: NavController,dataType : String?,category : String?){
+fun ViewAll(navController: NavController, displayType : String?, category : String?){
 
     val viewAllViewModel : ViewAllViewModel = hiltViewModel()
     LaunchedEffect(key1 = true){
-        if(dataType != null && category != null){
-            viewAllViewModel.load(dataType,category)
+        if(displayType != null && category != null){
+            viewAllViewModel.load(displayType,category)
         }
     }
 
@@ -47,9 +47,9 @@ fun ViewAll(navController: NavController,dataType : String?,category : String?){
             .padding(horizontal = 15.dp)
             .fillMaxSize()
     ){
-        if(dataType != null && category != null){
+        if(displayType != null && category != null){
             Text(
-                text = viewAllViewModel.getCategory(category).title + " " + viewAllViewModel.getType(dataType).title,
+                text = viewAllViewModel.getCategory(category).title + " " + viewAllViewModel.getType(displayType).title,
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontSize = 20.sp
                 ),
@@ -58,8 +58,8 @@ fun ViewAll(navController: NavController,dataType : String?,category : String?){
             )
         }
 
-        when(dataType){
-            DisplayType.Movie.path -> MoviePages(viewAllViewModel,navController)
+        when(displayType){
+            DisplayType.Movie.path -> MoviePages(viewAllViewModel,displayType,navController)
             DisplayType.TvSeries.path -> TvSeriesPages(viewAllViewModel,navController)
         }
 
@@ -68,10 +68,10 @@ fun ViewAll(navController: NavController,dataType : String?,category : String?){
 }
 
 @Composable
-fun MoviePages(viewAllViewModel: ViewAllViewModel,navController: NavController){
+fun MoviePages(viewAllViewModel: ViewAllViewModel,displayType: String,navController: NavController){
     
     val moviesPagingItems : LazyPagingItems<Movie> = viewAllViewModel.movieState.collectAsLazyPagingItems()
-    
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         modifier = Modifier
@@ -88,7 +88,7 @@ fun MoviePages(viewAllViewModel: ViewAllViewModel,navController: NavController){
                     modifier = Modifier
                         .height(150.dp)
                 ){ movieId ->
-                    navController.navigate(Pages.MovieDetail.route+"/"+movieId)
+                    navController.navigate("${Pages.DisplayDetail.route}/${movie.id}&$displayType")
                 }
             }
             else{
@@ -97,7 +97,7 @@ fun MoviePages(viewAllViewModel: ViewAllViewModel,navController: NavController){
                         .height(150.dp)
                         .background(Color(0x0F5A5A5A))
                         .clickable {
-                            navController.navigate(Pages.TvSeriesDetail.route+"/"+movie.id)
+                            navController.navigate("${Pages.DisplayDetail.route}/${movie.id}&$displayType")
                         },
                 )
             }
@@ -149,7 +149,7 @@ fun TvSeriesPages(viewAllViewModel: ViewAllViewModel, navController: NavControll
                     modifier = Modifier
                         .height(150.dp)
                 ){ tvSeriesId ->
-                    navController.navigate(Pages.TvSeriesDetail.route+"/"+tvSeriesId)
+                    navController.navigate(Pages.DisplayDetail.route+"/"+tvSeriesId)
                 }
             }
             else{
@@ -158,7 +158,7 @@ fun TvSeriesPages(viewAllViewModel: ViewAllViewModel, navController: NavControll
                         .height(150.dp)
                         .background(Color(0x0F5A5A5A))
                         .clickable {
-                            navController.navigate(Pages.TvSeriesDetail.route+"/"+tvSeries.id)
+                            navController.navigate("${Pages.DisplayDetail.route}/${tvSeries.id}&${tvSeries.mediaType}")
                         },
                 )
             }

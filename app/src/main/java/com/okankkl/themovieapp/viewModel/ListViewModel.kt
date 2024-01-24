@@ -33,15 +33,6 @@ class ListViewModel
     private val _allDisplayList = MutableStateFlow(listOf<Display>())
     val allDisplayList = _allDisplayList.asStateFlow()
 
-    /*
-    private val _allMovieList = MutableStateFlow(listOf<Display>())
-    var allMovieList = _allMovieList.asStateFlow()
-
-    private val _allTvSeriesList = MutableStateFlow(listOf<Display>())
-    var allTvSeriesList = _allTvSeriesList.asStateFlow()
-
-     */
-
     var movieUpdateTime : String? = null
     var tvSeriesUpdateTime : String? = null
 
@@ -109,10 +100,10 @@ class ListViewModel
     private suspend fun getMoviesFromAPI(){
         GlobalScope.launch(Dispatchers.IO) {
             val apiJob = launch {
-                _allDisplayList.value = repository.getMovieListFromAPI(Categories.Popular,1) +
-                        repository.getMovieListFromAPI(Categories.Trending,1)  +
-                        repository.getMovieListFromAPI(Categories.TopRated,1)  +
-                        repository.getMovieListFromAPI(Categories.NowPlaying,1)
+                _allDisplayList.value = repository.getMoviesFromAPI(Categories.Popular,1) +
+                        repository.getMoviesFromAPI(Categories.Trending,1)  +
+                        repository.getMoviesFromAPI(Categories.TopRated,1)  +
+                        repository.getMoviesFromAPI(Categories.NowPlaying,1)
 
             }
             apiJob.join()
@@ -181,7 +172,8 @@ class ListViewModel
     fun getTvSeriesFromAPI(){
         GlobalScope.launch(Dispatchers.IO) {
             val apiJob = launch {
-                _allDisplayList.value = (repository.getTvSeriesListFromAPI(Categories.Popular,1) +
+                _allDisplayList.value = (
+                        repository.getTvSeriesListFromAPI(Categories.Popular,1) +
                         repository.getTvSeriesListFromAPI(Categories.Trending,1) +
                         repository.getTvSeriesListFromAPI(Categories.TopRated,1) +
                         repository.getTvSeriesListFromAPI(Categories.OnTheAir,1)
@@ -199,6 +191,7 @@ class ListViewModel
         val list = mutableListOf<Display>()
 
         _allDisplayList.value.forEach { display ->
+            display.mediaType = "movie"
             list.find { it.id == display.id }?.let {
                 it.category += ("," + display.category)
             } ?: list.add(display)
@@ -211,6 +204,7 @@ class ListViewModel
         val list = mutableListOf<Display>()
 
         _allDisplayList.value.forEach { display ->
+            display.mediaType ="tv"
             list.find { it.id == display.id }?.let {
                 it.category += ("," + display.category)
             } ?: list.add(display)

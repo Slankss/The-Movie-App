@@ -1,6 +1,7 @@
 package com.okankkl.themovieapp.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,7 +29,7 @@ fun Loading(
 fun Failed(errorMsg : String){
     Box(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(horizontal = 25.dp)
     ){
         Text(

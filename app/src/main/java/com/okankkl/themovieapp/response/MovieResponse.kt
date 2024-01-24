@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 
 data class MovieResponse(
     var page : Int,
-    var results : List<Display>,
+    var results : List<Movie>,
     @SerializedName("total_pages")
     var totalPages : Int,
     @SerializedName("total_results")

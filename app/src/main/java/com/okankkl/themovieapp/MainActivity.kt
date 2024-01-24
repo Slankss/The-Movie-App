@@ -4,9 +4,7 @@ package com.okankkl.themovieapp
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
-
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
@@ -57,9 +55,8 @@ import com.okankkl.themovieapp.model.StoreData
 import com.okankkl.themovieapp.ui.theme.BackgroundColor
 import com.okankkl.themovieapp.ui.theme.TheMovieAppTheme
 import com.okankkl.themovieapp.view.Favourites
-import com.okankkl.themovieapp.view.MovieDetail
+import com.okankkl.themovieapp.view.DisplayDetail
 import com.okankkl.themovieapp.view.Home
-import com.okankkl.themovieapp.view.TvSeriesDetail
 import com.okankkl.themovieapp.view.ViewAll
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
@@ -80,7 +77,6 @@ import com.okankkl.themovieapp.view.News
 import com.okankkl.themovieapp.view.SearchPage
 import com.okankkl.themovieapp.view.SplashScreen
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
 @AndroidEntryPoint
@@ -88,13 +84,9 @@ class MainActivity : ComponentActivity()
 {
     override fun onCreate(savedInstanceState: Bundle?)
     {
-
-
-
         super.onCreate(savedInstanceState)
         setContent {
             TheMovieAppTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -147,7 +139,7 @@ class MainActivity : ComponentActivity()
 fun AppActivity()
 {
     val scope = rememberCoroutineScope()
-    val durationMillis = 400
+    val durationMillis = 200
     val navController = rememberNavController()
     val snackbarHost = remember { SnackbarHostState()}
     var menuVisibility by remember{
@@ -254,10 +246,11 @@ fun AppActivity()
                     Home(navController = navController)
                 }
                 composable(
-                    route = "${Pages.MovieDetail.route}/{movieId}",
-                    arguments = listOf(navArgument("movieId"){
-                        type = NavType.IntType
-                    }),
+                    route = "${Pages.DisplayDetail.route}/{movieId}&{displayType}",
+                    arguments = listOf(
+                        navArgument("movieId"){ type = NavType.IntType },
+                        navArgument("displayType") { type = NavType.StringType}
+                    ),
                     enterTransition = {
                         fadeIn(
                             animationSpec = tween(
@@ -280,37 +273,8 @@ fun AppActivity()
                     }
                 )
                 { backStackEntry ->
-                    MovieDetail(navController = navController,backStackEntry.arguments?.getInt("movieId"),)
-                }
-
-                composable(
-                    route = "${Pages.TvSeriesDetail.route}/{tvSeriesId}",
-                    arguments = listOf(navArgument("tvSeriesId"){
-                        type = NavType.IntType
-                    }),
-                    enterTransition = {
-                        fadeIn(
-                            animationSpec = tween(
-                                durationMillis, easing = LinearEasing
-                            )
-                        ) + slideIntoContainer(
-                            animationSpec = tween(durationMillis, easing = EaseIn),
-                            towards = AnimatedContentTransitionScope.SlideDirection.Start
-                        )
-                    },
-                    exitTransition = {
-                        fadeOut(
-                            animationSpec = tween(
-                                durationMillis, easing = LinearEasing
-                            )
-                        ) + slideOutOfContainer(
-                            animationSpec = tween(durationMillis, easing = EaseOut),
-                            towards = AnimatedContentTransitionScope.SlideDirection.End
-                        )
-                    }
-                )
-                { backStackEntry ->
-                    TvSeriesDetail(navController = navController,backStackEntry.arguments?.getInt("tvSeriesId"))
+                    val arguments = backStackEntry.arguments
+                    DisplayDetail(navController = navController,arguments?.getInt("movieId"),arguments?.getString("displayType"))
                 }
                 composable(
                     route = "${Pages.ViewAll.route}/{dataType}&{category}",
@@ -342,7 +306,7 @@ fun AppActivity()
                     val arguments = requireNotNull(backStackEntry.arguments)
                     val dataType = arguments.getString("dataType")
                     val category = arguments.getString("category")
-                    ViewAll(navController = navController,dataType = dataType, category = category)
+                    ViewAll(navController = navController,displayType = dataType, category = category)
                 }
 
                 composable(

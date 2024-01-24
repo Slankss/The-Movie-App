@@ -28,3 +28,4 @@ val ShadowColor2 = Color(0xffBEE9E8)
 
 val iconSelectedColor = OceanPalet4
 val IconUnselectedColor = Color(0xB3FFFFFF)
+val SpecialRed = Color(0x24FA0707)

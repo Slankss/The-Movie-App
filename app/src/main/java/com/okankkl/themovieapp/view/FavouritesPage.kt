@@ -15,23 +15,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.DismissDirection
-import androidx.compose.material.DismissValue
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.SwipeToDismiss
-import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,11 +34,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -65,7 +53,6 @@ import com.okankkl.themovieapp.enum_sealed.DisplayType
 import com.okankkl.themovieapp.enum_sealed.Pages
 import com.okankkl.themovieapp.extensions.convertDate
 import com.okankkl.themovieapp.model.Favourite
-import com.okankkl.themovieapp.ui.theme.BackgroundColor
 import com.okankkl.themovieapp.ui.theme.OceanPalet4
 import com.okankkl.themovieapp.viewModel.FavouritesViewModel
 import kotlinx.coroutines.launch
@@ -83,7 +70,6 @@ fun Favourites(navController: NavController){
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { DisplayType.values().size })
     val selectedTabIndex = remember { derivedStateOf { pagerState.currentPage } }
-    val menuList = Pages.values().filter { it == Pages.MovieList || it == Pages.TvSeriesList }
 
     LaunchedEffect(key1 = true){
         favouriteViewModel.getFavourites(DisplayType.Movie)
@@ -155,10 +141,7 @@ fun FavouriteList(favouritesViewModel: FavouritesViewModel,favouriteList : List<
             FavouriteItem(
                 favourite = favourite,
                 onClick = {
-                    val route = when(favourite.type){
-                        DisplayType.Movie.path -> Pages.MovieDetail.route
-                        else -> Pages.TvSeriesDetail.route
-                    } + "/" + favourite.contentId
+                    val route = "${Pages.DisplayDetail.route}/${favourite.id}&${favourite.type}"
                     navController.navigate(route)
                 },
                 onDeleteClick = {

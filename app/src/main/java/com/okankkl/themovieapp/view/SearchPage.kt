@@ -6,7 +6,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,11 +32,12 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.okankkl.themovieapp.R
+import com.okankkl.themovieapp.components.Failed
+import com.okankkl.themovieapp.components.Loading
 import com.okankkl.themovieapp.components.Poster
 import com.okankkl.themovieapp.components.SearchTextField
-import com.okankkl.themovieapp.enum_sealed.DisplayType
 import com.okankkl.themovieapp.enum_sealed.Pages
-import com.okankkl.themovieapp.model.Search
+import com.okankkl.themovieapp.model.Display
 import com.okankkl.themovieapp.viewModel.SearchViewModel
 
 @Composable
@@ -45,6 +45,7 @@ fun SearchPage(navController: NavController,onMessage :(String) -> Unit){
 
     val searchViewModel : SearchViewModel = hiltViewModel()
     val searchList = searchViewModel.searchList.collectAsState()
+    val loadingState = searchViewModel.loadingState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -53,9 +54,24 @@ fun SearchPage(navController: NavController,onMessage :(String) -> Unit){
         SearchBar(searchViewModel){ message ->
             onMessage(message)
         }
-        SearchList(searchList = searchList.value, navController = navController)
-    }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ){
+            searchList.value?.let { list ->
+                if(list.isNotEmpty())
+                    SearchList(searchList = list, navController = navController)
+                else
+                    Failed(errorMsg = "Content not found!")
+                searchViewModel.setLoadingState(false)
+            }
 
+            if(loadingState.value)
+                Loading(modifier = Modifier.align(Alignment.Center))
+        }
+
+
+    }
 }
 
 @Composable
@@ -72,7 +88,7 @@ fun SearchBar(searchViewModel: SearchViewModel,onMessage: (String) -> Unit){
         val (searchField,favourites) = createRefs()
         SearchTextField(
             modifier = Modifier
-                .height(40.dp)
+                .height(45.dp)
                 .constrainAs(searchField) {
                     top.linkTo(parent.top)
                     end.linkTo(favourites.start, margin = 10.dp)
@@ -85,11 +101,20 @@ fun SearchBar(searchViewModel: SearchViewModel,onMessage: (String) -> Unit){
             value = search,
             onValueChange = {
                 search = it
+            },
+            onDone = {
+                if(search.isNotEmpty() || search.trim().length >= 2){
+                    searchViewModel.setLoadingState(true)
+                    searchViewModel.search(query = search)
+                }
+                else{
+                    onMessage("Search query must be more than two characters!")
+                }
             }
         )
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(45.dp)
                 .constrainAs(favourites) {
                     top.linkTo(parent.top)
                     end.linkTo(parent.end)
@@ -103,10 +128,11 @@ fun SearchBar(searchViewModel: SearchViewModel,onMessage: (String) -> Unit){
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 ) {
-                    if (search.isNotEmpty() || search.trim().length >= 2)
-                    {
+                    if (search.isNotEmpty() || search.trim().length >= 2){
+                        searchViewModel.setLoadingState(true)
                         searchViewModel.search(query = search)
-                    } else
+                    }
+                    else
                     {
                         onMessage("Search query must be more than two characters!")
                     }
@@ -120,16 +146,13 @@ fun SearchBar(searchViewModel: SearchViewModel,onMessage: (String) -> Unit){
                     .align(Alignment.Center)
                     .padding(5.dp)
                     .size(24.dp)
-
             )
         }
-
     }
-
 }
 
 @Composable
-fun SearchList(searchList : List<Search>, navController: NavController){
+fun SearchList(searchList : List<Display>, navController: NavController){
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
@@ -148,10 +171,7 @@ fun SearchList(searchList : List<Search>, navController: NavController){
                     modifier = Modifier
                         .height(150.dp)
                 ){ searchId ->
-                    when(search.mediaType){
-                        DisplayType.Movie.path -> navController.navigate("${Pages.MovieDetail.route}/${searchId}")
-                        DisplayType.TvSeries.path ->  navController.navigate("${Pages.TvSeriesDetail.route}/${searchId}")
-                    }
+                    navController.navigate("${Pages.DisplayDetail.route}/${searchId}&${search.mediaType}")
                 }
             }
         }

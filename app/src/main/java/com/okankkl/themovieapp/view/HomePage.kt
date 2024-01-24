@@ -1,6 +1,7 @@
 package com.okankkl.themovieapp.view
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -100,9 +101,9 @@ fun Home(navController: NavController)
 
                 if(displayList.isNotEmpty()){
                     if(type == Categories.Trending){
-                        TrendDisplayList(displays = displayList, navController = navController, topPadding = 100.dp)
+                        TrendDisplayList(displays = displayList,displayType = selectedPage.value.path, navController = navController, topPadding = 100.dp)
                     } else {
-                        DisplayContentList(displays = displayList, moviesType = type, navController = navController)
+                        DisplayContentList(displays = displayList,displayType = selectedPage.value.path, moviesType = type, navController = navController)
                     }
                 }
             }
@@ -152,6 +153,7 @@ fun TopMenu(navController: NavController,selectedPage : State<DisplayType>,menuV
                 contentDescription = "search",
                 tint = Color.White,
                 modifier = Modifier
+                    .size(26.dp)
                     .clickable(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
@@ -181,7 +183,7 @@ fun TopMenu(navController: NavController,selectedPage : State<DisplayType>,menuV
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TrendDisplayList(displays : List<Display>, navController: NavController, topPadding: Dp){
+fun TrendDisplayList(displays : List<Display>,displayType : String, navController: NavController, topPadding: Dp){
 
     var time by remember { mutableStateOf(0) }
 
@@ -226,19 +228,21 @@ fun TrendDisplayList(displays : List<Display>, navController: NavController, top
                         shape = RoundedCornerShape(12.dp)
                     ),
             ){
+                val display = displays[page]
                 AsyncImage(
-                    model = Util.IMAGE_BASE_URL +displays[page].backdropPath,
+                    model = Util.IMAGE_BASE_URL +display.backdropPath,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
                         .clickable {
-                            navController.navigate("${Pages.MovieDetail.route}/${displays[page].id}")
+                            val route = "${Pages.DisplayDetail.route}/${display.id}&$displayType"
+                            navController.navigate(route)
                         },
                     contentScale = ContentScale.Crop
                 )
                 Text(
-                    text = displays[page].title,
+                    text = display.en_title,
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .background(
@@ -247,10 +251,7 @@ fun TrendDisplayList(displays : List<Display>, navController: NavController, top
                         .fillMaxWidth()
                         .padding(5.dp),
                     style = MaterialTheme.typography.headlineLarge.copy(
-
                     ),
-
-
                     )
             }
 
@@ -280,7 +281,7 @@ fun TrendDisplayList(displays : List<Display>, navController: NavController, top
 }
 
 @Composable
-fun DisplayContentList(displays : List<Display>, moviesType : Categories, navController: NavController){
+fun DisplayContentList(displays : List<Display>,displayType: String,moviesType : Categories, navController: NavController){
 
     Column(
         modifier = Modifier
@@ -305,7 +306,7 @@ fun DisplayContentList(displays : List<Display>, moviesType : Categories, navCon
                     .align(Alignment.CenterEnd)
                     .padding(end = 15.dp)
                     .clickable {
-                        navController.navigate("${Pages.ViewAll.route}/${DisplayType.Movie.path}&${moviesType.path}")
+                        navController.navigate("${Pages.ViewAll.route}/$displayType&${moviesType.path}")
                     },
                 text = "view all",
                 style = MaterialTheme.typography.labelLarge.copy(
@@ -317,11 +318,11 @@ fun DisplayContentList(displays : List<Display>, moviesType : Categories, navCon
         LazyRow(
             modifier = Modifier
         ){
-            itemsIndexed(displays){ index, movie ->
-                if(movie.posterPath != null && movie.posterPath!!.isNotEmpty()){
+            itemsIndexed(displays){ index, display ->
+                if(display.posterPath != null && display.posterPath!!.isNotEmpty()){
                     Poster(
-                        posterPath = movie.posterPath!!,
-                        id = movie.id,
+                        posterPath = display.posterPath!!,
+                        id = display.id,
                         modifier = Modifier
                             .height(150.dp)
                             .padding(
@@ -329,8 +330,9 @@ fun DisplayContentList(displays : List<Display>, moviesType : Categories, navCon
                                 end = 15.dp
                             )
 
-                    ){ movieId ->
-                        navController.navigate("${Pages.MovieDetail.route}/${movieId}")
+                    ){ displayId ->
+                        val route = "${Pages.DisplayDetail.route}/${display.id}&$displayType"
+                        navController.navigate(route)
                     }
                 }
             }

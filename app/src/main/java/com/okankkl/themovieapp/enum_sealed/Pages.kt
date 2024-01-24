@@ -11,25 +11,17 @@ enum class Pages(
         route = "home",
         title = "Home"
     ),
-    MovieDetail(
-        route = "movie_detail",
-        title = "Movie Detail"
+    DisplayDetail(
+        route = "display_detail",
+        title = "Display Detail"
     ),
     Favourites(
         route = "favourites",
         title = "Favourites"
     ),
-    MovieList(
-        route = "home_movies",
-        title = "Movies"
-    ),
-    TvSeriesList(
-        route = "home_tv_series",
-        title = "Tv Series"
-    ),
-    TvSeriesDetail(
-        route = "tv_series",
-        title = "Tv Series"
+    DisplayList(
+        route = "displays",
+        title = "Displays"
     ),
     ViewAll(
         route = "view_all",

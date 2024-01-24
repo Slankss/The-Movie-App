@@ -4,7 +4,7 @@ import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.model.TvSeries
 import com.okankkl.themovieapp.response.MovieResponse
 import com.okankkl.themovieapp.response.ResponseDto
-import com.okankkl.themovieapp.response.SearchResponse
+import com.okankkl.themovieapp.response.DisplayResponse
 import com.okankkl.themovieapp.response.TvSeriesResponse
 import com.okankkl.themovieapp.util.Util.API_KEY
 import retrofit2.Response
@@ -43,7 +43,7 @@ interface TmdbApi
     
     @GET("/3/trending/movie/week")
     suspend fun getTrendingMovies(
-        @Query("api_key") aiKey : String = API_KEY
+        @Query("api_key") apiKey : String = API_KEY
     ) : Response<MovieResponse>
 
     @GET("/3/tv/{category}")
@@ -83,5 +83,5 @@ interface TmdbApi
     suspend fun getSearch(
         @Query("query") query: String,
         @Query("api_key") apiKey : String = API_KEY
-    ) : Response<SearchResponse>
+    ) : Response<DisplayResponse>
 }

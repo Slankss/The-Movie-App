@@ -2,7 +2,7 @@ package com.okankkl.themovieapp.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.okankkl.themovieapp.model.Search
+import com.okankkl.themovieapp.model.Display
 import com.okankkl.themovieapp.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,15 +17,29 @@ class SearchViewModel
     : ViewModel()
 {
 
-    private var _searchList = MutableStateFlow(listOf<Search>())
+    private var _searchList = MutableStateFlow<List<Display>?>(null)
     var searchList = _searchList.asStateFlow()
 
-    fun search(query : String){
+    private var _loadingState = MutableStateFlow(false)
+    var loadingState = _loadingState.asStateFlow()
 
+    fun search(query : String){
         viewModelScope.launch {
+            _searchList.value = null
             _searchList.value = repository.search(query)
         }
+    }
 
+    fun clearList(){
+        viewModelScope.launch {
+            _searchList.value = null
+        }
+    }
+
+    fun setLoadingState(state : Boolean){
+        viewModelScope.launch{
+            _loadingState.value = state
+        }
     }
 
 

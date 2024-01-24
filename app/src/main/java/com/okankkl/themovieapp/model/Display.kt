@@ -19,16 +19,20 @@ open class Display(
     open var popularity : Double,
     @SerializedName("vote_average")
     open var voteAverage : Double,
-    open var title : String,
+    open var en_title : String,
+    open var releaseDate : String,
     @ColumnInfo(defaultValue = "")
     open var category  : String = " ",
     @ColumnInfo(defaultValue = "")
+    @SerializedName("media_type")
     open var mediaType : String? = " "
 ){
 
     @Ignore
-    @ColumnInfo(defaultValue = "")
-    open var releaseDate : String = ""
-
+    var videos : Videos? = null
+    @Ignore
+    var overview : String = ""
+    @Ignore
+    var genres : List<Genres> = listOf()
 
 }

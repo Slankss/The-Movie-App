@@ -1,13 +1,13 @@
 package com.okankkl.themovieapp.response
 
 import com.google.gson.annotations.SerializedName
-import com.okankkl.themovieapp.model.Search
+import com.okankkl.themovieapp.model.Display
 
 
-class SearchResponse
+class DisplayResponse
     (
     var page : Int,
-    var results : List<Search>,
+    var results : List<Display>,
     @SerializedName("total_pages")
     var totalPages : Int,
     @SerializedName("total_results")
