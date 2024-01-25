@@ -1,16 +1,12 @@
 package com.okankkl.themovieapp.util
 
 import android.content.Context
-import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.okankkl.themovieapp.dao.Dao
 import com.okankkl.themovieapp.model.Display
 import com.okankkl.themovieapp.model.Favourite
-import com.okankkl.themovieapp.model.Movie
-import com.okankkl.themovieapp.model.MovieEntity
-import com.okankkl.themovieapp.model.TvSeries
 
 @Database(
     entities = [Display::class,Favourite::class],

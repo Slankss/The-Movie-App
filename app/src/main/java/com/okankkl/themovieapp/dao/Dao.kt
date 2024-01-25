@@ -1,16 +1,11 @@
 package com.okankkl.themovieapp.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
 import com.okankkl.themovieapp.model.Display
 import com.okankkl.themovieapp.model.Favourite
-import com.okankkl.themovieapp.model.Movie
-import com.okankkl.themovieapp.model.MovieEntity
-import com.okankkl.themovieapp.model.TvSeries
 
 @Dao
 interface Dao

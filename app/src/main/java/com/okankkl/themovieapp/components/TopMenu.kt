@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.okankkl.themovieapp.enum_sealed.DisplayType
-import com.okankkl.themovieapp.enum_sealed.Pages
 import com.okankkl.themovieapp.ui.theme.BackgroundColor
 
 @Composable

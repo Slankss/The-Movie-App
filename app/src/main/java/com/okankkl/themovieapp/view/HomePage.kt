@@ -1,10 +1,10 @@
 package com.okankkl.themovieapp.view
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -29,9 +29,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.navigation.NavController
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +42,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.okankkl.themovieapp.R
 import com.okankkl.themovieapp.components.Loading
@@ -58,6 +56,9 @@ import com.okankkl.themovieapp.ui.theme.BacgroundTransparentColor
 import com.okankkl.themovieapp.ui.theme.LightBlue
 import com.okankkl.themovieapp.util.Util
 import com.okankkl.themovieapp.viewModel.ListViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.Timer
 
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
 @Composable
@@ -65,7 +66,6 @@ fun Home(navController: NavController)
 {
     val listViewModel : ListViewModel = hiltViewModel()
     val selectedPage = listViewModel.selectedPage.collectAsState()
-    var menuVisibility by  remember { mutableStateOf(true) }
 
     val loadingState = listViewModel.loadingState.collectAsState()
     val scrollState = rememberScrollState()
@@ -109,7 +109,7 @@ fun Home(navController: NavController)
             }
         }
 
-        TopMenu(navController,selectedPage,menuVisibility){ page ->
+        TopMenu(navController,selectedPage){ page ->
             listViewModel.setSelectedPage(page)
         }
 
@@ -118,12 +118,11 @@ fun Home(navController: NavController)
                 modifier = Modifier
                     .align(Alignment.Center)
             )
-
     }
 }
 
 @Composable
-fun TopMenu(navController: NavController,selectedPage : State<DisplayType>,menuVisibility : Boolean,setSelectedPage :(DisplayType) -> Unit){
+fun TopMenu(navController: NavController,selectedPage : State<DisplayType>,setSelectedPage :(DisplayType) -> Unit){
 
     Column(
         modifier = Modifier
@@ -185,36 +184,32 @@ fun TopMenu(navController: NavController,selectedPage : State<DisplayType>,menuV
 @Composable
 fun TrendDisplayList(displays : List<Display>,displayType : String, navController: NavController, topPadding: Dp){
 
-    var time by remember { mutableStateOf(0) }
+    var time by remember { mutableIntStateOf(0) }
 
     var pageState = rememberPagerState(
-        pageCount = {
-            displays.size
-        },
-        initialPage = 0,
+        pageCount = { displays.size },
+        initialPage = 0,)
 
-        )
-
-    LaunchedEffect(key1 = time, block = {
-        /*
+    LaunchedEffect(key1 = time){
         while(true){
-            if(time == 5){
-                pageState.animateScrollToPage(pageState.currentPage +1)
-                time = 0
+            delay(1000)
+            if(time % 5 == 0){
+                if(pageState.currentPage == displays.size-1)
+                    pageState.scrollToPage(0)
+                else
+                    pageState.animateScrollToPage(pageState.currentPage+1)
             }
-            delay(1000L)
+
             time++
         }
-
-         */
-    })
+    }
     Column(
         modifier = Modifier
             .padding(top = topPadding, start = 15.dp,end = 15.dp)
     ) {
         HorizontalPager(
             state = pageState,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
         { page ->
             Box(
@@ -235,10 +230,15 @@ fun TrendDisplayList(displays : List<Display>,displayType : String, navControlle
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
-                        .clickable {
-                            val route = "${Pages.DisplayDetail.route}/${display.id}&$displayType"
-                            navController.navigate(route)
-                        },
+                        .combinedClickable (
+                            onClick = {
+                                val route = "${Pages.DisplayDetail.route}/${display.id}&$displayType"
+                                navController.navigate(route)
+                            },
+                            onLongClick = {
+                                time = 0
+                            }
+                        ),
                     contentScale = ContentScale.Crop
                 )
                 Text(

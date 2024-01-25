@@ -20,17 +20,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.okankkl.themovieapp.viewModel.ViewAllViewModel
-import com.okankkl.themovieapp.components.Loading
-import com.okankkl.themovieapp.components.Failed
-import com.okankkl.themovieapp.model.Movie
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.okankkl.themovieapp.components.Failed
+import com.okankkl.themovieapp.components.Loading
 import com.okankkl.themovieapp.components.Poster
 import com.okankkl.themovieapp.enum_sealed.DisplayType
 import com.okankkl.themovieapp.enum_sealed.Pages
+import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.model.TvSeries
+import com.okankkl.themovieapp.viewModel.ViewAllViewModel
 
 @Composable
 fun ViewAll(navController: NavController, displayType : String?, category : String?){

@@ -38,11 +38,22 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -50,34 +61,25 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.okankkl.themovieapp.enum_sealed.Pages
-import com.okankkl.themovieapp.model.StoreData
-import com.okankkl.themovieapp.ui.theme.BackgroundColor
-import com.okankkl.themovieapp.ui.theme.TheMovieAppTheme
-import com.okankkl.themovieapp.view.Favourites
-import com.okankkl.themovieapp.view.DisplayDetail
-import com.okankkl.themovieapp.view.Home
-import com.okankkl.themovieapp.view.ViewAll
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.runBlocking
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.okankkl.themovieapp.components.BottomMenuItem
 import com.okankkl.themovieapp.enum_sealed.MenuItems
+import com.okankkl.themovieapp.enum_sealed.Pages
 import com.okankkl.themovieapp.extensions.isNetworkAvailable
+import com.okankkl.themovieapp.model.StoreData
+import com.okankkl.themovieapp.ui.theme.BackgroundColor
 import com.okankkl.themovieapp.ui.theme.ShadowColor
 import com.okankkl.themovieapp.ui.theme.ShadowColor2
+import com.okankkl.themovieapp.ui.theme.TheMovieAppTheme
+import com.okankkl.themovieapp.view.DisplayDetail
+import com.okankkl.themovieapp.view.Favourites
+import com.okankkl.themovieapp.view.Home
 import com.okankkl.themovieapp.view.News
 import com.okankkl.themovieapp.view.SearchPage
 import com.okankkl.themovieapp.view.SplashScreen
+import com.okankkl.themovieapp.view.ViewAll
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.setValue
+import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity()
@@ -134,7 +136,7 @@ class MainActivity : ComponentActivity()
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation", "RestrictedApi")
 @Composable
 fun AppActivity()
 {
@@ -145,6 +147,7 @@ fun AppActivity()
     var menuVisibility by remember{
         mutableStateOf(false)
     }
+    val currentDestination = navController.currentBackStackEntryFlow.collectAsState(initial = navController.currentBackStackEntry)
 
     val storeDate = StoreData(LocalContext.current)
     LaunchedEffect(key1 =true, block = {
@@ -161,29 +164,31 @@ fun AppActivity()
             SnackbarHost(hostState = snackbarHost)
         },
         bottomBar = {
-            BottomNavigation(
-                backgroundColor = BackgroundColor,
-                modifier = Modifier
-                    .shadow(
-                        elevation = 12.dp,
-                        ambientColor = ShadowColor,
-                        spotColor = ShadowColor2,
-                    )
-            ){
-                val navBackStactEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStactEntry?.destination
-                MenuItems.values().forEach { menuItem ->
-                    val selected = currentDestination?.hierarchy?.any{ it.route == menuItem.route } == true
-                    BottomNavigationItem(
-                        selected = selected,
-                        onClick = {
-                            navController.navigate(menuItem.route)
-                        },
-                        icon = {
-                            BottomMenuItem(selected = selected, menuItem = menuItem)
-                        },
+            if(currentDestination.value != null && currentDestination.value!!.destination.route != Pages.Splash.route){
+                BottomNavigation(
+                    backgroundColor = BackgroundColor,
+                    modifier = Modifier
+                        .shadow(
+                            elevation = 12.dp,
+                            ambientColor = ShadowColor,
+                            spotColor = ShadowColor2,
+                        )
+                ){
+                    val navBackStactEntry by navController.currentBackStackEntryAsState()
+                    val currentDestination = navBackStactEntry?.destination
+                    MenuItems.values().forEach { menuItem ->
+                        val selected = currentDestination?.hierarchy?.any{ it.route == menuItem.route } == true
+                        BottomNavigationItem(
+                            selected = selected,
+                            onClick = {
+                                navController.navigate(menuItem.route)
+                            },
+                            icon = {
+                                BottomMenuItem(selected = selected, menuItem = menuItem)
+                            },
 
-                    )
+                            )
+                    }
                 }
             }
         }
@@ -211,13 +216,7 @@ fun AppActivity()
                     },
 
                 ){
-                    SplashScreen()
-
-                    navController.navigate(Pages.Home.route){
-                        popUpTo(Pages.Splash.route) {
-                            inclusive = true
-                        }
-                    }
+                    SplashScreen(navController)
                 }
                 composable(
                     route = Pages.Home.route,

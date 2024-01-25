@@ -3,7 +3,6 @@ package com.okankkl.themovieapp.paging.paging_source
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.okankkl.themovieapp.enum_sealed.Categories
-import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.model.TvSeries
 import com.okankkl.themovieapp.paging.data_source.DataSources
 import retrofit2.HttpException

@@ -24,6 +24,10 @@ enum class Categories(
     OnTheAir(
         path = "on_the_air",
         title = "On The Air"
+    ),
+    UpComing(
+        path = "upcoming",
+        title = "Upcoming Movies"
     )
 }
 

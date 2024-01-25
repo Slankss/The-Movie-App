@@ -54,6 +54,7 @@ class ListViewModel
             setLoadingState(true)
             movieUpdateTime = storeData.getMovieUpdateTime.first()
             val currentDate = LocalDateTime.now()
+            _allDisplayList.value = emptyList()
             if(movieUpdateTime == null || movieUpdateTime!!.isEmpty()){
                 getMoviesFromAPI()
                 storeData.saveMovieUpdateTime(currentDate.toString())
@@ -126,6 +127,7 @@ class ListViewModel
             setLoadingState(true)
             tvSeriesUpdateTime = storeData.getTvSeriesUpdateTime.first()
             val currentDate = LocalDateTime.now()
+            _allDisplayList.value = emptyList()
             if(tvSeriesUpdateTime == null || tvSeriesUpdateTime!!.isEmpty()){
                 getTvSeriesFromAPI()
                 storeData.saveTvSeriesUpdateTime(currentDate.toString())
