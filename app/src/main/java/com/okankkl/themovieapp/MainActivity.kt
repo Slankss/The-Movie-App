@@ -38,6 +38,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -134,7 +135,7 @@ class MainActivity : ComponentActivity()
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation", "RestrictedApi")
 @Composable
 fun AppActivity()
 {
@@ -145,6 +146,7 @@ fun AppActivity()
     var menuVisibility by remember{
         mutableStateOf(false)
     }
+    val currentDestination = navController.currentBackStackEntryFlow.collectAsState(initial = navController.currentBackStackEntry)
 
     val storeDate = StoreData(LocalContext.current)
     LaunchedEffect(key1 =true, block = {
@@ -161,29 +163,31 @@ fun AppActivity()
             SnackbarHost(hostState = snackbarHost)
         },
         bottomBar = {
-            BottomNavigation(
-                backgroundColor = BackgroundColor,
-                modifier = Modifier
-                    .shadow(
-                        elevation = 12.dp,
-                        ambientColor = ShadowColor,
-                        spotColor = ShadowColor2,
-                    )
-            ){
-                val navBackStactEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStactEntry?.destination
-                MenuItems.values().forEach { menuItem ->
-                    val selected = currentDestination?.hierarchy?.any{ it.route == menuItem.route } == true
-                    BottomNavigationItem(
-                        selected = selected,
-                        onClick = {
-                            navController.navigate(menuItem.route)
-                        },
-                        icon = {
-                            BottomMenuItem(selected = selected, menuItem = menuItem)
-                        },
+            if(currentDestination.value != null && currentDestination.value!!.destination.route != Pages.Splash.route){
+                BottomNavigation(
+                    backgroundColor = BackgroundColor,
+                    modifier = Modifier
+                        .shadow(
+                            elevation = 12.dp,
+                            ambientColor = ShadowColor,
+                            spotColor = ShadowColor2,
+                        )
+                ){
+                    val navBackStactEntry by navController.currentBackStackEntryAsState()
+                    val currentDestination = navBackStactEntry?.destination
+                    MenuItems.values().forEach { menuItem ->
+                        val selected = currentDestination?.hierarchy?.any{ it.route == menuItem.route } == true
+                        BottomNavigationItem(
+                            selected = selected,
+                            onClick = {
+                                navController.navigate(menuItem.route)
+                            },
+                            icon = {
+                                BottomMenuItem(selected = selected, menuItem = menuItem)
+                            },
 
-                    )
+                            )
+                    }
                 }
             }
         }
@@ -211,13 +215,7 @@ fun AppActivity()
                     },
 
                 ){
-                    SplashScreen()
-
-                    navController.navigate(Pages.Home.route){
-                        popUpTo(Pages.Splash.route) {
-                            inclusive = true
-                        }
-                    }
+                    SplashScreen(navController)
                 }
                 composable(
                     route = Pages.Home.route,

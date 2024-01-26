@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.filter
 import com.okankkl.themovieapp.enum_sealed.Categories
 import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.paging.use_case.GetMoviesUseCase
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,9 +38,14 @@ class NewMoviesViewModel
                 .distinctUntilChanged()
                 .cachedIn(viewModelScope)
                 .collect{
-                    _newsMovies.value = it
+                    _newsMovies.value = it.filter {  movie ->
+                        val localDate = LocalDate.now()
+                        val movieDate = LocalDate.parse(movie.releaseDate)
+                        movieDate.isAfter(localDate)
+                    }
                 }
         }
+
     }
 
 

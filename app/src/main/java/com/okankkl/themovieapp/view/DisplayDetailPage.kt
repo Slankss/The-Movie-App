@@ -50,6 +50,7 @@ import com.okankkl.themovieapp.components.GenreBox
 import com.okankkl.themovieapp.components.Loading
 import com.okankkl.themovieapp.components.Poster
 import com.okankkl.themovieapp.components.YouTubePlayer
+import com.okankkl.themovieapp.enum_sealed.DisplayType
 import com.okankkl.themovieapp.enum_sealed.Pages
 import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.extensions.convertDate
@@ -69,7 +70,8 @@ fun DisplayDetail(navController: NavController, movieId : Int?, displayType : St
     val displayViewModel : DisplayDetailViewModel = hiltViewModel()
     val display = displayViewModel.display.collectAsState()
     val similarDisplays = displayViewModel.similarDisplays.collectAsState()
-
+    val favouriteState = displayViewModel.favouriteState.collectAsState()
+    
     LaunchedEffect(key1 = true){
         if(movieId != null && displayType != null){
             displayViewModel.getDisplay(movieId,displayType)
@@ -114,6 +116,53 @@ fun DisplayDetail(navController: NavController, movieId : Int?, displayType : St
                     videos = data.videos,
                     backdropPath = data.backdropPath
                 )
+                
+                Row(
+                    modifier =  Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp, start =  15.dp, end =  15.dp, bottom = 10.dp)
+                ){
+                    Text(
+                        text = data.en_title,
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = 24.sp,
+                            lineHeight = 32.sp
+                        ),
+                        modifier = Modifier
+                            .weight(4f)
+                    )
+                    Icon(
+                        painter = if(favouriteState.value == null) painterResource(id = R.drawable.ic_fav_unselected) else painterResource(
+                            id = R.drawable.ic_fav_selected
+                        ),
+                        contentDescription = null,
+                        tint = if(favouriteState.value == null) Color.White else OceanPalet4,
+                        modifier = Modifier
+                            .weight(1f)
+                            .size(24.dp)
+                            .clickable {
+                                if (favouriteState.value == null){
+                                    displayViewModel.addFavourite(
+                                        display = data,
+                                        displayType = when(data){
+                                            is Movie -> DisplayType.Movie.path
+                                            else -> DisplayType.TvSeries.path
+                                        }
+                                    )
+                                }
+                                else{
+                                    displayViewModel.deleteFavourite(
+                                        display = data,
+                                        displayType = when(data){
+                                            is Movie -> DisplayType.Movie.path
+                                            else -> DisplayType.TvSeries.path
+                                        }
+                                    )
+                                }
+                            }
+                    )
+                }
+                
                 if(data is Movie){
                     MovieContent(movie = data,displayType!!,displayViewModel)
                 }
@@ -132,8 +181,6 @@ fun DisplayDetail(navController: NavController, movieId : Int?, displayType : St
         if(display.value is Resources.Loading) Loading(modifier = Modifier.align(Alignment.Center))
     }
 }
-
-
 @Composable
 fun Trailer(videos: Videos?,backdropPath : String?){
     Box(
@@ -142,10 +189,12 @@ fun Trailer(videos: Videos?,backdropPath : String?){
         ,
     ){
         videos?.apply {
-            results.firstOrNull { it.type == "Trailer"}?.let { video ->
+            val trailer = results.firstOrNull{ it.type == "Trailer"}
+                ?: results.firstOrNull()
+
+            trailer?.let { video ->
                 YouTubePlayer(videoId = video.key, lifecycleOwner = LocalLifecycleOwner.current)
-            }
-                ?: Box(
+            }  ?: Box(
                 modifier = Modifier
                     .fillMaxWidth()
             ){
@@ -158,19 +207,13 @@ fun Trailer(videos: Videos?,backdropPath : String?){
                 )
             }
         }
-
     }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MovieContent(movie: Movie, displayType : String, displayViewModel: DisplayDetailViewModel){
-
-    val favouriteState = displayViewModel.favouriteState.collectAsState()
-    val titleStyle = MaterialTheme.typography.labelLarge.copy(
-        fontSize = 24.sp,
-        lineHeight = 32.sp
-    )
+    
     val subTitleStyle = MaterialTheme.typography.bodyLarge.copy(
         fontSize = 16.sp,
         color = Color(0xFFFFFFFF)
@@ -181,14 +224,6 @@ fun MovieContent(movie: Movie, displayType : String, displayViewModel: DisplayDe
             .padding(vertical = 15.dp, horizontal = 15.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-
-        Text(
-            text = movie.en_title,
-            style = titleStyle,
-            modifier = Modifier
-                .padding(bottom = 10.dp)
-        )
-
         FlowRow(
             maxItemsInEachRow = 3,
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -289,28 +324,14 @@ fun MovieContent(movie: Movie, displayType : String, displayViewModel: DisplayDe
             )
         )
 
-        AddFavourite(
-            modifier = Modifier
-                .align(Alignment.End),
-            favouriteState = favouriteState.value == null
-        ) {
-            if (favouriteState.value == null)
-                displayViewModel.addFavourite(movie,displayType)
-            else
-                displayViewModel.deleteFavourite(movie,displayType)
-        }
+       
     }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TvSeriesContent(tvSeries: TvSeries,displayType: String,displayViewModel : DisplayDetailViewModel){
-
-    val favouriteState = displayViewModel.favouriteState.collectAsState()
-    val titleStyle = MaterialTheme.typography.labelLarge.copy(
-        fontSize = 24.sp,
-        lineHeight = 32.sp
-    )
+    
     val subTitleStyle = MaterialTheme.typography.bodyLarge.copy(
         fontSize = 16.sp,
         color = Color(0xFFFFFFFF)
@@ -322,13 +343,7 @@ fun TvSeriesContent(tvSeries: TvSeries,displayType: String,displayViewModel : Di
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
 
-        Text(
-            text = tvSeries.en_title,
-            style = titleStyle,
-            modifier = Modifier
-                .padding(bottom = 10.dp)
-        )
-
+        
         FlowRow(
             maxItemsInEachRow = 3,
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -485,17 +500,6 @@ fun TvSeriesContent(tvSeries: TvSeries,displayType: String,displayViewModel : Di
                 )
             )
         }
-
-        AddFavourite(
-            modifier = Modifier
-                .align(Alignment.End),
-            favouriteState = favouriteState.value == null
-        ) {
-            if (favouriteState.value == null)
-                displayViewModel.addFavourite(tvSeries,displayType)
-            else
-                displayViewModel.deleteFavourite(tvSeries,displayType)
-        }
     }
 }
 
@@ -516,25 +520,8 @@ fun AddFavourite(modifier : Modifier,favouriteState : Boolean,onClick: () -> Uni
                 .align(Alignment.CenterEnd),
             verticalAlignment = Alignment.CenterVertically
         ){
-            Text(
-                text = if(favouriteState) "Favorilere Ekle" else "Favorilerden Çıkar",
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontSize = 14.sp,
-                    color = Color(0x99FFFFFF)
-                ),
-                modifier = Modifier
-            )
-            Icon(
-                painter = if(favouriteState) painterResource(id = R.drawable.ic_fav_unselected) else painterResource(
-                    id = R.drawable.ic_fav_selected
-                ),
-                contentDescription = null,
-                tint = if(favouriteState) Color.White else OceanPalet4,
-                modifier = Modifier
-                    .padding(start = 10.dp)
-                    .size(16.dp)
-
-            )
+        
+        
 
         }
     }

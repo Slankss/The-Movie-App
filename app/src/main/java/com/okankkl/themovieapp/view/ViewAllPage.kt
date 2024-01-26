@@ -149,7 +149,7 @@ fun TvSeriesPages(viewAllViewModel: ViewAllViewModel, navController: NavControll
                     modifier = Modifier
                         .height(150.dp)
                 ){ tvSeriesId ->
-                    navController.navigate(Pages.DisplayDetail.route+"/"+tvSeriesId)
+                    navController.navigate("${ Pages.DisplayDetail.route }/$tvSeriesId&${DisplayType.TvSeries.path}")
                 }
             }
             else{

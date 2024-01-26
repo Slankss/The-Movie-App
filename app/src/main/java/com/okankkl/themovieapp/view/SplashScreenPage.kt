@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -17,12 +18,17 @@ import com.okankkl.themovieapp.R
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(){
+fun SplashScreen(navController : NavController){
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash_screen_anim))
 
     LaunchedEffect(composition){
-        delay(1500)
+        delay(1000)
+        navController.navigate(Pages.Home.route){
+            popUpTo(Pages.Splash.route) {
+                inclusive = true
+            }
+        }
     }
 
     Box(

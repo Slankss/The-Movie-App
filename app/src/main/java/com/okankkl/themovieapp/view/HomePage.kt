@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -55,6 +56,9 @@ import com.okankkl.themovieapp.ui.theme.BacgroundTransparentColor
 import com.okankkl.themovieapp.ui.theme.LightBlue
 import com.okankkl.themovieapp.util.Util
 import com.okankkl.themovieapp.viewModel.ListViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.Timer
 
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
 @Composable
@@ -62,7 +66,6 @@ fun Home(navController: NavController)
 {
     val listViewModel : ListViewModel = hiltViewModel()
     val selectedPage = listViewModel.selectedPage.collectAsState()
-    var menuVisibility by  remember { mutableStateOf(true) }
 
     val loadingState = listViewModel.loadingState.collectAsState()
     val scrollState = rememberScrollState()
@@ -106,7 +109,7 @@ fun Home(navController: NavController)
             }
         }
 
-        TopMenu(navController,selectedPage,menuVisibility){ page ->
+        TopMenu(navController,selectedPage){ page ->
             listViewModel.setSelectedPage(page)
         }
 
@@ -115,14 +118,13 @@ fun Home(navController: NavController)
                 modifier = Modifier
                     .align(Alignment.Center)
             )
-
     }
 }
 
 @Composable
-fun TopMenu(navController: NavController,selectedPage : State<DisplayType>,menuVisibility : Boolean,setSelectedPage :(DisplayType) -> Unit){
+fun TopMenu(navController: NavController,selectedPage : State<DisplayType>,setSelectedPage :(DisplayType) -> Unit){
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = BacgroundTransparentColor)
@@ -131,38 +133,11 @@ fun TopMenu(navController: NavController,selectedPage : State<DisplayType>,menuV
                 detectTapGestures {
                 }
             },
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ){
-            Box(
-                modifier = Modifier
-                    .height(25.dp)
-                    .width(25.dp)
-                    .background(color = Color.White)
-            )
-            Icon(
-                painter = painterResource(id = R.drawable.ic_search),
-                contentDescription = "search",
-                tint = Color.White,
-                modifier = Modifier
-                    .size(26.dp)
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) {
-                        navController.navigate(Pages.Search.route)
-                    }
-            )
-        }
-
-        Row(
-            modifier = Modifier
                 .fillMaxWidth()
+                .align(Alignment.TopStart)
                 .padding(bottom = 10.dp),
             horizontalArrangement = Arrangement.spacedBy(20.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -174,6 +149,21 @@ fun TopMenu(navController: NavController,selectedPage : State<DisplayType>,menuV
                 }
             }
         }
+    
+        Icon(
+            painter = painterResource(id = R.drawable.ic_search),
+            contentDescription = "search",
+            tint = Color.White,
+            modifier = Modifier
+                .size(26.dp)
+                .align(Alignment.TopEnd)
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    navController.navigate(Pages.Search.route)
+                }
+        )
 
     }
 }
@@ -182,36 +172,32 @@ fun TopMenu(navController: NavController,selectedPage : State<DisplayType>,menuV
 @Composable
 fun TrendDisplayList(displays : List<Display>,displayType : String, navController: NavController, topPadding: Dp){
 
-    var time by remember { mutableStateOf(0) }
+    var time by remember { mutableIntStateOf(0) }
 
     var pageState = rememberPagerState(
-        pageCount = {
-            displays.size
-        },
-        initialPage = 0,
+        pageCount = { displays.size },
+        initialPage = 0,)
 
-        )
-
-    LaunchedEffect(key1 = time, block = {
-        /*
+    LaunchedEffect(key1 = time){
         while(true){
-            if(time == 5){
-                pageState.animateScrollToPage(pageState.currentPage +1)
-                time = 0
+            delay(1000)
+            if(time % 5 == 0){
+                if(pageState.currentPage == displays.size-1)
+                    pageState.scrollToPage(0)
+                else
+                    pageState.animateScrollToPage(pageState.currentPage+1)
             }
-            delay(1000L)
+
             time++
         }
-
-         */
-    })
+    }
     Column(
         modifier = Modifier
             .padding(top = topPadding, start = 15.dp,end = 15.dp)
     ) {
         HorizontalPager(
             state = pageState,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
         { page ->
             Box(
@@ -232,10 +218,15 @@ fun TrendDisplayList(displays : List<Display>,displayType : String, navControlle
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
-                        .clickable {
-                            val route = "${Pages.DisplayDetail.route}/${display.id}&$displayType"
-                            navController.navigate(route)
-                        },
+                        .combinedClickable (
+                            onClick = {
+                                val route = "${Pages.DisplayDetail.route}/${display.id}&$displayType"
+                                navController.navigate(route)
+                            },
+                            onLongClick = {
+                                time = 0
+                            }
+                        ),
                     contentScale = ContentScale.Crop
                 )
                 Text(
