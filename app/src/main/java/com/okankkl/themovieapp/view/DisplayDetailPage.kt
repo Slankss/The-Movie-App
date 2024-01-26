@@ -142,10 +142,12 @@ fun Trailer(videos: Videos?,backdropPath : String?){
         ,
     ){
         videos?.apply {
-            results.firstOrNull { it.type == "Trailer"}?.let { video ->
+            val trailer = results.firstOrNull{ it.type == "Trailer"}
+                ?: results.firstOrNull()
+
+            trailer?.let { video ->
                 YouTubePlayer(videoId = video.key, lifecycleOwner = LocalLifecycleOwner.current)
-            }
-                ?: Box(
+            }  ?: Box(
                 modifier = Modifier
                     .fillMaxWidth()
             ){
@@ -158,7 +160,6 @@ fun Trailer(videos: Videos?,backdropPath : String?){
                 )
             }
         }
-
     }
 }
 

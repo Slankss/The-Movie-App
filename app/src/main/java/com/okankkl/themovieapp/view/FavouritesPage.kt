@@ -5,6 +5,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +21,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -72,6 +72,7 @@ fun Favourites(navController: NavController){
     val selectedTabIndex = remember { derivedStateOf { pagerState.currentPage } }
 
     LaunchedEffect(key1 = true){
+        pagerState.scrollToPage(0)
         favouriteViewModel.getFavourites(DisplayType.Movie)
     }
 
@@ -127,7 +128,7 @@ fun Favourites(navController: NavController){
 
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+
 @Composable
 fun FavouriteList(favouritesViewModel: FavouritesViewModel,favouriteList : List<Favourite>,navController: NavController,displayType: DisplayType){
 
@@ -141,7 +142,7 @@ fun FavouriteList(favouritesViewModel: FavouritesViewModel,favouriteList : List<
             FavouriteItem(
                 favourite = favourite,
                 onClick = {
-                    val route = "${Pages.DisplayDetail.route}/${favourite.id}&${favourite.type}"
+                    val route = "${Pages.DisplayDetail.route}/${favourite.contentId}&${favourite.type}"
                     navController.navigate(route)
                 },
                 onDeleteClick = {
@@ -154,7 +155,7 @@ fun FavouriteList(favouritesViewModel: FavouritesViewModel,favouriteList : List<
 }
 
 @Composable
-fun FavouriteItem(favourite : Favourite,onClick : (Int) -> Unit,onDeleteClick : () -> Unit){
+fun FavouriteItem(favourite : Favourite,onClick : () -> Unit,onDeleteClick : () -> Unit){
 
     Box(
         modifier = Modifier
@@ -174,6 +175,9 @@ fun FavouriteItem(favourite : Favourite,onClick : (Int) -> Unit,onDeleteClick : 
                 color = Color(0x0DFFFFFF),
                 shape = RoundedCornerShape(14.dp)
             )
+            .clickable {
+                onClick()
+            }
     ){
         val delete = SwipeAction(
             onSwipe = {
@@ -211,9 +215,7 @@ fun FavouriteItem(favourite : Favourite,onClick : (Int) -> Unit,onDeleteClick : 
                             ambientColor = OceanPalet4,
                             shape = RoundedCornerShape(14.dp)
                         )
-                ){ movieId ->
-                    onClick(movieId)
-                }
+                ){}
 
                 Column(
                     modifier = Modifier
