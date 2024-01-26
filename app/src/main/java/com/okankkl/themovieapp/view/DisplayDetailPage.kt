@@ -168,10 +168,10 @@ fun DisplayDetail(navController: NavController, movieId : Int?, displayType : St
                 }
                 
                 if(data is Movie){
-                    MovieContent(movie = data,displayType!!,displayViewModel)
+                    MovieContent(movie = data)
                 }
                 else if(data is TvSeries){
-                    TvSeriesContent(tvSeries = data,displayType!!,displayViewModel = displayViewModel)
+                    TvSeriesContent(tvSeries = data)
                 }
             }
             if(similarDisplays.value.isNotEmpty()){
@@ -216,7 +216,7 @@ fun Trailer(videos: Videos?,backdropPath : String?){
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun MovieContent(movie: Movie, displayType : String, displayViewModel: DisplayDetailViewModel){
+fun MovieContent(movie: Movie){
     
     val subTitleStyle = MaterialTheme.typography.bodyLarge.copy(
         fontSize = 16.sp,
@@ -334,7 +334,7 @@ fun MovieContent(movie: Movie, displayType : String, displayViewModel: DisplayDe
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TvSeriesContent(tvSeries: TvSeries,displayType: String,displayViewModel : DisplayDetailViewModel){
+fun TvSeriesContent(tvSeries: TvSeries){
     
     val subTitleStyle = MaterialTheme.typography.bodyLarge.copy(
         fontSize = 16.sp,
@@ -503,30 +503,6 @@ fun TvSeriesContent(tvSeries: TvSeries,displayType: String,displayViewModel : Di
                     textAlign = TextAlign.Justify
                 )
             )
-        }
-    }
-}
-
-@Composable
-fun AddFavourite(modifier : Modifier,favouriteState : Boolean,onClick: () -> Unit){
-    Box(
-        modifier = modifier
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            ) {
-              onClick()
-            },
-    ){
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 10.dp, vertical = 5.dp)
-                .align(Alignment.CenterEnd),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-        
-        
-
         }
     }
 }
