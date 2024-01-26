@@ -66,7 +66,7 @@ interface TmdbApi
         @Query("append_to_response") appendToVideos: String = "videos"
     ) : Response<TvSeries>
 
-    @GET("/3/tv/{id}/similar")
+    @GET("/3/tv/{id}/recommendations")
     suspend fun getSimilarTvSeries(
         @Path("id") id : Int,
         @Query("api_key") apiKey : String = API_KEY
@@ -84,4 +84,6 @@ interface TmdbApi
         @Query("query") query: String,
         @Query("api_key") apiKey : String = API_KEY
     ) : Response<DisplayResponse>
+
+
 }

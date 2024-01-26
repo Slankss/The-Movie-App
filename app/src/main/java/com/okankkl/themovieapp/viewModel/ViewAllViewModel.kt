@@ -8,9 +8,9 @@ import com.okankkl.themovieapp.enum_sealed.Categories
 import com.okankkl.themovieapp.enum_sealed.DisplayType
 import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.model.TvSeries
-import com.okankkl.themovieapp.repository.RepositoryImp
 import com.okankkl.themovieapp.paging.use_case.GetMoviesUseCase
 import com.okankkl.themovieapp.paging.use_case.GetTvSeriesUseCase
+import com.okankkl.themovieapp.repository.RepositoryImp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged

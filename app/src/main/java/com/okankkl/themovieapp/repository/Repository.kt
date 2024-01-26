@@ -7,7 +7,6 @@ import com.okankkl.themovieapp.enum_sealed.Resources
 import com.okankkl.themovieapp.model.Display
 import com.okankkl.themovieapp.model.Favourite
 import com.okankkl.themovieapp.model.Movie
-import com.okankkl.themovieapp.model.Search
 import com.okankkl.themovieapp.model.TvSeries
 import kotlinx.coroutines.flow.Flow
 

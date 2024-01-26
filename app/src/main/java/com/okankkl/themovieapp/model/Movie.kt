@@ -1,6 +1,5 @@
 package com.okankkl.themovieapp.model
 
-import androidx.room.ColumnInfo
 import androidx.room.Ignore
 import com.google.gson.annotations.SerializedName
 

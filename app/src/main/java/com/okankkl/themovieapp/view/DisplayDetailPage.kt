@@ -24,40 +24,44 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import com.okankkl.themovieapp.R
-import androidx.compose.runtime.*
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.okankkl.themovieapp.R
+import com.okankkl.themovieapp.components.Credit
 import com.okankkl.themovieapp.components.GenreBox
+import com.okankkl.themovieapp.components.Loading
+import com.okankkl.themovieapp.components.Poster
 import com.okankkl.themovieapp.components.YouTubePlayer
 import com.okankkl.themovieapp.enum_sealed.Pages
-import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.enum_sealed.Resources
-import com.okankkl.themovieapp.util.Util.IMAGE_BASE_URL
-import com.okankkl.themovieapp.viewModel.DisplayDetailViewModel
-import java.time.LocalDate
-import com.okankkl.themovieapp.extensions.*
-import com.okankkl.themovieapp.components.*
+import com.okankkl.themovieapp.extensions.convertDate
 import com.okankkl.themovieapp.model.Display
+import com.okankkl.themovieapp.model.Movie
 import com.okankkl.themovieapp.model.TvSeries
 import com.okankkl.themovieapp.model.Videos
 import com.okankkl.themovieapp.ui.theme.OceanPalet4
 import com.okankkl.themovieapp.ui.theme.StatusBarColor
+import com.okankkl.themovieapp.util.Util.IMAGE_BASE_URL
+import com.okankkl.themovieapp.viewModel.DisplayDetailViewModel
+import java.time.LocalDate
 
 @Composable
 fun DisplayDetail(navController: NavController, movieId : Int?, displayType : String?)
@@ -160,158 +164,141 @@ fun Trailer(videos: Videos?,backdropPath : String?){
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun MovieContent(movie: Movie,displayType : String,movieViewModel: DisplayDetailViewModel){
+fun MovieContent(movie: Movie, displayType : String, displayViewModel: DisplayDetailViewModel){
 
-    val favouriteState = movieViewModel.favouriteState.collectAsState()
+    val favouriteState = displayViewModel.favouriteState.collectAsState()
+    val titleStyle = MaterialTheme.typography.labelLarge.copy(
+        fontSize = 24.sp,
+        lineHeight = 32.sp
+    )
+    val subTitleStyle = MaterialTheme.typography.bodyLarge.copy(
+        fontSize = 16.sp,
+        color = Color(0xFFFFFFFF)
+    )
 
     Column(
         modifier = Modifier
-            .padding(vertical = 15.dp, horizontal = 25.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+            .padding(vertical = 15.dp, horizontal = 15.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
 
         Text(
             text = movie.en_title,
-            style = MaterialTheme.typography.labelLarge.copy(
-                fontSize = 24.sp,
-                lineHeight = 32.sp
-            )
+            style = titleStyle,
+            modifier = Modifier
+                .padding(bottom = 10.dp)
         )
 
-        Row(
-            modifier = Modifier,
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Icon(
-                painter = painterResource(id = R.drawable.time),
-                contentDescription = null,
-                tint = Color(0xFFBBBBBB)
-            )
-            Text(
-                modifier = Modifier
-                    .padding(start = 5.dp),
-                text = "${movie.runtime} minutes",
-                color = Color(0xFFBCBCBC)
-            )
-
-            Icon(
-                painter = painterResource(id = R.drawable.filled_star),
-                contentDescription = null,
-                tint = Color(0xFFBBBBBB),
-                modifier = Modifier
-                    .padding(start = 20.dp)
-            )
-            Text(
-                modifier = Modifier
-                    .padding(start = 5.dp),
-                text = "${String.format("%.1f",movie.voteAverage)} (IMDB)",
-                color = Color(0xFFBCBCBC)
-            )
-        }
-
-        Divider(
-            modifier = Modifier
-                .background(color = Color.White)
-                .height(1.dp)
-                .fillMaxWidth()
-        )
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(25.dp),
-            modifier = Modifier
-        ){
-            Column {
-                ContentHeader(header = "Release date")
-                Text(
-                    text = convertDate(movie.releaseDate),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontSize = 12.sp,
-                        color = Color(0xFFBCBCBC)
-                    )
-                )
-            }
-            Column {
-                ContentHeader(header = "Genre")
-                FlowRow(
-                    maxItemsInEachRow = 2,
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    movie.genres.forEach { genre ->
-                        GenreBox(
-                            modifier = Modifier
-                                .padding(end = 15.dp),
-                            genreName = genre.name
-                        )
-                    }
-                }
-            }
-        }
-
-        Divider(
-            modifier = Modifier
-                .background(color = Color.White)
-                .height(1.dp)
-                .fillMaxWidth()
-        )
-
-        Column {
-            ContentHeader(header = "Overview")
-            Text(
-                text = movie.overview,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Light,
-                    color = Color(0xFFBCBCBC),
-                    textAlign = TextAlign.Justify
-                )
-            )
-        }
-        Box(
-            modifier = Modifier
-                .align(Alignment.End)
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ) {
-                    if (favouriteState.value == null)
-                    {
-                        movieViewModel.addFavourite(movie,displayType)
-                    } else
-                    {
-                        movieViewModel.deleteFavourite(movie,displayType)
-                    }
-                }
-            ,
-        ){
+        FlowRow(
+            maxItemsInEachRow = 3,
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
             Row(
-                modifier = Modifier
-                    .padding(horizontal = 10.dp, vertical = 5.dp)
-                    .align(Alignment.CenterEnd),
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Text(
-                    text = if(favouriteState.value == null) "Favorilere Ekle" else "Favorilerden Çıkar",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontSize = 14.sp,
-                        color = Color(0x99FFFFFF)
-                    ),
-                    modifier = Modifier
-                )
                 Icon(
-                    painter = if(favouriteState.value == null) painterResource(id = R.drawable.ic_fav_unselected) else painterResource(
-                        id = R.drawable.ic_fav_selected
-                    ),
+                    painter = painterResource(id = R.drawable.time),
                     contentDescription = null,
-                    tint = if(favouriteState.value == null) Color.White else OceanPalet4,
-                    modifier = Modifier
-                        .padding(start = 10.dp)
-                        .size(16.dp)
-
+                    tint = Color(0xFFBBBBBB)
                 )
-
+                Text(
+                    modifier = Modifier
+                        .padding(start = 5.dp),
+                    text = "${movie.runtime} minutes",
+                    color = Color(0xFFBCBCBC)
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.filled_star),
+                    contentDescription = null,
+                    tint = Color(0xFFBBBBBB),
+                )
+                Text(
+                    modifier = Modifier
+                        .padding(start = 5.dp),
+                    text = "${String.format("%.1f",movie.voteAverage)} (TMDB)",
+                    color = Color(0xFFBCBCBC)
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_calendar),
+                    contentDescription = null,
+                    tint = Color(0xFFBBBBBB),
+                    modifier = Modifier
+                )
+                Text(
+                    text = convertDate(movie.releaseDate),
+                    color = Color(0xFFBCBCBC),
+                    modifier = Modifier
+                        .padding(start = 5.dp)
+                )
             }
         }
 
+        Divider(
+            modifier = Modifier
+                .background(color = Color.White)
+                .height(1.dp)
+                .fillMaxWidth()
+        )
+
+        Text(
+            text = "Genres",
+            style = subTitleStyle
+        )
+
+        FlowRow(
+            maxItemsInEachRow = 3,
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            movie.genres.forEach { genre ->
+                GenreBox(
+                    modifier = Modifier
+                        .padding(end = 15.dp),
+                    genreName = genre.name
+                )
+            }
+        }
+
+        Divider(
+            modifier = Modifier
+                .background(color = Color.White)
+                .height(1.dp)
+                .fillMaxWidth()
+        )
+
+        Text(
+            text = "Overview",
+            style = subTitleStyle,
+            modifier = Modifier
+        )
+        Text(
+            text = movie.overview,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Light,
+                color = Color(0xFFBCBCBC),
+                textAlign = TextAlign.Justify
+            )
+        )
+
+        AddFavourite(
+            modifier = Modifier
+                .align(Alignment.End),
+            favouriteState = favouriteState.value == null
+        ) {
+            if (favouriteState.value == null)
+                displayViewModel.addFavourite(movie,displayType)
+            else
+                displayViewModel.deleteFavourite(movie,displayType)
+        }
     }
 }
 
@@ -319,109 +306,122 @@ fun MovieContent(movie: Movie,displayType : String,movieViewModel: DisplayDetail
 @Composable
 fun TvSeriesContent(tvSeries: TvSeries,displayType: String,displayViewModel : DisplayDetailViewModel){
 
-
     val favouriteState = displayViewModel.favouriteState.collectAsState()
+    val titleStyle = MaterialTheme.typography.labelLarge.copy(
+        fontSize = 24.sp,
+        lineHeight = 32.sp
+    )
+    val subTitleStyle = MaterialTheme.typography.bodyLarge.copy(
+        fontSize = 16.sp,
+        color = Color(0xFFFFFFFF)
+    )
 
     Column(
         modifier = Modifier
-            .padding(vertical = 15.dp, horizontal = 25.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+            .padding(vertical = 15.dp, horizontal = 15.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
 
         Text(
             text = tvSeries.en_title,
-            style = MaterialTheme.typography.labelLarge.copy(
-                fontSize = 24.sp,
-                lineHeight = 32.sp,
-            )
+            style = titleStyle,
+            modifier = Modifier
+                .padding(bottom = 10.dp)
         )
 
-        Row(
-            modifier = Modifier,
-            verticalAlignment = Alignment.CenterVertically
+        FlowRow(
+            maxItemsInEachRow = 3,
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ){
-            Icon(
-                painter = painterResource(id = R.drawable.ic_tv_series_season),
-                contentDescription = null,
-                tint = Color(0xFFBBBBBB)
-            )
-            Text(
-                modifier = Modifier
-                    .padding(start = 5.dp),
-                text = "${tvSeries.numberOfSeasons} season",
-                color = Color(0xFFBCBCBC),
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = 13.sp,
-                    color = Color(0xFFBCBCBC)
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_tv_series_season),
+                    contentDescription = null,
+                    tint = Color(0xFFBBBBBB)
                 )
-            )
-
-            Icon(
-                painter = painterResource(id = R.drawable.ic_tv_series_season),
-                contentDescription = null,
-                tint = Color(0xFFBBBBBB),
-                modifier = Modifier
-                    .padding(start = 20.dp)
-            )
-            Text(
-                modifier = Modifier
-                    .padding(start = 5.dp),
-                text = "${tvSeries.numberOfEpisodes} episodes",
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = 13.sp,
-                    color = Color(0xFFBCBCBC)
-                ),
-                color = Color(0xFFBCBCBC)
-            )
-
-            Icon(
-                painter = painterResource(id = R.drawable.filled_star),
-                contentDescription = null,
-                tint = Color(0xFFBBBBBB),
-                modifier = Modifier
-                    .padding(start = 20.dp)
-            )
-            Text(
-                modifier = Modifier
-                    .padding(start = 5.dp),
-                text = "${String.format("%.1f",tvSeries.voteAverage)} (IMDB)",
-                color = Color(0xFFBCBCBC),
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = 13.sp,
-                    color = Color(0xFFBCBCBC)
-                )
-            )
-        }
-
-        Row(
-            modifier = Modifier
-        ){
-            Icon(
-                painterResource(id = R.drawable.ic_calendar),
-                contentDescription = "date",
-                tint = Color(0xFFBBBBBB),
-                modifier = Modifier
-                    .padding(end = 5.dp)
-            )
-            if(tvSeries.releaseDate.isNotEmpty()){
                 Text(
-                    text = convertDate(tvSeries.releaseDate),
+                    modifier = Modifier
+                        .padding(start = 5.dp),
+                    text = "${tvSeries.numberOfSeasons} season",
+                    color = Color(0xFFBCBCBC),
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 13.sp,
                         color = Color(0xFFBCBCBC)
                     )
                 )
             }
-            if(tvSeries.lastAirDate.isNotEmpty()){
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_tv_series_season),
+                    contentDescription = null,
+                    tint = Color(0xFFBBBBBB)
+                )
                 Text(
-                    text = " - "+convertDate(tvSeries.lastAirDate),
+                    modifier = Modifier
+                        .padding(start = 5.dp),
+                    text = "${tvSeries.numberOfEpisodes} episodes",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 13.sp,
+                        color = Color(0xFFBCBCBC)
+                    ),
+                    color = Color(0xFFBCBCBC)
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(
+                    painter = painterResource(id = R.drawable.filled_star),
+                    contentDescription = null,
+                    tint = Color(0xFFBBBBBB)
+                )
+                Text(
+                    modifier = Modifier
+                        .padding(start = 5.dp),
+                    text = "${String.format("%.1f",tvSeries.voteAverage)} (TMDB)",
+                    color = Color(0xFFBCBCBC),
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 13.sp,
                         color = Color(0xFFBCBCBC)
                     )
                 )
             }
+            Row(
+               verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(
+                    painterResource(id = R.drawable.ic_calendar),
+                    contentDescription = "date",
+                    tint = Color(0xFFBBBBBB),
+                    modifier = Modifier
+                        .padding(end = 5.dp)
+                )
+                if(tvSeries.releaseDate.isNotEmpty()){
+                    Text(
+                        text = convertDate(tvSeries.releaseDate),
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = 13.sp,
+                            color = Color(0xFFBCBCBC)
+                        )
+                    )
+                }
+                if(tvSeries.lastAirDate.isNotEmpty()){
+                    Text(
+                        text = " - "+convertDate(tvSeries.lastAirDate),
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = 13.sp,
+                            color = Color(0xFFBCBCBC)
+                        )
+                    )
+                }
+            }
         }
+
 
         Divider(
             modifier = Modifier
@@ -430,29 +430,23 @@ fun TvSeriesContent(tvSeries: TvSeries,displayType: String,displayViewModel : Di
                 .fillMaxWidth()
         )
 
-        Column(
+        Text(
+            text = "Genre",
+            style = subTitleStyle,
+            modifier = Modifier
+        )
+
+        FlowRow(
+            maxItemsInEachRow = 3,
+            verticalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier
         ) {
-            Text(
-                text = "Genre",
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontSize = 16.sp
-                ),
-                modifier = Modifier
-                    .padding(bottom= 10.dp)
-            )
-            FlowRow(
-                maxItemsInEachRow = 3,
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier
-            ) {
-                tvSeries.genres.forEach { genre ->
-                    GenreBox(
-                        modifier = Modifier
-                            .padding(end = 15.dp),
-                        genreName = genre.name
-                    )
-                }
+            tvSeries.genres.forEach { genre ->
+                GenreBox(
+                    modifier = Modifier
+                        .padding(end = 15.dp),
+                    genreName = genre.name
+                )
             }
         }
 
@@ -473,90 +467,77 @@ fun TvSeriesContent(tvSeries: TvSeries,displayType: String,displayViewModel : Di
             )
         }
 
-
         if(tvSeries.overview.isNotEmpty()){
-            Column(
+            Text(
+                text = "Overview",
+                style = subTitleStyle,
                 modifier = Modifier
-            ) {
-                Text(
-                    text = "Overview",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontSize = 16.sp
-                    ),
-                    modifier = Modifier
-                        .padding(bottom= 10.dp)
-                )
+                    .padding(bottom= 10.dp)
+            )
 
-                Text(
-                    text = tvSeries.overview,
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Light,
-                        color = Color(0xFFBCBCBC),
-                        textAlign = TextAlign.Justify
-                    )
+            Text(
+                text = tvSeries.overview,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Light,
+                    color = Color(0xFFBCBCBC),
+                    textAlign = TextAlign.Justify
                 )
-            }
-
+            )
         }
 
-        Box(
+        AddFavourite(
             modifier = Modifier
-                .align(Alignment.End)
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ) {
-                    if (favouriteState.value == null)
-                    {
-                        displayViewModel.addFavourite(tvSeries,displayType)
-                    } else
-                    {
-                        displayViewModel.deleteFavourite(tvSeries, displayType)
-                    }
-                },
-        ){
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 10.dp, vertical = 5.dp)
-                    .align(Alignment.CenterEnd),
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Text(
-                    text = if(favouriteState.value == null) "Favorilere Ekle" else "Favorilerden Çıkar",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontSize = 14.sp,
-                        color = Color(0x99FFFFFF)
-                    ),
-                    modifier = Modifier
-                )
-                Icon(
-                    painter = if(favouriteState.value == null) painterResource(id = R.drawable.ic_fav_unselected) else painterResource(
-                        id = R.drawable.ic_fav_selected
-                    ),
-                    contentDescription = null,
-                    tint = if(favouriteState.value == null) Color.White else OceanPalet4,
-                    modifier = Modifier
-                        .padding(start = 10.dp)
-                        .size(16.dp)
-
-                )
-
-            }
+                .align(Alignment.End),
+            favouriteState = favouriteState.value == null
+        ) {
+            if (favouriteState.value == null)
+                displayViewModel.addFavourite(tvSeries,displayType)
+            else
+                displayViewModel.deleteFavourite(tvSeries,displayType)
         }
     }
 }
 
 @Composable
-fun ContentHeader(header : String){
-    Text(
-        text = header,
-        style = MaterialTheme.typography.labelLarge.copy(
-            fontSize = 16.sp
-        ),
-        modifier = Modifier
-            .padding(bottom= 10.dp)
-    )
+fun AddFavourite(modifier : Modifier,favouriteState : Boolean,onClick: () -> Unit){
+    Box(
+        modifier = modifier
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) {
+              onClick()
+            },
+    ){
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 10.dp, vertical = 5.dp)
+                .align(Alignment.CenterEnd),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text(
+                text = if(favouriteState) "Favorilere Ekle" else "Favorilerden Çıkar",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = 14.sp,
+                    color = Color(0x99FFFFFF)
+                ),
+                modifier = Modifier
+            )
+            Icon(
+                painter = if(favouriteState) painterResource(id = R.drawable.ic_fav_unselected) else painterResource(
+                    id = R.drawable.ic_fav_selected
+                ),
+                contentDescription = null,
+                tint = if(favouriteState) Color.White else OceanPalet4,
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .size(16.dp)
+
+            )
+
+        }
+    }
 }
 
 @Composable
@@ -568,7 +549,7 @@ fun SimilarDisplays(similarDisplay : List<Display>, navController: NavController
             fontSize = 16.sp
         ),
         modifier = Modifier
-            .padding(bottom = 15.dp, start = 25.dp,end = 25.dp)
+            .padding(bottom = 15.dp, start = 15.dp)
     )
 
     LazyRow(
@@ -596,8 +577,8 @@ fun SimilarDisplay(display: Display, index : Int, onClick : (Int) -> Unit){
     Column(
         modifier = Modifier
             .padding(
-                start = if(index == 0) 20.dp else 0.dp,
-                end = 20.dp,
+                start = if(index == 0) 15.dp else 0.dp,
+                end = 15.dp,
                 bottom = 10.dp
             )
     ){
@@ -650,6 +631,8 @@ fun SimilarDisplay(display: Display, index : Int, onClick : (Int) -> Unit){
     }
 
 }
+
+
 
 
 

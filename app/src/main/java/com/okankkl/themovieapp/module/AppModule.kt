@@ -3,13 +3,13 @@ package com.okankkl.themovieapp.module
 import android.content.Context
 import com.okankkl.themovieapp.api.TmdbApi
 import com.okankkl.themovieapp.dao.Dao
-import com.okankkl.themovieapp.paging.data_source.DataSourcesImp
 import com.okankkl.themovieapp.model.StoreData
 import com.okankkl.themovieapp.paging.data_source.DataSources
-import com.okankkl.themovieapp.repository.Repository
-import com.okankkl.themovieapp.repository.RepositoryImp
+import com.okankkl.themovieapp.paging.data_source.DataSourcesImp
 import com.okankkl.themovieapp.paging.use_case.GetMoviesUseCase
 import com.okankkl.themovieapp.paging.use_case.GetTvSeriesUseCase
+import com.okankkl.themovieapp.repository.Repository
+import com.okankkl.themovieapp.repository.RepositoryImp
 import com.okankkl.themovieapp.util.AppDatabase
 import com.okankkl.themovieapp.util.Util.BASE_URL
 import dagger.Module
