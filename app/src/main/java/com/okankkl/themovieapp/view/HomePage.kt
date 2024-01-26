@@ -124,7 +124,7 @@ fun Home(navController: NavController)
 @Composable
 fun TopMenu(navController: NavController,selectedPage : State<DisplayType>,setSelectedPage :(DisplayType) -> Unit){
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = BacgroundTransparentColor)
@@ -133,38 +133,11 @@ fun TopMenu(navController: NavController,selectedPage : State<DisplayType>,setSe
                 detectTapGestures {
                 }
             },
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ){
-            Box(
-                modifier = Modifier
-                    .height(25.dp)
-                    .width(25.dp)
-                    .background(color = Color.White)
-            )
-            Icon(
-                painter = painterResource(id = R.drawable.ic_search),
-                contentDescription = "search",
-                tint = Color.White,
-                modifier = Modifier
-                    .size(26.dp)
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) {
-                        navController.navigate(Pages.Search.route)
-                    }
-            )
-        }
-
-        Row(
-            modifier = Modifier
                 .fillMaxWidth()
+                .align(Alignment.TopStart)
                 .padding(bottom = 10.dp),
             horizontalArrangement = Arrangement.spacedBy(20.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -176,6 +149,21 @@ fun TopMenu(navController: NavController,selectedPage : State<DisplayType>,setSe
                 }
             }
         }
+    
+        Icon(
+            painter = painterResource(id = R.drawable.ic_search),
+            contentDescription = "search",
+            tint = Color.White,
+            modifier = Modifier
+                .size(26.dp)
+                .align(Alignment.TopEnd)
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    navController.navigate(Pages.Search.route)
+                }
+        )
 
     }
 }
