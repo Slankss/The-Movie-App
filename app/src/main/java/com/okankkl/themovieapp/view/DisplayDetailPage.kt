@@ -120,7 +120,8 @@ fun DisplayDetail(navController: NavController, movieId : Int?, displayType : St
                 Row(
                     modifier =  Modifier
                         .fillMaxWidth()
-                        .padding(top = 10.dp, start =  15.dp, end =  15.dp, bottom = 10.dp)
+                        .padding(top = 10.dp, start =  15.dp, end =  15.dp, bottom = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ){
                     Text(
                         text = data.en_title,
@@ -139,8 +140,11 @@ fun DisplayDetail(navController: NavController, movieId : Int?, displayType : St
                         tint = if(favouriteState.value == null) Color.White else OceanPalet4,
                         modifier = Modifier
                             .weight(1f)
-                            .size(24.dp)
-                            .clickable {
+                            .size(20.dp)
+                            .clickable(
+                                indication = null,
+                                interactionSource = remember{ MutableInteractionSource()}
+                            ) {
                                 if (favouriteState.value == null){
                                     displayViewModel.addFavourite(
                                         display = data,

@@ -15,6 +15,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.okankkl.themovieapp.R
+import com.okankkl.themovieapp.enum_sealed.Pages
 import kotlinx.coroutines.delay
 
 @Composable
