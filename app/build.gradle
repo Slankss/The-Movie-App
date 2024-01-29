@@ -137,7 +137,6 @@ dependencies {
     def lottieVersion = "4.0.0"
     implementation("com.airbnb.android:lottie-compose:4.0.0")
 
-    //implementation "com.github.x3rocode:xblur-compose:1.0.1"
     // Swipe
     implementation "me.saket.swipe:swipe:1.2.0"
 
