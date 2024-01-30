@@ -6,6 +6,7 @@
 * Retrofit
 * Hilt
 * Room
+* Pagination
 * Compose navigation
 * DataStore
 * Flow
