@@ -13,3 +13,6 @@
 * Job
 * ViewModel
 * YoutubePlayer
+
+![application ui](https://github.com/Slankss/The-Movie-App/blob/master/assets/ui.jpg)
+![application demo](https://github.com/Slankss/The-Movie-App/blob/master/assets/app_demo.mp4)
