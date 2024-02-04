@@ -99,13 +99,14 @@ class ListViewModel
 
     @OptIn(DelicateCoroutinesApi::class)
     private suspend fun getMoviesFromAPI(){
+        // 1.54
         GlobalScope.launch(Dispatchers.IO) {
+            _allDisplayList.value = emptyList()
             val apiJob = launch {
                 _allDisplayList.value = repository.getMoviesFromAPI(Categories.Popular,1) +
-                        repository.getMoviesFromAPI(Categories.Trending,1)  +
-                        repository.getMoviesFromAPI(Categories.TopRated,1)  +
+                        repository.getMoviesFromAPI(Categories.Trending,1) +
+                        repository.getMoviesFromAPI(Categories.TopRated,1) +
                         repository.getMoviesFromAPI(Categories.NowPlaying,1)
-
             }
             apiJob.join()
             apiJob.invokeOnCompletion {
