@@ -1,10 +1,10 @@
 package com.okankkl.themovieapp.paging.data_source
 
-import com.okankkl.themovieapp.api.TmdbApi
-import com.okankkl.themovieapp.enum_sealed.Categories
-import com.okankkl.themovieapp.model.Movie
-import com.okankkl.themovieapp.model.TvSeries
-import com.okankkl.themovieapp.response.ResponseDto
+import com.okankkl.themovieapp.data.remote.TmdbApi
+import com.okankkl.themovieapp.presentation.Categories
+import com.okankkl.themovieapp.domain.model.Movie
+import com.okankkl.themovieapp.domain.model.TvSeries
+import com.okankkl.themovieapp.domain.model.response.ResponseDto
 
 class DataSourcesImp(
     private val tmdbApi : TmdbApi
