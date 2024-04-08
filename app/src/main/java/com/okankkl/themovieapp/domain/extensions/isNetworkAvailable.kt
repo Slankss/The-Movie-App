@@ -1,4 +1,4 @@
-package com.okankkl.themovieapp.extensions
+package com.okankkl.themovieapp.domain.extensions
 
 import android.content.Context
 import android.net.ConnectivityManager

@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.okankkl.themovieapp.common.Constants
 import com.okankkl.themovieapp.data.remote.dto.Videos
-import com.okankkl.themovieapp.presentation.components.YouTubePlayer
 
 @Composable
 fun Trailer(videos: Videos?, backdropPath : String?){

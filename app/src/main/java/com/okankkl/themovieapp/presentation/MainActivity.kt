@@ -62,7 +62,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.okankkl.themovieapp.R
 import com.okankkl.themovieapp.presentation.components.BottomMenuItem
-import com.okankkl.themovieapp.extensions.isNetworkAvailable
+import com.okankkl.themovieapp.domain.extensions.isNetworkAvailable
 import com.okankkl.themovieapp.data.local.preferences.StoreData
 import com.okankkl.themovieapp.ui.theme.BackgroundColor
 import com.okankkl.themovieapp.ui.theme.ShadowColor

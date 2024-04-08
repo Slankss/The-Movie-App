@@ -1,4 +1,4 @@
-package com.okankkl.themovieapp.presentation.components
+package com.okankkl.themovieapp.presentation.content_detail_screen.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

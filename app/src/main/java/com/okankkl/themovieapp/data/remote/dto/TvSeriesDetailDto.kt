@@ -14,7 +14,7 @@ data class TvSeriesDetailDto(
     val in_production: Boolean,
     val languages: List<String>,
     val last_air_date: String,
-    val last_episode_to_air: LastEpisodeToAir,
+    //val last_episode_to_air: LastEpisodeToAir?,
     val name: String,
     val networks: List<Network>,
     //val next_episode_to_air: Any,

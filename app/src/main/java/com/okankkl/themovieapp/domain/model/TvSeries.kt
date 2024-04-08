@@ -14,9 +14,9 @@ class TvSeries(
     releaseDate : String,
     category : String,
     mediaType: String
-) : Content(id,backdropPath,posterPath,popularity,voteAverage,title,releaseDate,category,mediaType)
+) : Content(id,backdropPath,posterPath,title,mediaType,releaseDate,category,popularity,voteAverage)
 {
-    var videos : Videos? = null
+    override var videos : Videos? = null
     var createdBy : List<CreatedBy> = listOf()
     var lastAirDate : String = ""
     var numberOfEpisodes : Int = 0

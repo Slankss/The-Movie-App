@@ -1,31 +1,31 @@
-package com.okankkl.themovieapp.paging.paging_source
+package com.okankkl.themovieapp.data.paging.paging_source
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.okankkl.themovieapp.presentation.Categories
-import com.okankkl.themovieapp.domain.model.Movie
-import com.okankkl.themovieapp.paging.data_source.DataSources
+import com.okankkl.themovieapp.data.paging.data_source.ContentDataSource
+import com.okankkl.themovieapp.data.remote.dto.TvSeriesDto
 import retrofit2.HttpException
 import java.io.IOException
 
-class MoviePagingSource(
-    private val dataSource : DataSources,
+class TvSeriesPagingSource(
+    private val dataSource : ContentDataSource,
     var category : Categories
-) : PagingSource<Int, Movie>()
+) : PagingSource<Int, TvSeriesDto>()
 {
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Movie>
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, TvSeriesDto>
     {
         return try
         {
             val currentPage = params.key ?: 1
-            val movies = dataSource.getMovies(
+            val tvSeries = dataSource.getTvSeries(
                 category = category,
                 pageNumber = currentPage
             )
             LoadResult.Page(
-                data =  movies.results!!,
+                data =  tvSeries.results!!,
                 prevKey = if(currentPage == 1) null else currentPage - 1,
-                nextKey = if(movies.results.isEmpty()) null else movies.page!! + 1
+                nextKey = if(tvSeries.results.isEmpty()) null else tvSeries.page!! + 1
             )
         } catch (exception: IOException) {
             return LoadResult.Error(exception)
@@ -33,8 +33,8 @@ class MoviePagingSource(
             return LoadResult.Error(exception)
         }
     }
-    
-    override fun getRefreshKey(state: PagingState<Int, Movie>): Int?
+
+    override fun getRefreshKey(state: PagingState<Int, TvSeriesDto>): Int?
     {
         return state.anchorPosition
     }

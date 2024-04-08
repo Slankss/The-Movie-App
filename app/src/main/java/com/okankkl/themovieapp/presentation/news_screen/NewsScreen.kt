@@ -31,12 +31,14 @@ import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.okankkl.themovieapp.data.remote.dto.MovieDto
 import com.okankkl.themovieapp.presentation.components.ErrorUi
 import com.okankkl.themovieapp.presentation.components.LoadingUi
 import com.okankkl.themovieapp.presentation.components.ContentPoster
 import com.okankkl.themovieapp.presentation.DisplayType
 import com.okankkl.themovieapp.presentation.Pages
 import com.okankkl.themovieapp.domain.model.Movie
+import com.okankkl.themovieapp.presentation.news_screen.components.NewMovieContent
 import com.okankkl.themovieapp.ui.theme.OceanPalet4
 import java.time.LocalDate
 
@@ -44,7 +46,7 @@ import java.time.LocalDate
 fun News(navController: NavController){
 
     val newMoviesViewModel : NewMoviesViewModel = hiltViewModel()
-    val moviesPagingItems : LazyPagingItems<Movie> = newMoviesViewModel.newsMovies.collectAsLazyPagingItems()
+    val moviesPagingItems : LazyPagingItems<MovieDto> = newMoviesViewModel.newsMovies.collectAsLazyPagingItems()
 
     LaunchedEffect(key1 = true){
         newMoviesViewModel.loadMovies()
@@ -62,7 +64,7 @@ fun News(navController: NavController){
         ){
             items(moviesPagingItems.itemCount){ index ->
                 val movie = moviesPagingItems[index]
-                if(movie!!.posterPath != null && movie.posterPath!!.isNotEmpty()){
+                if(movie!!.poster_path != null && movie.poster_path!!.isNotEmpty()){
                     NewMovieContent(movie){ movieId ->
                         navController.navigate("${Pages.DisplayDetail.route}/$movieId&${DisplayType.Movie.path}")
                     }
@@ -82,7 +84,7 @@ fun News(navController: NavController){
                         }
                     }
                     loadState.append is LoadState.Loading -> {
-                        item{ LoadingUi(Modifier) }
+                        item{ LoadingUi(Modifier.align(Alignment.CenterHorizontally)) }
                     }
                     loadState.append is LoadState.Error -> {
                         val error = moviesPagingItems.loadState.append as LoadState.Error
@@ -92,89 +94,8 @@ fun News(navController: NavController){
                     }
                 }
             }
-
         }
-
-    }
-
-}
-
-@Composable
-fun NewMovieContent(movie : Movie, onClick : (Int)->Unit){
-
-    val date = LocalDate.parse(movie.releaseDate)
-    val day = date.dayOfMonth
-    var month = date.month.name
-    month = month.lowercase().replaceFirstChar { it.uppercase() }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-    ){
-        Row(
-            modifier = Modifier
-                .weight(1f),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Box(
-                modifier = Modifier
-                    .padding(end = 10.dp)
-            ) {
-                Divider(
-                    modifier = Modifier
-                        .height(225.dp)
-                        .width(1.dp)
-                        .align(Alignment.TopCenter)
-                        .background(Color(0xB3FFFFFF))
-                )
-                Box(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .size(12.dp)
-                        .align(Alignment.Center)
-                        .background(
-                            color = OceanPalet4,
-                            shape = CircleShape
-                        )
-                )
-            }
-            Text(
-                buildAnnotatedString {
-                    withStyle(
-                        style = SpanStyle(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 24.sp,
-                            color = Color.White
-                        )
-                    ){
-                        append(day.toString())
-                    }
-                    withStyle(
-                        style = SpanStyle(
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 16.sp,
-                            color = Color(0xB3FFFFFF)
-                        )
-                    ){
-                        append(" $month")
-                    }
-                },
-                modifier = Modifier
-                    .padding(end = 10.dp)
-            )
-        }
-
-        ContentPoster(
-            posterPath = movie.posterPath!!,
-            id = movie.id,
-            modifier = Modifier
-                .weight(1f)
-                .height(225.dp)
-                .padding(bottom = 25.dp)
-        )
-        {
-            onClick(it)
-        }
-
     }
 }
+
 

@@ -23,6 +23,8 @@ import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.okankkl.themovieapp.data.remote.dto.MovieDto
+import com.okankkl.themovieapp.data.remote.dto.TvSeriesDto
 import com.okankkl.themovieapp.presentation.components.ErrorUi
 import com.okankkl.themovieapp.presentation.components.LoadingUi
 import com.okankkl.themovieapp.presentation.components.ContentPoster
@@ -59,7 +61,7 @@ fun ViewAll(navController: NavController, displayType : String?, category : Stri
 
         when(displayType){
             DisplayType.Movie.path -> MoviePages(viewAllViewModel,displayType,navController)
-            DisplayType.TvSeries.path -> TvSeriesPages(viewAllViewModel,navController)
+            DisplayType.TvSeries.path -> TvSeriesPages(viewAllViewModel,displayType,navController)
         }
 
     }
@@ -69,7 +71,7 @@ fun ViewAll(navController: NavController, displayType : String?, category : Stri
 @Composable
 fun MoviePages(viewAllViewModel: ViewAllViewModel, displayType: String, navController: NavController){
     
-    val moviesPagingItems : LazyPagingItems<Movie> = viewAllViewModel.movieState.collectAsLazyPagingItems()
+    val moviesPagingItems : LazyPagingItems<MovieDto> = viewAllViewModel.movieState.collectAsLazyPagingItems()
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
@@ -80,9 +82,9 @@ fun MoviePages(viewAllViewModel: ViewAllViewModel, displayType: String, navContr
     ){
         items(moviesPagingItems.itemCount){ index ->
             val movie = moviesPagingItems[index]
-            if(movie!!.posterPath != null && movie.posterPath!!.isNotEmpty()){
+            if(movie!!.poster_path != null && movie.poster_path!!.isNotEmpty()){
                 ContentPoster(
-                    posterPath = movie.posterPath!!,
+                    posterPath = movie.poster_path,
                     id = movie.id,
                     modifier = Modifier
                         .height(150.dp)
@@ -127,9 +129,9 @@ fun MoviePages(viewAllViewModel: ViewAllViewModel, displayType: String, navContr
 }
 
 @Composable
-fun TvSeriesPages(viewAllViewModel: ViewAllViewModel, navController: NavController){
+fun TvSeriesPages(viewAllViewModel: ViewAllViewModel, displayType: String,navController: NavController){
 
-    val tvSeriesPagingItems : LazyPagingItems<TvSeries> = viewAllViewModel.tvSeriesState.collectAsLazyPagingItems()
+    val tvSeriesPagingItems : LazyPagingItems<TvSeriesDto> = viewAllViewModel.tvSeriesState.collectAsLazyPagingItems()
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
@@ -141,14 +143,14 @@ fun TvSeriesPages(viewAllViewModel: ViewAllViewModel, navController: NavControll
 
         items(tvSeriesPagingItems.itemCount){ index ->
             val tvSeries = tvSeriesPagingItems[index]
-            if(tvSeries!!.posterPath != null && tvSeries.posterPath!!.isNotEmpty()){
+            if(tvSeries!!.poster_path != null && tvSeries.poster_path!!.isNotEmpty()){
                 ContentPoster(
-                    posterPath = tvSeries.posterPath!!,
+                    posterPath = tvSeries.poster_path,
                     id = tvSeries.id,
                     modifier = Modifier
                         .height(150.dp)
                 ){ tvSeriesId ->
-                    navController.navigate("${ Pages.DisplayDetail.route }/$tvSeriesId&${DisplayType.TvSeries.path}")
+                    navController.navigate("${ Pages.DisplayDetail.route }/$tvSeriesId&${displayType}")
                 }
             }
             else{
@@ -157,7 +159,7 @@ fun TvSeriesPages(viewAllViewModel: ViewAllViewModel, navController: NavControll
                         .height(150.dp)
                         .background(Color(0x0F5A5A5A))
                         .clickable {
-                            navController.navigate("${Pages.DisplayDetail.route}/${tvSeries.id}&${tvSeries.mediaType}")
+                            navController.navigate("${Pages.DisplayDetail.route}/${tvSeries.id}&${displayType}")
                         },
                 )
             }

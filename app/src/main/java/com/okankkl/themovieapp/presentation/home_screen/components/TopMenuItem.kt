@@ -1,4 +1,4 @@
-package com.okankkl.themovieapp.presentation.components
+package com.okankkl.themovieapp.presentation.home_screen.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,7 +26,6 @@ fun TopMenuItem(
 ){
 
     val mainShape = CircleShape
-
     Box(
         modifier = Modifier
             .border(

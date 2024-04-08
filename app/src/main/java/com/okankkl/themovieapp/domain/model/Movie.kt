@@ -13,10 +13,10 @@ class Movie(
     releaseDate: String,
     category  : String,
     mediaType : String
-) : Content(id,backdropPath,posterPath,popularity,voteAverage,title,releaseDate,category,mediaType)
+) : Content(id,backdropPath,posterPath,title,mediaType,releaseDate,category,popularity,voteAverage)
 {
 
-    var videos : Videos? = null
+    override var videos : Videos? = null
     var overview : String = ""
     var genres : List<Genre> = listOf()
     var revenue : Long = 0

@@ -1,16 +1,16 @@
-package com.okankkl.themovieapp.paging.data_source
+package com.okankkl.themovieapp.data.paging.data_source
 
 import com.okankkl.themovieapp.data.remote.TmdbApi
+import com.okankkl.themovieapp.data.remote.dto.MovieDto
+import com.okankkl.themovieapp.data.remote.dto.TvSeriesDto
 import com.okankkl.themovieapp.presentation.Categories
-import com.okankkl.themovieapp.domain.model.Movie
-import com.okankkl.themovieapp.domain.model.TvSeries
 import com.okankkl.themovieapp.domain.model.response.ResponseDto
 
-class DataSourcesImp(
+class ContentDataSourceImp(
     private val tmdbApi : TmdbApi
-) : DataSources
+) : ContentDataSource
 {
-    override suspend fun getMovies(category: Categories, pageNumber: Int): ResponseDto<List<Movie>>
+    override suspend fun getMovies(category: Categories, pageNumber: Int): ResponseDto<List<MovieDto>>
     {
         return tmdbApi.getMoviesPage(
             category = category.path,
@@ -21,7 +21,7 @@ class DataSourcesImp(
     override suspend fun getTvSeries(
         category: Categories,
         pageNumber: Int
-    ): ResponseDto<List<TvSeries>>
+    ): ResponseDto<List<TvSeriesDto>>
     {
         return tmdbApi.getTvSeriesPage(
             category = category.path,

@@ -1,11 +1,10 @@
 package com.okankkl.themovieapp.data.remote.repository
 
-import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.okankkl.themovieapp.data.remote.TmdbApi
-import com.okankkl.themovieapp.data.local.database.ContentDao
+import com.okankkl.themovieapp.data.remote.dto.MovieDto
 import com.okankkl.themovieapp.presentation.Categories
 import com.okankkl.themovieapp.data.remote.dto.toContentResponse
 import com.okankkl.themovieapp.data.remote.dto.toMovie
@@ -16,9 +15,10 @@ import com.okankkl.themovieapp.domain.model.TvSeries
 import com.okankkl.themovieapp.domain.model.response.ContentResponse
 import com.okankkl.themovieapp.domain.model.response.MultiSearchContentResponse
 import com.okankkl.themovieapp.domain.repository.ApiRepository
-import com.okankkl.themovieapp.paging.data_source.DataSourcesImp
-import com.okankkl.themovieapp.paging.paging_source.MoviePagingSource
-import com.okankkl.themovieapp.paging.paging_source.TvSeriesPagingSource
+import com.okankkl.themovieapp.data.paging.data_source.ContentDataSourceImp
+import com.okankkl.themovieapp.data.paging.paging_source.MoviePagingSource
+import com.okankkl.themovieapp.data.paging.paging_source.TvSeriesPagingSource
+import com.okankkl.themovieapp.data.remote.dto.TvSeriesDto
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -47,7 +47,7 @@ constructor(
     {
         return tmdbApi.getSimilarMovies(id).toContentResponse()
     }
-    override suspend fun getMoviesPage(category: Categories): Flow<PagingData<Movie>>
+    override suspend fun getMoviesPage(category: Categories): Flow<PagingData<MovieDto>>
     {
         return Pager(
             config = PagingConfig(
@@ -56,7 +56,7 @@ constructor(
             ),
             pagingSourceFactory = {
                 MoviePagingSource(
-                    dataSource = DataSourcesImp(tmdbApi),
+                    dataSource = ContentDataSourceImp(tmdbApi),
                     category = category
                 )
             }
@@ -78,7 +78,7 @@ constructor(
     {
         return tmdbApi.getSimilarTvSeries(id).toContentResponse()
     }
-    override suspend fun getTvSeriesPage(category: Categories): Flow<PagingData<TvSeries>>
+    override suspend fun getTvSeriesPage(category: Categories): Flow<PagingData<TvSeriesDto>>
     {
         return Pager(
             config = PagingConfig(
@@ -87,7 +87,7 @@ constructor(
             ),
             pagingSourceFactory = {
                 TvSeriesPagingSource(
-                    dataSource = DataSourcesImp(tmdbApi),
+                    dataSource = ContentDataSourceImp(tmdbApi),
                     category = category
                 )
             }

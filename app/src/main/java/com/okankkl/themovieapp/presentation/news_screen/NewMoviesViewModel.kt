@@ -7,7 +7,8 @@ import androidx.paging.cachedIn
 import androidx.paging.filter
 import com.okankkl.themovieapp.presentation.Categories
 import com.okankkl.themovieapp.domain.model.Movie
-import com.okankkl.themovieapp.paging.use_case.GetMoviesUseCase
+import com.okankkl.themovieapp.data.paging.use_case.GetMoviesUseCase
+import com.okankkl.themovieapp.data.remote.dto.MovieDto
 import com.okankkl.themovieapp.domain.repository.ApiRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +27,7 @@ class NewMoviesViewModel
     : ViewModel()
 {
 
-    private val _newsMovies : MutableStateFlow<PagingData<Movie>> = MutableStateFlow(PagingData.empty())
+    private val _newsMovies : MutableStateFlow<PagingData<MovieDto>> = MutableStateFlow(PagingData.empty())
     val newsMovies get() = _newsMovies
 
     fun loadMovies(){
@@ -39,7 +40,7 @@ class NewMoviesViewModel
                 .collect{
                     _newsMovies.value = it.filter {  movie ->
                         val localDate = LocalDate.now()
-                        val movieDate = LocalDate.parse(movie.releaseDate)
+                        val movieDate = LocalDate.parse(movie.release_date)
                         movieDate.isAfter(localDate)
                     }
                 }

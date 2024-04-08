@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.okankkl.themovieapp.R
 import com.okankkl.themovieapp.domain.model.Favourite
-import com.okankkl.themovieapp.extensions.convertDate
+import com.okankkl.themovieapp.domain.extensions.convertDate
 import com.okankkl.themovieapp.presentation.DisplayType
 import com.okankkl.themovieapp.presentation.components.ContentPoster
 import com.okankkl.themovieapp.ui.theme.OceanPalet4

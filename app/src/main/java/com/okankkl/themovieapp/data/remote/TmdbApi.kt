@@ -12,6 +12,7 @@ import com.okankkl.themovieapp.data.remote.dto.MovieDto
 import com.okankkl.themovieapp.data.remote.dto.MovieResponseDto
 import com.okankkl.themovieapp.data.remote.dto.MultiSearchContentResponseDto
 import com.okankkl.themovieapp.data.remote.dto.TvSeriesDetailDto
+import com.okankkl.themovieapp.data.remote.dto.TvSeriesDto
 import com.okankkl.themovieapp.data.remote.dto.TvSeriesResponseDto
 import retrofit2.Response
 import retrofit2.http.GET
@@ -25,7 +26,7 @@ interface TmdbApi
             @Path("category") category : String,
             @Query("page") page : Int,
             @Query("api_key") apiKey : String = API_KEY
-    ) : ResponseDto<List<Movie>>
+    ) : ResponseDto<List<MovieDto>>
     @GET("/3/movie/{category}")
     suspend fun getMovies(
         @Path("category") category : String,
@@ -83,7 +84,7 @@ interface TmdbApi
         @Path("category") category : String,
         @Query("page") page : Int,
         @Query("api_key") apiKey : String = API_KEY
-    ) : ResponseDto<List<TvSeries>>
+    ) : ResponseDto<List<TvSeriesDto>>
 
     @GET("/3/search/multi")
     suspend fun getSearch(

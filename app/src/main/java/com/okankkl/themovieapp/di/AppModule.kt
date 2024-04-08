@@ -4,10 +4,10 @@ import android.content.Context
 import com.okankkl.themovieapp.data.remote.TmdbApi
 import com.okankkl.themovieapp.data.local.database.ContentDao
 import com.okankkl.themovieapp.data.local.preferences.StoreData
-import com.okankkl.themovieapp.paging.data_source.DataSources
-import com.okankkl.themovieapp.paging.data_source.DataSourcesImp
-import com.okankkl.themovieapp.paging.use_case.GetMoviesUseCase
-import com.okankkl.themovieapp.paging.use_case.GetTvSeriesUseCase
+import com.okankkl.themovieapp.data.paging.data_source.ContentDataSource
+import com.okankkl.themovieapp.data.paging.data_source.ContentDataSourceImp
+import com.okankkl.themovieapp.data.paging.use_case.GetMoviesUseCase
+import com.okankkl.themovieapp.data.paging.use_case.GetTvSeriesUseCase
 import com.okankkl.themovieapp.domain.repository.ApiRepository
 import com.okankkl.themovieapp.data.remote.repository.ApiRepositoryImp
 import com.okankkl.themovieapp.data.local.database.AppDatabase
@@ -54,9 +54,9 @@ class AppModule
     @Provides
     fun provideMovieDataSource(
             api: TmdbApi
-    ) : DataSources
+    ) : ContentDataSource
     {
-        return DataSourcesImp(api)
+        return ContentDataSourceImp(api)
     }
     
     @Singleton

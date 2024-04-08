@@ -8,8 +8,10 @@ import com.okankkl.themovieapp.presentation.Categories
 import com.okankkl.themovieapp.presentation.DisplayType
 import com.okankkl.themovieapp.domain.model.Movie
 import com.okankkl.themovieapp.domain.model.TvSeries
-import com.okankkl.themovieapp.paging.use_case.GetMoviesUseCase
-import com.okankkl.themovieapp.paging.use_case.GetTvSeriesUseCase
+import com.okankkl.themovieapp.data.paging.use_case.GetMoviesUseCase
+import com.okankkl.themovieapp.data.paging.use_case.GetTvSeriesUseCase
+import com.okankkl.themovieapp.data.remote.dto.MovieDto
+import com.okankkl.themovieapp.data.remote.dto.TvSeriesDto
 import com.okankkl.themovieapp.data.remote.repository.ApiRepositoryImp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,10 +29,10 @@ class ViewAllViewModel
         ) : ViewModel()
 {
 
-    private val _movieState : MutableStateFlow<PagingData<Movie>> = MutableStateFlow(PagingData.empty())
+    private val _movieState : MutableStateFlow<PagingData<MovieDto>> = MutableStateFlow(PagingData.empty())
     val movieState get() = _movieState
 
-    private val _tvSeriesState : MutableStateFlow<PagingData<TvSeries>> = MutableStateFlow(PagingData.empty())
+    private val _tvSeriesState : MutableStateFlow<PagingData<TvSeriesDto>> = MutableStateFlow(PagingData.empty())
     val tvSeriesState get() = _tvSeriesState
 
     fun load(type: String, category: String){

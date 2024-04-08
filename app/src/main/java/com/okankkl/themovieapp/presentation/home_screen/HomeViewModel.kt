@@ -80,10 +80,10 @@ class HomeViewModel @Inject constructor(
         getMoviesFromRoomUseCase().onEach { result ->
             _state.value = when(result){
                 is Resources.Success -> ContentState(data = result.data)
-                is Resources.Loading -> ContentState()
+                is Resources.Loading -> ContentState(is_loading = true)
                 is Resources.Failed -> ContentState(message = result.message)
                 }
-        }.launchIn(GlobalScope)
+        }.launchIn(scope = CoroutineScope(Dispatchers.IO))
     }
     private fun addMoviesToRoom()  {
         GlobalScope.launch(Dispatchers.IO) {
@@ -104,9 +104,9 @@ class HomeViewModel @Inject constructor(
                     ContentState(data = result.data)
                 }
                 is Resources.Failed -> ContentState(message = result.message)
-                is Resources.Loading -> ContentState()
+                is Resources.Loading -> ContentState(is_loading = true)
             }
-        }.launchIn(viewModelScope).join()
+        }.launchIn(scope = CoroutineScope(Dispatchers.IO)).join()
 
         addMoviesToRoom()
         }
@@ -135,10 +135,10 @@ class HomeViewModel @Inject constructor(
         getTvSeriesFromRoomUseCase.getTvSeries().onEach { result ->
             _state.value = when(result){
                 is Resources.Success -> ContentState(data = result.data)
-                is Resources.Loading -> ContentState()
+                is Resources.Loading -> ContentState(is_loading = true)
                 is Resources.Failed -> ContentState(message = result.message)
             }
-        }.launchIn(GlobalScope)
+        }.launchIn(scope = CoroutineScope(Dispatchers.IO))
     }
     private fun addTvSeriesToRoom(){
         GlobalScope.launch(Dispatchers.IO) {
@@ -160,9 +160,9 @@ class HomeViewModel @Inject constructor(
                 _state.value = when(result){
                     is Resources.Success -> ContentState(data = result.data)
                     is Resources.Failed -> ContentState(message = result.message)
-                    is Resources.Loading -> ContentState()
+                    is Resources.Loading -> ContentState(is_loading = true)
                 }
-            }.launchIn(viewModelScope).join()
+            }.launchIn(scope = CoroutineScope(Dispatchers.IO)).join()
             addTvSeriesToRoom()
         }
     }

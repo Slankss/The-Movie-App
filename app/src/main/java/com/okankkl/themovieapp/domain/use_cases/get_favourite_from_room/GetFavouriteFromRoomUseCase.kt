@@ -1,5 +1,6 @@
 package com.okankkl.themovieapp.domain.use_cases.get_favourite_from_room
 
+import android.util.Log
 import com.okankkl.themovieapp.common.Resources
 import com.okankkl.themovieapp.domain.model.Favourite
 import com.okankkl.themovieapp.domain.repository.RoomRepository
@@ -13,10 +14,7 @@ class GetFavouriteFromRoomUseCase @Inject constructor(
     fun getFavourite(contentId : Int,displayType: String) : Flow<Resources<Boolean>> = flow {
         try {
             val favourite = roomRepository.getFavourite(contentId,displayType)
-            if(favourite == null)
-                emit(Resources.Failed(""))
-            else
-                emit(Resources.Success(data = true))
+            emit(Resources.Success(data = (favourite != null)))
         } catch (_ : Exception){
             emit(Resources.Failed(""))
         }

@@ -24,7 +24,6 @@ import androidx.navigation.NavController
 import com.okankkl.themovieapp.R
 import com.okankkl.themovieapp.presentation.DisplayType
 import com.okankkl.themovieapp.presentation.Pages
-import com.okankkl.themovieapp.presentation.components.TopMenuItem
 import com.okankkl.themovieapp.ui.theme.BacgroundTransparentColor
 
 @Composable

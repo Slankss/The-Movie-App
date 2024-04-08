@@ -1,5 +1,6 @@
 package com.okankkl.themovieapp.domain.use_cases.add_favourite_to_room
 
+import android.util.Log
 import com.okankkl.themovieapp.common.Resources
 import com.okankkl.themovieapp.domain.model.Favourite
 import com.okankkl.themovieapp.domain.repository.RoomRepository
@@ -10,13 +11,12 @@ import javax.inject.Inject
 class AddFavouriteToRoomUseCase @Inject constructor(
     private val roomRepository: RoomRepository
 ) {
-
     fun addFavourite(favourite: Favourite) : Flow<Resources<Boolean>> = flow {
         try {
             roomRepository.addFavourite(favourite)
             emit(Resources.Success(true))
-        } catch (_ : Exception){
-            emit(Resources.Failed(""))
+        } catch (e : Exception){
+            emit(Resources.Failed(e.localizedMessage ?: "Unexpected error occured!"))
         }
     }
 }

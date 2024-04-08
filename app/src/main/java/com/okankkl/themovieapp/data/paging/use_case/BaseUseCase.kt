@@ -1,4 +1,4 @@
-package com.okankkl.themovieapp.paging.use_case
+package com.okankkl.themovieapp.data.paging.use_case
 
 import com.okankkl.themovieapp.presentation.Categories
 

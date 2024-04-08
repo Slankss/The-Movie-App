@@ -18,6 +18,7 @@ import com.okankkl.themovieapp.domain.use_cases.get_similar_movies.GetSimilarMov
 import com.okankkl.themovieapp.domain.use_cases.get_similar_tv_series.GetSimilarTvSeriesUseCase
 import com.okankkl.themovieapp.domain.use_cases.get_tv_series_detail.GetTvSeriesDetailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(DelicateCoroutinesApi::class)
 @HiltViewModel
 class ContentDetailViewModel @Inject constructor(
     val getMovieDetailUseCase: GetMovieDetailUseCase,
@@ -39,7 +41,7 @@ class ContentDetailViewModel @Inject constructor(
     val getSimilarTvSeriesUseCase: GetSimilarTvSeriesUseCase,
 ) : ViewModel()
 {
-    private val _contentState = MutableStateFlow(ContentDetailState())
+    private val _contentState = MutableStateFlow(ContentDetailState(is_loading = true))
     var contentState = _contentState.asStateFlow()
 
     private val _similarContents = MutableStateFlow<List<Content>>(emptyList())
@@ -52,19 +54,19 @@ class ContentDetailViewModel @Inject constructor(
         getMovieDetailUseCase.getMovieDetail(id).onEach { result ->
             _contentState.value = when(result){
                 is Resources.Success -> ContentDetailState(data = result.data)
-                is Resources.Loading -> ContentDetailState()
+                is Resources.Loading -> ContentDetailState(is_loading = true)
                 is Resources.Failed -> ContentDetailState(message = result.message)
             }
-        }.launchIn(viewModelScope)
+        }.launchIn(scope = CoroutineScope(Dispatchers.IO))
     }
     fun getTvSeriesDetail(id : Int){
         getTvSeriesDetailUseCase.getTvSeriesDetail(id).onEach { result ->
             _contentState.value = when(result){
                 is Resources.Success -> ContentDetailState(data = result.data)
-                is Resources.Loading -> ContentDetailState()
+                is Resources.Loading -> ContentDetailState(is_loading = true)
                 is Resources.Failed -> ContentDetailState(message = result.message)
             }
-        }.launchIn(viewModelScope)
+        }.launchIn(scope = CoroutineScope(Dispatchers.IO))
     }
 
     fun getSimilarMovies(id : Int){
@@ -73,7 +75,7 @@ class ContentDetailViewModel @Inject constructor(
                 is Resources.Success -> result.data ?: emptyList()
                 else -> emptyList()
             }
-        }.launchIn(viewModelScope)
+        }.launchIn(scope = CoroutineScope(Dispatchers.IO))
     }
 
     fun getSimilarTvSeries(id : Int){
@@ -82,14 +84,13 @@ class ContentDetailViewModel @Inject constructor(
                 is Resources.Success -> result.data ?: emptyList()
                 else -> emptyList()
             }
-        }.launchIn(viewModelScope)
+        }.launchIn(scope = CoroutineScope(Dispatchers.IO))
     }
     fun getFavourite(contentId : Int,displayType: String){
         getFavouriteFromRoomUseCase.getFavourite(contentId,displayType).onEach { result ->
-            _favouriteState.value = (result.data != null || result.data == true)
-        }.launchIn(viewModelScope)
+            _favouriteState.value = result.data ?: false
+        }.launchIn(scope = CoroutineScope(Dispatchers.IO))
     }
-
     fun addFavourite(content : Content, displayType: String){
         val time = when(content){
             is Movie -> "${content.runtime} minutes"
@@ -100,14 +101,14 @@ class ContentDetailViewModel @Inject constructor(
         val favourite = Favourite(displayType,content.title,content.backdropPath ?: "",content.posterPath ?: "",
             content.id,content.releaseDate,content.voteAverage,time)
         addFavouriteToRoomUseCase.addFavourite(favourite).onEach {  result ->
-            _favouriteState.value = !(result.data == null || result.data == false)
-        }.launchIn(viewModelScope)
+            _favouriteState.value = result is Resources.Success
+        }.launchIn(scope = CoroutineScope(Dispatchers.IO))
     }
 
     fun deleteFavourite(content: Content, displayType: String){
         deleteFavouriteFromRoomUseCase.deleteFavourite(content.id,displayType).onEach { result ->
-            _favouriteState.value = (result.data != null && result.data == true)
-        }.launchIn(viewModelScope)
+            _favouriteState.value = result !is Resources.Success
+        }.launchIn(scope = CoroutineScope(Dispatchers.IO))
     }
 
 }
