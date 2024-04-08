@@ -44,7 +44,6 @@ class HomeViewModel @Inject constructor(
     private val _state = mutableStateOf(ContentState())
     val state : State<ContentState> = _state
 
-
     var movieUpdateTime : String? = null
     var tvSeriesUpdateTime : String? = null
 
@@ -87,28 +86,25 @@ class HomeViewModel @Inject constructor(
     }
     private fun addMoviesToRoom()  {
         GlobalScope.launch(Dispatchers.IO) {
-            val deleteJob = launch {
+            launch {
                 deleteContentsFromRoomUseCase.deleteContents(DisplayType.Movie)
-            }
-            deleteJob.join()
-            if(_state.value.data != null){
-                addContentsToRoomUseCase.addContents(_state.value.data!!)
-            }
+            }.join()
+            if(_state.value.data != null) addContentsToRoomUseCase.addContents(_state.value.data!!)
         }
     }
     private fun getMoviesFromAPI(){
         GlobalScope.launch {
-        getMoviesFromInternetUseCase().onEach { result ->
-            _state.value = when(result){
-                is Resources.Success -> {
-                    ContentState(data = result.data)
+            getMoviesFromInternetUseCase().onEach { result ->
+                _state.value = when(result){
+                    is Resources.Success -> {
+                        ContentState(data = result.data)
+                    }
+                    is Resources.Failed -> ContentState(message = result.message)
+                    is Resources.Loading -> ContentState(is_loading = true)
                 }
-                is Resources.Failed -> ContentState(message = result.message)
-                is Resources.Loading -> ContentState(is_loading = true)
-            }
-        }.launchIn(scope = CoroutineScope(Dispatchers.IO)).join()
+            }.launchIn(scope = CoroutineScope(Dispatchers.IO)).join()
 
-        addMoviesToRoom()
+            addMoviesToRoom()
         }
     }
     fun getTvSeries(){
@@ -142,20 +138,14 @@ class HomeViewModel @Inject constructor(
     }
     private fun addTvSeriesToRoom(){
         GlobalScope.launch(Dispatchers.IO) {
-            val deleteJob = launch {
+            launch {
                 deleteContentsFromRoomUseCase.deleteContents(DisplayType.TvSeries)
-            }
-            deleteJob.join()
-
-            if(_state.value.data != null){
-                addContentsToRoomUseCase.addContents(_state.value.data!!)
-            }
+            }.join()
+            if(_state.value.data != null) addContentsToRoomUseCase.addContents(_state.value.data!!)
         }
     }
     private fun getTvSeriesFromAPI(){
         GlobalScope.launch(Dispatchers.IO) {
-            Log.w("noluyoyo","get tv series from api geldi")
-
             getTvSeriesFromInternetUseCase.getTvSeries().onEach { result ->
                 _state.value = when(result){
                     is Resources.Success -> ContentState(data = result.data)
