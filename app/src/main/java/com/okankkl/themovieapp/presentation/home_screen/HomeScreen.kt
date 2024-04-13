@@ -56,37 +56,11 @@ fun Home(navController: NavController, contentHomeViewModel : HomeViewModel = hi
                 contentHomeViewModel.setSelectedPage(page)
             }
             if(state.data != null){
-                Column(
-                    modifier = Modifier,
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    TrendContentList(
-                        contents = state.data!!.trending,
-                        displayType = selectedPage.value.path,
-                        navController = navController,
-                        topPadding = 25.dp
-                    )
-
-                    ContentHorizontalList(
-                        contents = state.data!!.popular,
-                        displayType = selectedPage.value.path,
-                        moviesType = Categories.Popular,
-                        navController = navController
-                    )
-                    ContentHorizontalList(
-                        contents = state.data!!.now_playing,
-                        displayType = selectedPage.value.path,
-                        moviesType = if(selectedPage.value == DisplayType.Movie) Categories.NowPlaying
-                        else Categories.OnTheAir,
-                        navController = navController
-                    )
-                    ContentHorizontalList(
-                        contents = state.data!!.top_rated,
-                        displayType = selectedPage.value.path,
-                        moviesType = Categories.TopRated,
-                        navController = navController
-                    )
-                }
+               Contents(
+                   contentList = state.data!!,
+                   selectedPage = selectedPage.value,
+                   navController = navController
+               )
             }
         }
 
@@ -97,6 +71,41 @@ fun Home(navController: NavController, contentHomeViewModel : HomeViewModel = hi
             ErrorUi(errorMsg = state.message)
         }
 
+    }
+}
+
+@Composable
+fun Contents(contentList: ContentList,selectedPage : DisplayType,navController : NavController){
+    Column(
+        modifier = Modifier,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        TrendContentList(
+            contents = contentList.trending,
+            displayType = selectedPage.path,
+            navController = navController,
+            topPadding = 25.dp
+        )
+
+        ContentHorizontalList(
+            contents = contentList.popular,
+            displayType = selectedPage.path,
+            moviesType = Categories.Popular,
+            navController = navController
+        )
+        ContentHorizontalList(
+            contents = contentList.now_playing,
+            displayType = selectedPage.path,
+            moviesType = if(selectedPage == DisplayType.Movie) Categories.NowPlaying
+            else Categories.OnTheAir,
+            navController = navController
+        )
+        ContentHorizontalList(
+            contents = contentList.top_rated,
+            displayType = selectedPage.path,
+            moviesType = Categories.TopRated,
+            navController = navController
+        )
     }
 }
 

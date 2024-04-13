@@ -146,6 +146,7 @@ fun AppActivity()
         mutableStateOf(false)
     }
     val currentDestination = navController.currentBackStackEntryFlow.collectAsState(initial = navController.currentBackStackEntry)
+    val backStackEntry by navController.currentBackStackEntryAsState()
 
     val storeDate = StoreData(LocalContext.current)
     LaunchedEffect(key1 =true, block = {
@@ -371,7 +372,7 @@ fun AppActivity()
                             )
                         ) + slideIntoContainer(
                             animationSpec = tween(durationMillis, easing = EaseIn),
-                            towards = if((navController.previousBackStackEntry?.destination != null) && (navController.previousBackStackEntry?.destination!!.route == Pages.Home.route))
+                            towards = if((backStackEntry?.destination != null) && (backStackEntry?.destination!!.route == Pages.Home.route))
                                 AnimatedContentTransitionScope.SlideDirection.Start else  AnimatedContentTransitionScope.SlideDirection.End
                         )
                     },
@@ -382,7 +383,7 @@ fun AppActivity()
                             )
                         ) + slideOutOfContainer(
                             animationSpec = tween(durationMillis, easing = EaseOut),
-                            towards = if(navController.currentBackStackEntry?.destination != null && navController.currentBackStackEntry?.destination!!.route == Pages.Home.route)
+                            towards = if(backStackEntry?.destination != null && backStackEntry?.destination!!.route == Pages.Home.route)
                                 AnimatedContentTransitionScope.SlideDirection.End else  AnimatedContentTransitionScope.SlideDirection.Start
                         )
                     }
