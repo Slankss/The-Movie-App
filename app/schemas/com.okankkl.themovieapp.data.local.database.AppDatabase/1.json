@@ -2,75 +2,103 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "a715011a7e76b1a71661b8355c0d3917",
+    "identityHash": "ef4c8f1239ef26c38ff8b21dce18875a",
     "entities": [
       {
-        "tableName": "Display",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `backdropPath` TEXT DEFAULT '', `posterPath` TEXT DEFAULT '', `popularity` REAL NOT NULL, `voteAverage` REAL NOT NULL, `title` TEXT NOT NULL, `releaseDate` TEXT NOT NULL, `category` TEXT NOT NULL DEFAULT '', `mediaType` TEXT DEFAULT '', PRIMARY KEY(`id`))",
+        "tableName": "Movie",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`localId` INTEGER, `id` INTEGER, `backdropPath` TEXT, `posterPath` TEXT, `title` TEXT, `category` TEXT, PRIMARY KEY(`localId`))",
         "fields": [
+          {
+            "fieldPath": "localId",
+            "columnName": "localId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
           {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "backdropPath",
             "columnName": "backdropPath",
             "affinity": "TEXT",
-            "notNull": false,
-            "defaultValue": "''"
+            "notNull": false
           },
           {
             "fieldPath": "posterPath",
             "columnName": "posterPath",
             "affinity": "TEXT",
-            "notNull": false,
-            "defaultValue": "''"
-          },
-          {
-            "fieldPath": "popularity",
-            "columnName": "popularity",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "voteAverage",
-            "columnName": "voteAverage",
-            "affinity": "REAL",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "title",
             "columnName": "title",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "releaseDate",
-            "columnName": "releaseDate",
-            "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "category",
             "columnName": "category",
             "affinity": "TEXT",
-            "notNull": true,
-            "defaultValue": "''"
-          },
-          {
-            "fieldPath": "mediaType",
-            "columnName": "mediaType",
-            "affinity": "TEXT",
-            "notNull": false,
-            "defaultValue": "''"
+            "notNull": false
           }
         ],
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "id"
+            "localId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "TvSeries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`localId` INTEGER, `id` INTEGER, `backdropPath` TEXT, `posterPath` TEXT, `title` TEXT, `category` TEXT, PRIMARY KEY(`localId`))",
+        "fields": [
+          {
+            "fieldPath": "localId",
+            "columnName": "localId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "backdropPath",
+            "columnName": "backdropPath",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "posterPath",
+            "columnName": "posterPath",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "localId"
           ]
         },
         "indices": [],
@@ -78,61 +106,61 @@
       },
       {
         "tableName": "Favourites",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`type` TEXT NOT NULL, `title` TEXT NOT NULL, `backdropPath` TEXT NOT NULL, `posterPath` TEXT NOT NULL, `contentId` INTEGER NOT NULL, `date` TEXT NOT NULL, `imdb` REAL NOT NULL, `time` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `contentType` TEXT, `title` TEXT, `backdropPath` TEXT, `posterPath` TEXT, `contentId` INTEGER, `date` TEXT, `imdb` REAL, `time` TEXT)",
         "fields": [
           {
-            "fieldPath": "type",
-            "columnName": "type",
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "contentType",
+            "columnName": "contentType",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "title",
             "columnName": "title",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "backdropPath",
             "columnName": "backdropPath",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "posterPath",
             "columnName": "posterPath",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "contentId",
             "columnName": "contentId",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "date",
             "columnName": "date",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "imdb",
             "columnName": "imdb",
             "affinity": "REAL",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "time",
             "columnName": "time",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -148,7 +176,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a715011a7e76b1a71661b8355c0d3917')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ef4c8f1239ef26c38ff8b21dce18875a')"
     ]
   }
 }

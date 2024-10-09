@@ -17,15 +17,20 @@ val OceanPalet3 = Color(0xFF1B4965)
 val OceanPalet4 = Color(0xFFCAE9FF)
 val OceanPalet5 = Color(0xFF5FA8D3)
 
-val BackgroundColor = Color(0xFF0D1321)
-val BacgroundTransparentColor = Color(0xB30D1321)
+val BgColor = Color(0xFF0D1321)
+val BgTransparentColor = Color(0xB30D1321)
 val LightBlue = Color(0xFF4BEDF7)
 val StatusBarColor = Color(0xFF010E0F)
 
 val BottomMenuColor = Color(0xFF3E5C76)
 val ShadowColor = Color(0xffCAE9FF)
 val ShadowColor2 = Color(0xffBEE9E8)
+val ButtonBgColor = OceanPalet4
 
 val iconSelectedColor = OceanPalet4
 val IconUnselectedColor = Color(0xB3FFFFFF)
 val SpecialRed = Color(0x24FA0707)
+val PosterTransparentColor = Color(0x99000000)
+val GoogleColor = Color(0xffF2F2F2)
+val BoxBgColor = Color(0xffffffff)
+val BottomSheetBgColor = Color(0xff2b2d42)

@@ -4,20 +4,21 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.okankkl.themovieapp.domain.model.Content
-import com.okankkl.themovieapp.domain.model.Favourite
+import com.okankkl.themovieapp.data.model.entity.MovieEntity
+import com.okankkl.themovieapp.data.model.entity.TvSeriesEntity
+import com.okankkl.themovieapp.data.model.entity.Favourite
 
 @Database(
-    entities = [Content::class, Favourite::class],
+    entities = [MovieEntity::class, TvSeriesEntity::class, Favourite::class],
     version = 1
 )
 abstract class AppDatabase : RoomDatabase()
 {
-    abstract fun dao() : ContentDao
+    abstract fun dao() : LocalDb
     companion object{
         private var INSTANCE : AppDatabase? = null
         fun getDatabase(context : Context) : AppDatabase {
-            var tmpInstance = INSTANCE
+            val tmpInstance = INSTANCE
             if(tmpInstance != null){
                 return tmpInstance
             }
@@ -25,7 +26,7 @@ abstract class AppDatabase : RoomDatabase()
                 val instance = Room.databaseBuilder(
                     context,
                     AppDatabase::class.java,
-                    "cache_db"
+                    "local_db"
                 ).build()
                 INSTANCE = instance
                 return instance

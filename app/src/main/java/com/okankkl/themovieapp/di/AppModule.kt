@@ -2,18 +2,10 @@ package com.okankkl.themovieapp.di
 
 import android.content.Context
 import com.okankkl.themovieapp.data.remote.TmdbApi
-import com.okankkl.themovieapp.data.local.database.ContentDao
-import com.okankkl.themovieapp.data.local.preferences.StoreData
-import com.okankkl.themovieapp.data.paging.data_source.ContentDataSource
-import com.okankkl.themovieapp.data.paging.data_source.ContentDataSourceImp
-import com.okankkl.themovieapp.data.paging.use_case.GetMoviesUseCase
-import com.okankkl.themovieapp.data.paging.use_case.GetTvSeriesUseCase
-import com.okankkl.themovieapp.domain.repository.ApiRepository
-import com.okankkl.themovieapp.data.remote.repository.ApiRepositoryImp
+import com.okankkl.themovieapp.data.local.database.LocalDb
+import com.okankkl.themovieapp.data.local.preferences.PrefsImpl
 import com.okankkl.themovieapp.data.local.database.AppDatabase
-import com.okankkl.themovieapp.common.Constants.BASE_URL
-import com.okankkl.themovieapp.data.local.database.repository.RoomRepositoryImp
-import com.okankkl.themovieapp.domain.repository.RoomRepository
+import com.okankkl.themovieapp.utils.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,59 +30,15 @@ class AppModule
     }
     @Singleton
     @Provides
-    fun provideStoreData(@ApplicationContext appContext : Context) : StoreData {
-        return StoreData(appContext)
+    fun provideStoreData(@ApplicationContext appContext : Context) : PrefsImpl {
+        return PrefsImpl(appContext)
     }
 
     @Singleton
     @Provides
-    fun provideDao(@ApplicationContext appContext : Context) : ContentDao {
+    fun provideDao(@ApplicationContext appContext : Context) : LocalDb {
         return AppDatabase
             .getDatabase(appContext)
             .dao()
     }
-    
-    @Singleton
-    @Provides
-    fun provideMovieDataSource(
-            api: TmdbApi
-    ) : ContentDataSource
-    {
-        return ContentDataSourceImp(api)
-    }
-    
-    @Singleton
-    @Provides
-    fun provideRepository(
-        api: TmdbApi
-    ) : ApiRepository
-    {
-        return ApiRepositoryImp(api)
-    }
-    @Singleton
-    @Provides
-    fun provideRoomRepository(
-        contentDao: ContentDao
-    ) : RoomRepository {
-        return RoomRepositoryImp(contentDao)
-    }
-
-    @Singleton
-    @Provides
-    fun provideTvSeriesUseCase(
-        apiRepository: ApiRepository
-    ): GetTvSeriesUseCase
-    {
-        return GetTvSeriesUseCase(apiRepository)
-    }
-
-    @Singleton
-    @Provides
-    fun provideMovieUseCase(
-        apiRepository: ApiRepository
-    ): GetMoviesUseCase
-    {
-        return GetMoviesUseCase(apiRepository)
-    }
-
 }
