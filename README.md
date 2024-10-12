@@ -1,7 +1,6 @@
 ### This application is an application that offers film and series information from tmdb site to its users. You can see the posters of films and series in the application and you can examine the details of the content you want. You can add the content you like to your favorites and you can see this content even when you don't have internet. About the app You can also find the films that will be released.
 
 ## Structures used in the application
-* Mvmm 
 * Compose
 * Retrofit
 * Hilt
