@@ -1,19 +1,20 @@
 //import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.compose'
 }
 
 android {
     namespace 'com.okankkl.themovieapp'
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.okankkl.themovieapp"
         minSdk 27
-        targetSdk 34
+        targetSdk 36
         versionCode 3
         versionName "3.0"
 
@@ -38,9 +39,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = '17'
-    }
+
     buildFeatures {
         compose true
     }
@@ -55,24 +54,18 @@ android {
 }
 
 dependencies {
-    def nav_version = "2.7.5"
-    def hilt_version = "2.49"
-    def room_version = "2.6.1"
+    def nav_version = "2.9.2"
+    def hilt_version = "2.57"
+    def room_version = "2.7.2"
 
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
-    implementation 'androidx.activity:activity-compose:1.8.2'
-    implementation platform('androidx.compose:compose-bom:2023.03.00')
+    implementation 'androidx.core:core-ktx:1.16.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.2'
+    implementation 'androidx.activity:activity-compose:1.10.1'
+    implementation platform('androidx.compose:compose-bom:2025.07.00')
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.ui:ui-graphics'
     implementation 'androidx.compose.ui:ui-tooling-preview'
-    //implementation 'androidx.compose.material3:material3'
-    implementation 'androidx.compose.material3:material3-android:1.3.0'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation platform('androidx.compose:compose-bom:2023.03.00')
-    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
+    implementation 'androidx.compose.material3:material3-android:1.3.2'
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 
@@ -80,7 +73,7 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$hilt_version"
     annotationProcessor "com.google.dagger:hilt-compiler:$hilt_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
-    implementation 'androidx.hilt:hilt-navigation-compose:1.1.0'
+    implementation 'androidx.hilt:hilt-navigation-compose:1.2.0'
 
     // For instrumentation tests
     androidTestImplementation  "com.google.dagger:hilt-android-testing:$hilt_version"
@@ -98,45 +91,47 @@ dependencies {
 
     // Unit Test
     testImplementation "junit:junit:4.13.2"
-    testImplementation "com.google.truth:truth:1.1.4"
+    testImplementation "com.google.truth:truth:1.4.4"
 
     // ViewModel
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2"
 
     // Navigation
     implementation "androidx.navigation:navigation-compose:$nav_version"
-    implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
+    implementation "androidx.constraintlayout:constraintlayout-compose:1.1.1"
 
     // Youtube
-    implementation "com.pierfrancescosoffritti.androidyoutubeplayer:chromecast-sender:0.28"
+    implementation "com.pierfrancescosoffritti.androidyoutubeplayer:chromecast-sender:0.31"
 
     
-    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0'
 
     // Retrofit
-    implementation "com.squareup.retrofit2:retrofit:2.11.0"
+    implementation "com.squareup.retrofit2:retrofit:3.0.0"
 
-    implementation "com.google.code.gson:gson:2.10.1"
-    implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
+    implementation "com.google.code.gson:gson:2.13.1"
+    implementation 'com.squareup.retrofit2:converter-gson:3.0.0'
 
     // Data Store
-    implementation "androidx.datastore:datastore-preferences:1.1.1"
+    implementation "androidx.datastore:datastore-preferences:1.1.7"
 
     // Coil
-    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")
 
     //
-    def pagingVersion = "3.3.0-alpha02"
-    implementation "androidx.paging:paging-runtime:$pagingVersion"
+    def pagingVersion = "3.3.6"
+    implementation "androidx.paging:paging-runtime-ktx:$pagingVersion"
     implementation "androidx.paging:paging-compose:$pagingVersion"
 
     // Bottom Navigation
-    implementation "androidx.compose.material:material:1.7.2"
+    implementation "androidx.compose.material:material:1.8.3"
 
     // Lottie
-    def lottieVersion = "4.0.0"
-    implementation("com.airbnb.android:lottie-compose:4.0.0")
+    implementation("com.airbnb.android:lottie-compose:6.6.7")
 
     // Swipe
-    implementation "me.saket.swipe:swipe:1.2.0"
+    implementation "me.saket.swipe:swipe:1.3.0"
+
+    // Splash
+    implementation "androidx.core:core-splashscreen:1.0.1"
 }
