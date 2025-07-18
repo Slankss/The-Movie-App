@@ -2,17 +2,13 @@ package com.okankkl.themovieapp.presentation.navigation
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.okankkl.themovieapp.SessionViewModel
-import com.okankkl.themovieapp.utils.Constants.ARG_CATEGORY
-import com.okankkl.themovieapp.utils.Constants.ARG_CONTENT_DETAIL_ID
-import com.okankkl.themovieapp.utils.Constants.ARG_CONTENT_TYPE
 import com.okankkl.themovieapp.presentation.Screen
+import com.okankkl.themovieapp.presentation.screens.YoutubePlayerScreen
 import com.okankkl.themovieapp.presentation.screens.content_detail.ContentDetailScreen
 import com.okankkl.themovieapp.presentation.screens.favourite.FavouritesScreen
 import com.okankkl.themovieapp.presentation.screens.home.HomeScreen
@@ -20,7 +16,10 @@ import com.okankkl.themovieapp.presentation.screens.news.NewsMoviesScreen
 import com.okankkl.themovieapp.presentation.screens.search.SearchPage
 import com.okankkl.themovieapp.presentation.screens.splash.SplashScreen
 import com.okankkl.themovieapp.presentation.screens.view_all.ViewAllScreen
-import kotlinx.coroutines.launch
+import com.okankkl.themovieapp.utils.Constants.ARG_CATEGORY
+import com.okankkl.themovieapp.utils.Constants.ARG_CONTENT_DETAIL_ID
+import com.okankkl.themovieapp.utils.Constants.ARG_CONTENT_TYPE
+import com.okankkl.themovieapp.utils.Constants.ARG_VIDEO_KEY
 
 @Composable
 fun BaseNavigation(
@@ -28,7 +27,6 @@ fun BaseNavigation(
     showMessage: (String) -> Unit,
     sessionViewModel: SessionViewModel
 ) {
-
     NavHost(
         navController = navController,
         startDestination = Screen.Splash.route,
@@ -82,9 +80,11 @@ fun BaseNavigation(
                 ContentDetailScreen(
                     contentId = backStackEntry.arguments?.getInt(ARG_CONTENT_DETAIL_ID),
                     contentType = backStackEntry.arguments?.getString(ARG_CONTENT_TYPE),
-                    sessionViewModel = sessionViewModel,
                     navigateToContentDetail = { contentId, contentType ->
                         navController.navigate("content_detail/$contentId&$contentType")
+                    },
+                    navigateToYoutubePlayer = { videoKey ->
+                        navController.navigate(Screen.YoutubePlayer.withArgs(videoKey))
                     }
                 )
             }
@@ -150,6 +150,23 @@ fun BaseNavigation(
                 NewsMoviesScreen(
                     navigateToContentDetail = { contentId, contentType ->
                         navController.navigate("content_detail/$contentId&$contentType")
+                    }
+                )
+            }
+        }
+
+        Screen.YoutubePlayer.apply {
+            composable(
+                route = route,
+                enterTransition = { enterAnimation},
+                exitTransition = { exitAnimation},
+                arguments = args
+            ) { backStackEntry ->
+                YoutubePlayerScreen(
+                    videoKey = backStackEntry.arguments?.getString(ARG_VIDEO_KEY),
+                    sessionViewModel = sessionViewModel,
+                    navigateToBack = {
+                        navController.popBackStack()
                     }
                 )
             }

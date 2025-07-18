@@ -54,6 +54,7 @@ class MainActivity : ComponentActivity() {
 fun TheMovieApp() {
 
     val sessionViewModel : SessionViewModel = hiltViewModel()
+    val menuVisibility = sessionViewModel.viewState.collectAsState().value.menuVisibility
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
     val snackBarHost = remember { SnackbarHostState() }
@@ -67,7 +68,7 @@ fun TheMovieApp() {
         },
         bottomBar = {
             currentDestination.value?.destination?.let { destination ->
-                if (destination.route != Screen.Splash.route) {
+                if (destination.route != Screen.Splash.route && menuVisibility) {
                     BottomMenuNavigation(navController)
                 }
             }

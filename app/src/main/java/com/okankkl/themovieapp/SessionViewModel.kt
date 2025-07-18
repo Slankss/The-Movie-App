@@ -23,9 +23,18 @@ class SessionViewModel @Inject constructor(
         }
     }
 
+    fun changeMenuVisibility(state: Boolean) {
+        _viewState.update {
+            it.copy(
+                menuVisibility = state
+            )
+        }
+    }
+
 }
 data class SessionState(
     val errorMessage: String? = null,
     val showPosterDialog: Boolean = false,
-    val currentPosterPath: String? = null
+    val currentPosterPath: String? = null,
+    val menuVisibility: Boolean = true,
 )

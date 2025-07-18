@@ -2,20 +2,17 @@ package com.okankkl.themovieapp.presentation.screens.content_detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.okankkl.themovieapp.utils.ContentType
-import com.okankkl.themovieapp.utils.Resources
-import com.okankkl.themovieapp.data.mapper.toContent
 import com.okankkl.themovieapp.data.mapper.toContentDetail
 import com.okankkl.themovieapp.data.mapper.toFavourite
 import com.okankkl.themovieapp.data.model.dto.Person
 import com.okankkl.themovieapp.data.model.dto.Review
-import com.okankkl.themovieapp.data.model.entity.Favourite
-import com.okankkl.themovieapp.domain.model.Content
 import com.okankkl.themovieapp.domain.model.ContentDetail
 import com.okankkl.themovieapp.domain.repository.FavouritesRepository
 import com.okankkl.themovieapp.domain.repository.MoviesRepository
 import com.okankkl.themovieapp.domain.repository.PersonRepository
 import com.okankkl.themovieapp.domain.repository.TvSeriesRepository
+import com.okankkl.themovieapp.utils.ContentType
+import com.okankkl.themovieapp.utils.Resources
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -213,22 +210,6 @@ class ContentDetailViewModel @Inject constructor(
         }
     }
 
-    fun changeVideoDialogState(state: Boolean) {
-        _viewState.update {
-            it.copy(
-                showVideoDialog = state
-            )
-        }
-    }
-
-    fun setCurrentVideoKey(key: String?) {
-        _viewState.update {
-            it.copy(
-                currentVideoKey = key
-            )
-        }
-    }
-
     fun getPersonDetail(id: Int) {
         if (viewState.value.personDetail?.id == id){
             changePersonDetailBottomSheetState(true)
@@ -272,9 +253,6 @@ data class ContentDetailState(
     val errorMessage: String? = null,
     val showVideosBottomSheet: Boolean = false,
     val showReviewsBottomSheet: Boolean = false,
-    val showVideoDialog: Boolean = false,
-    val currentVideoKey: String? = null,
-    val currentVideoSecond: Int? = null,
     val reviewsState: ReviewsState = ReviewsState(),
     val personDetail: Person? = null,
     val showPersonDetailBottomSheet: Boolean = false,

@@ -1,6 +1,5 @@
 package com.okankkl.themovieapp.presentation
 
-import android.graphics.drawable.Icon
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.navigation.NamedNavArgument
@@ -12,7 +11,9 @@ import androidx.navigation.NavType
 import com.okankkl.themovieapp.utils.Constants.ARG_CATEGORY
 import com.okankkl.themovieapp.utils.Constants.ARG_CONTENT_DETAIL_ID
 import com.okankkl.themovieapp.utils.Constants.ARG_CONTENT_TYPE
+import com.okankkl.themovieapp.utils.Constants.ARG_VIDEO_KEY
 import com.okankkl.themovieapp.utils.Constants.FAVOURITES_ROUTE
+import com.okankkl.themovieapp.utils.Constants.YOUTUBE_PLAYER_ROUTE
 import com.okankkl.themovieapp.utils.Constants.HOME_ROUTE
 import com.okankkl.themovieapp.utils.Constants.NEW_MOVIES_ROUTE
 import com.okankkl.themovieapp.utils.Constants.SEARCH_ROUTE
@@ -76,7 +77,29 @@ enum class Screen(
         title = "Search",
         enterAnimation = AnimationUtils.enterAnimLeftToRight(),
         exitAnimation = AnimationUtils.exitAnimRightToLeft()
-    )
+    ),
+
+    YoutubePlayer(
+        route = YOUTUBE_PLAYER_ROUTE,
+        title = "Youtube Player",
+        args = listOf(
+          navArgument(ARG_VIDEO_KEY) { type = NavType.StringType }
+        ),
+        enterAnimation = AnimationUtils.enterAnimLeftToRight(),
+        exitAnimation = AnimationUtils.exitAnimRightToLeft()
+    );
+
+    fun withArgs(vararg args : String): String{
+        var route = this.route
+        // content_detail/$contentId&$contentType
+        // content_detail/{video_key}
+        args.forEach{ arg ->
+            route = route
+                .replaceFirst("{", arg)
+                .replaceAfter(arg,"")
+        }
+        return route
+    }
 }
 
 enum class MenuItem(
@@ -98,23 +121,5 @@ enum class MenuItem(
         screen = Screen.Favourites,
         selectedIcon = R.drawable.ic_fav_selected,
         unSelectedIcon = R.drawable.ic_fav_unselected
-    )
-}
-
-enum class ContentDetailMenuItem(
-    val title: String,
-    val icon: Int
-){
-    Detail(
-        title = "Detail",
-        icon = R.drawable.ic_share
-    ),
-    Trailers(
-        title = "Trailers",
-        icon = R.drawable.ic_search
-    ),
-    Reviews(
-        title = "Reviews",
-        icon = R.drawable.ic_share
     )
 }

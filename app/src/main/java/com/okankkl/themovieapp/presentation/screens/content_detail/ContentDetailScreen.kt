@@ -11,13 +11,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.okankkl.themovieapp.SessionViewModel
-import com.okankkl.themovieapp.data.model.dto.Images
-import com.okankkl.themovieapp.presentation.components.Loading
 import com.okankkl.themovieapp.presentation.components.Error
+import com.okankkl.themovieapp.presentation.components.Loading
 import com.okankkl.themovieapp.presentation.screens.content_detail.bottom_sheet.PersonDetailBottomSheet
 import com.okankkl.themovieapp.presentation.screens.content_detail.bottom_sheet.ReviewsBottomSheet
-import com.okankkl.themovieapp.presentation.screens.content_detail.dialog.VideoDialog
 import com.okankkl.themovieapp.presentation.screens.content_detail.bottom_sheet.VideosBottomSheet
 import com.okankkl.themovieapp.presentation.screens.content_detail.dialog.ImageDialog
 import com.okankkl.themovieapp.utils.ContentType
@@ -28,7 +25,7 @@ fun ContentDetailScreen(
     contentId: Int?,
     contentType: String?,
     navigateToContentDetail: (Int?, String?) -> Unit,
-    sessionViewModel: SessionViewModel
+    navigateToYoutubePlayer: (String) -> Unit
 ) {
     val contentDetailViewModel: ContentDetailViewModel = hiltViewModel()
     val viewState = contentDetailViewModel.viewState.collectAsState().value
@@ -108,8 +105,7 @@ fun ContentDetailScreen(
                 VideosBottomSheet(
                     videos = contentDetail.videos,
                     onClick = { videoKey ->
-                        contentDetailViewModel.changeVideoDialogState(true)
-                        contentDetailViewModel.setCurrentVideoKey(videoKey)
+                        navigateToYoutubePlayer(videoKey)
                     },
                     onDismissClick = {
                         contentDetailViewModel.changeVideosBottomSheetState(false)
@@ -131,15 +127,6 @@ fun ContentDetailScreen(
                     },
                     onDismissClick = {
                         contentDetailViewModel.changeCommentsBottomSheetState(false)
-                    }
-                )
-            }
-
-            if (showVideoDialog && currentVideoKey != null) {
-                VideoDialog(
-                    videoKey = currentVideoKey,
-                    dismissClick = {
-                        contentDetailViewModel.changeVideoDialogState(false)
                     }
                 )
             }
