@@ -10,9 +10,10 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,7 +46,8 @@ fun PersonDetailBottomSheet(
                 item {
                     ContentPoster(
                         modifier = modifier,
-                        posterPath = it
+                        posterPath = it,
+                        contentScale = ContentScale.FillHeight
                     )
                 }
             }
@@ -64,7 +66,7 @@ fun PersonDetailBottomSheet(
             }
 
             item{
-                Row(){
+                Row{
                     Text(
                         text = DateUtils.formatDateString(person.birthday),
                         style = MaterialTheme.typography.labelLarge.copy(
