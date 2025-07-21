@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+/bundle_key
+/certificate
+/app/release

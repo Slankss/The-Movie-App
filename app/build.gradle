@@ -15,8 +15,8 @@ android {
         applicationId "com.okankkl.themovieapp"
         minSdk 27
         targetSdk 36
-        versionCode 3
-        versionName "3.0"
+        versionCode 4
+        versionName "4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -29,9 +29,19 @@ android {
         }
     }
 
+    signingConfigs {
+        release {
+            storeFile file("../${app_keystore_file}")
+            storePassword app_keystore_password
+            keyAlias app_key_alias
+            keyPassword app_key_password
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
